@@ -3,6 +3,11 @@ package com.example.basketballsupervisor.db;
 import android.content.Context;
 import android.provider.BaseColumns;
 
+/**
+ * 球队表
+ * @author Administrator
+ *
+ */
 public class GroupDb extends BaseDb {
 	
 	public GroupDb(Context context) {

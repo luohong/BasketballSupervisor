@@ -3,6 +3,11 @@ package com.example.basketballsupervisor.db;
 import android.content.Context;
 import android.provider.BaseColumns;
 
+/**
+ * 球员发生动作行为表（包括投篮二分不中等）
+ * @author Administrator
+ *
+ */
 public class ActionDb extends BaseDb {
 	
 	public ActionDb(Context context) {
