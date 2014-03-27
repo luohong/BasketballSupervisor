@@ -1,6 +1,20 @@
 package com.example.basketballsupervisor.db;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import so.contacts.hub.db.Exception;
+import so.contacts.hub.db.String;
+
+import com.example.basketballsupervisor.config.Config;
+import com.example.basketballsupervisor.db.GameDb.Table;
+import com.example.basketballsupervisor.model.Game;
+import com.example.basketballsupervisor.model.Group;
+import com.google.gson.reflect.TypeToken;
+
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.provider.BaseColumns;
 
 /**
@@ -9,6 +23,20 @@ import android.provider.BaseColumns;
  *
  */
 public class GroupDb extends BaseDb {
+	
+	public static class Table implements BaseColumns {
+
+		public static final String TABLE_NAME = "tb_group";
+
+		public static final String GAME_ID = "g_id";
+		
+		public static final String NAME = "name"; 
+		public static final String SLOGAN = "slogan"; 
+
+		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
+
+		public static final String[] PROJECTION = { _ID, GAME_ID, NAME, SLOGAN };
+	}
 	
 	public GroupDb(Context context) {
 		super(context);
@@ -32,24 +60,77 @@ public class GroupDb extends BaseDb {
 
 		return sb.toString();
 	}
-	
-	public static class Table implements BaseColumns {
-
-		public static final String TABLE_NAME = "tb_group";
-
-		public static final String GAME_ID = "g_id";
-		
-		public static final String NAME = "name"; 
-		public static final String SLOGAN = "slogan"; 
-
-		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
-
-		public static final String[] PROJECTION = { _ID, GAME_ID, NAME, SLOGAN };
-	}
 
 	@Override
 	protected String getDropTableSQL() {
 		return DROP_TABLE_PREFIX + Table.TABLE_NAME;
+	}
+
+	@Override
+	protected Object parseCursor(Cursor cursor) {
+		Group group = new Group();
+		
+		group.gruopId = cursor.getLong(cursor.getColumnIndexOrThrow(Table._ID));
+		group.Slogan = cursor.getString(cursor.getColumnIndexOrThrow(Table.SLOGAN));
+		group.groupName = cursor.getString(cursor.getColumnIndexOrThrow(Table.NAME));
+		
+		return group;
+	}
+
+	public List<Group> getGameGroups(long gId) {
+		List<Group> groupList = new ArrayList<Group>();
+		
+        String selection = String.format(" %s = 0 ", Table.GAME_ID);
+        String[] selectionArgs = new String[] { String.valueOf(gId) };
+
+        Cursor cursor = null;
+        try {
+        	checkDb();
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table.DEFAULT_SORT_ORDER + " limit 1");
+            while (cursor != null && cursor.moveToNext()) {
+                Group group = (Group) parseCursor(cursor);
+                groupList.add(group);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return groupList;
+	}
+	
+	public void saveAll(List<Group> groupList, Game game) {
+		checkDb();
+		beginTransaction();
+		try {
+			if (groupList != null && groupList.size() > 0) {
+				clearAllData();
+				for (Group group : groupList) {
+					insert(group, game);
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			endTransaction();
+		}
+	}
+
+	public void insert(Group group, Game game) {
+		if (group != null && game != null) {
+			checkDb();
+			
+			ContentValues values = new ContentValues();
+			values.put(Table._ID, group.gruopId);
+			values.put(Table.GAME_ID, game.gId);
+			values.put(Table.NAME, group.groupName);
+			values.put(Table.SLOGAN, group.Slogan);
+			
+			db.insert(Table.TABLE_NAME, null, values);
+		}
 	}
 
 }

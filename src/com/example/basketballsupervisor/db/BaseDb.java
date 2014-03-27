@@ -79,7 +79,7 @@ public abstract class BaseDb {
 		}
 	}
 
-	protected boolean isHasData() {
+	public boolean isHasData() {
 		checkDb();
 		String sql = "select * from " + getTableName() + " limit 1";
 		cursor = db.rawQuery(sql, null);
@@ -95,4 +95,6 @@ public abstract class BaseDb {
     protected abstract String getCreateTableSQL();
     
     protected abstract String getDropTableSQL();
+    
+    protected abstract Object parseCursor(Cursor cursor);
 }
