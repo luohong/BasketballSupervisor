@@ -50,7 +50,7 @@
          android:background="@color/login_btn"/>
      
      <TextView 
-         android:id="@+id/btn_commit"
+         android:id="@+id/btn_forget_password"
          android:layout_width="match_parent"
          android:layout_height="@dimen/edittext_height"
          android:layout_marginLeft="10dp"
