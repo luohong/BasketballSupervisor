@@ -12,6 +12,14 @@ public class DbHelper extends SQLiteOpenHelper {
 	private static final int DATABASE_VERSION = 1;
 
 	private static DbHelper mDbHelper;
+	
+	private GameDb gameDb;
+	private GroupDb groupDb;
+	private MemberDb memberDb;
+	private GameTimeDb gameTimeDb;
+	private PlayingTimeDb playingTimeDb;
+	private ActionDb actionDb;
+	private RecordDb recordDb;
 
 	public static DbHelper getInstance(Context context) {
 		if (mDbHelper == null) {
@@ -22,6 +30,14 @@ public class DbHelper extends SQLiteOpenHelper {
 
 	private DbHelper(Context context) {
 		super(context, DB_NAME, null, DATABASE_VERSION);
+		
+		gameDb = new GameDb(context);
+		groupDb = new GroupDb(context);
+		memberDb = new MemberDb(context);
+		gameTimeDb = new GameTimeDb(context);
+		playingTimeDb = new PlayingTimeDb(context);
+		actionDb = new ActionDb(context);
+		recordDb = new RecordDb(context);
 	}
 
 	@Override
@@ -33,26 +49,61 @@ public class DbHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		Log.i(getTag(), "onUpgrade");
-//		db.execSQL("DROP TABLE IF EXISTS " + CityDb.TABLE_NAME);
-//		db.execSQL("DROP TABLE IF EXISTS " + SaleEvaluateDb.TABLE_NAME);
-//		db.execSQL("DROP TABLE IF EXISTS " + QueryCacheDB.TABLE_NAME);
-//		db.execSQL("DROP TABLE IF EXISTS " + RegionInfoDB.TABLE_NAME);
-//		db.execSQL("DROP TABLE IF EXISTS " + SearChRecordDB.TABLE_NAME);
-//		db.execSQL("DROP TABLE IF EXISTS " + AgentDb.TABLE_NAME);
+		db.execSQL(gameDb.getDropTableSQL());
+		db.execSQL(groupDb.getDropTableSQL());
+		db.execSQL(memberDb.getDropTableSQL());
+		db.execSQL(gameTimeDb.getDropTableSQL());
+		db.execSQL(playingTimeDb.getDropTableSQL());
+		db.execSQL(actionDb.getDropTableSQL());
+		db.execSQL(recordDb.getDropTableSQL());
+		
 		createTable(db);
 	}
 
 	private void createTable(SQLiteDatabase db) {
-//		db.execSQL(CityDb.CREATE_TABLE);
-//		db.execSQL(SaleEvaluateDb.CREATE_TABLE);
-//		db.execSQL(QueryCacheDB.CREATE_TABLE);
-//		db.execSQL(RegionInfoDB.CREATE_TABLE);
-//		db.execSQL(SearChRecordDB.CREATE_TABLE);
-//		db.execSQL(AgentDb.CREATE_TABLE);
+		db.execSQL(gameDb.getCreateTableSQL());
+		db.execSQL(groupDb.getCreateTableSQL());
+		db.execSQL(memberDb.getCreateTableSQL());
+		db.execSQL(gameTimeDb.getCreateTableSQL());
+		db.execSQL(playingTimeDb.getCreateTableSQL());
+		db.execSQL(actionDb.getCreateTableSQL());
+		db.execSQL(recordDb.getCreateTableSQL());
 	}
 
 	private String getTag() {
 		return this.getClass().toString();
 	}
 
+	public static DbHelper getmDbHelper() {
+		return mDbHelper;
+	}
+
+	public GameDb getGameDb() {
+		return gameDb;
+	}
+
+	public GroupDb getGroupDb() {
+		return groupDb;
+	}
+
+	public MemberDb getMemberDb() {
+		return memberDb;
+	}
+
+	public GameTimeDb getGameTimeDb() {
+		return gameTimeDb;
+	}
+
+	public PlayingTimeDb getPlayingTimeDb() {
+		return playingTimeDb;
+	}
+
+	public ActionDb getActionDb() {
+		return actionDb;
+	}
+
+	public RecordDb getRecordDb() {
+		return recordDb;
+	}
+	
 }

@@ -23,7 +23,7 @@ import android.text.TextUtils;
 import com.android.framework.core.widget.ProgressDialog;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.config.http.IgnitedHttpResponse;
-import com.example.basketballsupervisor.model.User;
+import com.example.basketballsupervisor.db.DbHelper;
 import com.example.basketballsupervisor.util.SystemUtil;
 import com.google.gson.Gson;
 
@@ -60,6 +60,10 @@ public class Config extends Library {
 			mHttp = new Http(Instance().getApplication());
 		}
 		return mHttp;
+	}
+	
+	public static DbHelper getDbHelper() {
+		return DbHelper.getInstance(mContext);
 	}
 
 	/**
