@@ -18,7 +18,7 @@
     <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
-    <application
+    <com.example.basketballsupervisor.IApplication
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
@@ -36,6 +36,6 @@
             android:name="com.example.basketballsupervisor.MainActivity"
             android:label="@string/app_name" >
         </activity>
-    </application>
+    </com.example.basketballsupervisor.IApplication>
 
 </manifest>
