@@ -43,6 +43,8 @@ public abstract class BaseActivity extends FragmentActivity {
 
 	protected Toast mLongToast = null;
 
+	protected Dialog progressDialog;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -305,9 +307,6 @@ public abstract class BaseActivity extends FragmentActivity {
 	public void showToast(String message) {
 		showToastLong(message);
 	}
-
-	// jiang add
-	protected Dialog progressDialog;
 
 	protected Activity getActivity() {
 		return this;

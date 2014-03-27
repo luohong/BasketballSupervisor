@@ -101,6 +101,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	}
 	
 	private void requestLogin() {
+		String username = getUsername();
+		String password = getPassword();
 		
 	}
 
