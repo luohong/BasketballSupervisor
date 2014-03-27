@@ -12,6 +12,7 @@ import android.util.Log;
 import com.android.framework.core.util.Md5Util;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.config.Config;
+import com.example.basketballsupervisor.util.SpUtil;
 import com.example.basketballsupervisor.util.SystemUtil;
 
 public abstract class BaseRequest<T extends BaseResponse> {
@@ -26,7 +27,7 @@ public abstract class BaseRequest<T extends BaseResponse> {
 		Context context = Config.getContext();
 		
 		action_code = actionCode;
-		token = Config.getUser().token;
+		token = SpUtil.getInstance(context).getUser().token;
 		timestamp = System.currentTimeMillis();
 		version = new VersionInfo(SystemUtil.getAppVersion(context) + "", null, null);
 		secret_key = Md5Util.MD5Encode(actionCode + version.app_version + timestamp

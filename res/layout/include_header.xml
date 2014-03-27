@@ -51,6 +51,7 @@
         android:textColor="@color/include_header_title"
         android:textSize="@dimen/include_header_text_size"
         android:visibility="visible"
-        android:layout_alignParentRight="true" />
+        android:layout_alignParentRight="true"
+        android:drawablePadding="5dp" />
 
 </RelativeLayout>

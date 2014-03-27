@@ -1,5 +1,6 @@
 package com.example.basketballsupervisor.activity.common;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,6 +12,13 @@ import android.widget.TextView;
 
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.activity.BaseActivity;
+import com.example.basketballsupervisor.activity.MainActivity;
+import com.example.basketballsupervisor.config.Config;
+import com.example.basketballsupervisor.config.Config.CallBack;
+import com.example.basketballsupervisor.http.TotalLoginRequest;
+import com.example.basketballsupervisor.http.TotalLoginResponse;
+import com.example.basketballsupervisor.model.User;
+import com.example.basketballsupervisor.util.SpUtil;
 
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
@@ -19,7 +27,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private Button btnCommit;
 	private EditText etUsername;
 	private EditText etPassword;
-	private Button btnForgetPassword;
+	private TextView btnForgetPassword;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +47,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		etUsername = (EditText) findViewById(R.id.et_username);
 		etPassword = (EditText) findViewById(R.id.et_password);
 		btnCommit = (Button) findViewById(R.id.btn_commit);
-		btnForgetPassword = (Button) findViewById(R.id.btn_forget_password);
+		btnForgetPassword = (TextView) findViewById(R.id.btn_forget_password);
 	}
 
 	@Override
@@ -75,7 +83,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		
 		boolean check = false;
 		if (TextUtils.isEmpty(username)) {
-			showToast("请填写注册的手机号码");
+			showToast("请输入手机号码");
 		} else if (username.contains(" ")) {
 			showToast("手机号码不能包含空格");
 		} else if (username.length() != 11) {
@@ -92,8 +100,20 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	}
 	
 	private boolean checkPassword() {
-		String username = getUsername();
-		return !TextUtils.isEmpty(username);
+		String password = getPassword();
+		
+		boolean check = false;
+		if (TextUtils.isEmpty(password)) {
+			showToast("请输入密码");
+		} else if (password.contains(" ")) {
+			showToast("密码不能包含空格");
+		} else if (password.length() < 6 || password.length() > 30) {
+			showToast("密码由6~30位字母，数字和下划线组成");
+		} else {
+			check = true;
+		}
+		
+		return check;
 	}
 	
 	public String getPassword() {
@@ -104,6 +124,49 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		String username = getUsername();
 		String password = getPassword();
 		
+		final TotalLoginRequest request = new TotalLoginRequest(username, password);
+		Config.asynPost(this, "正在登录", request.getData(), new CallBack() {
+			
+			@Override
+			public void onSuccess(String o) {
+				TotalLoginResponse response = request.getObject(o);
+				if (response != null) {
+					if (response.isSuccess()) {
+						showToastShort("登录成功");
+						
+						SpUtil sp = SpUtil.getInstance(getActivity());
+						User user = sp.getUser();
+						user.token = response.token;
+						sp.setUser(user);
+						
+						gotoMain();
+					} else {
+						onFail(response.error_remark);
+					}
+				} else {
+					onFail(null);
+				}
+			}
+			
+			@Override
+			public void onFinish(Object obj) {
+			}
+			
+			@Override
+			public void onFail(String msg) {
+				if (TextUtils.isEmpty(msg)) {
+					msg = "用户名或密码错误";
+				}
+				showToastShort(msg);
+			}
+		});
+	}
+
+	protected void gotoMain() {
+		Intent intent = new Intent(this, MainActivity.class);
+		startActivity(intent);
+		
+		finish();
 	}
 
 }

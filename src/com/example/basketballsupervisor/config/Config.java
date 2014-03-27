@@ -54,10 +54,6 @@ public class Config extends Library {
 		return mContext;
 	}
 
-	public static User getUser() {
-		return null;
-	}
-
 	// 取得http对象
 	public static Http getApiHttp() {
 		if (mHttp == null) {

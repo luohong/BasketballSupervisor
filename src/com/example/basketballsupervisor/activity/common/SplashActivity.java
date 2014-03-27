@@ -10,8 +10,8 @@ import android.view.animation.Animation.AnimationListener;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.activity.BaseActivity;
 import com.example.basketballsupervisor.activity.MainActivity;
-import com.example.basketballsupervisor.config.Config;
 import com.example.basketballsupervisor.model.User;
+import com.example.basketballsupervisor.util.SpUtil;
 
 public class SplashActivity extends BaseActivity {
 
@@ -63,9 +63,9 @@ public class SplashActivity extends BaseActivity {
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				User user = Config.getUser();
+				User user = SpUtil.getInstance(getActivity()).getUser();
 				Intent intent = null;
-				if (user != null) {
+				if (user != null && user.isLogin()) {
 					intent = new Intent(SplashActivity.this, MainActivity.class);
 				} else {
 					intent = new Intent(SplashActivity.this, LoginActivity.class);
