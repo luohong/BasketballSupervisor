@@ -1,6 +1,7 @@
 package com.example.basketballsupervisor.db;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.provider.BaseColumns;
 
 /**
@@ -9,6 +10,21 @@ import android.provider.BaseColumns;
  *
  */
 public class ActionDb extends BaseDb {
+	
+	public static class Table implements BaseColumns {
+
+		public static final String TABLE_NAME = "tb_action";
+
+		public static final String NEXT_ACTION_ID = "next_action_id";
+		
+		public static final String NAME = "name"; 
+		public static final String SCORE = "score"; 
+		public static final String CANCELABLE = "cancelable"; 
+
+		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
+
+		public static final String[] PROJECTION = { _ID, NEXT_ACTION_ID, NAME, SCORE };
+	}
 	
 	public ActionDb(Context context) {
 		super(context);
@@ -33,25 +49,15 @@ public class ActionDb extends BaseDb {
 
 		return sb.toString();
 	}
-	
-	public static class Table implements BaseColumns {
-
-		public static final String TABLE_NAME = "tb_action";
-
-		public static final String NEXT_ACTION_ID = "next_action_id";
-		
-		public static final String NAME = "name"; 
-		public static final String SCORE = "score"; 
-		public static final String CANCELABLE = "cancelable"; 
-
-		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
-
-		public static final String[] PROJECTION = { _ID, NEXT_ACTION_ID, NAME, SCORE };
-	}
 
 	@Override
 	protected String getDropTableSQL() {
 		return DROP_TABLE_PREFIX + Table.TABLE_NAME;
+	}
+
+	@Override
+	protected Object parseCursor(Cursor cursor) {
+		return null;
 	}
 
 }

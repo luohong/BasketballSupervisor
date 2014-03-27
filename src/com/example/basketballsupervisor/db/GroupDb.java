@@ -3,19 +3,13 @@ package com.example.basketballsupervisor.db;
 import java.util.ArrayList;
 import java.util.List;
 
-import so.contacts.hub.db.Exception;
-import so.contacts.hub.db.String;
-
-import com.example.basketballsupervisor.config.Config;
-import com.example.basketballsupervisor.db.GameDb.Table;
-import com.example.basketballsupervisor.model.Game;
-import com.example.basketballsupervisor.model.Group;
-import com.google.gson.reflect.TypeToken;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+
+import com.example.basketballsupervisor.model.Game;
+import com.example.basketballsupervisor.model.Group;
 
 /**
  * 球队表

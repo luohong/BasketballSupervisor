@@ -1,6 +1,7 @@
 package com.example.basketballsupervisor.db;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.provider.BaseColumns;
 
 /**
@@ -9,6 +10,22 @@ import android.provider.BaseColumns;
  *
  */
 public class PlayingTimeDb extends BaseDb {
+	
+	public static class Table implements BaseColumns {
+
+		public static final String TABLE_NAME = "tb_playing_time";
+
+		public static final String GAME_ID = "g_id";
+		public static final String GROUP_ID = "t_id"; 
+		public static final String MEMBER_ID = "m_id"; 
+		
+		public static final String START_TIME = "start_time"; 
+		public static final String END_TIME = "end_time"; 
+
+		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
+
+		public static final String[] PROJECTION = { _ID, GAME_ID, GROUP_ID, MEMBER_ID, START_TIME, END_TIME };
+	}
 	
 	public PlayingTimeDb(Context context) {
 		super(context);
@@ -34,26 +51,15 @@ public class PlayingTimeDb extends BaseDb {
 
 		return sb.toString();
 	}
-	
-	public static class Table implements BaseColumns {
-
-		public static final String TABLE_NAME = "tb_playing_time";
-
-		public static final String GAME_ID = "g_id";
-		public static final String GROUP_ID = "t_id"; 
-		public static final String MEMBER_ID = "m_id"; 
-		
-		public static final String START_TIME = "start_time"; 
-		public static final String END_TIME = "end_time"; 
-
-		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
-
-		public static final String[] PROJECTION = { _ID, GAME_ID, GROUP_ID, MEMBER_ID, START_TIME, END_TIME };
-	}
 
 	@Override
 	protected String getDropTableSQL() {
 		return DROP_TABLE_PREFIX + Table.TABLE_NAME;
+	}
+
+	@Override
+	protected Object parseCursor(Cursor cursor) {
+		return null;
 	}
 
 }
