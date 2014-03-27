@@ -50,7 +50,7 @@ public class GameDb extends BaseDb {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(CREATE_TABLE_PREFIX).append(Table.TABLE_NAME).append(BRACKET_LEFT);
-		sb.append(Table._ID).append(COLUMN_TYPE.LONG).append(PRIMARY_KEY_AUTOINCREMENT).append(COMMA);
+		sb.append(Table._ID).append(COLUMN_TYPE.LONG).append(PRIMARY_KEY).append(COMMA);
 		sb.append(Table.PLATFORM_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.NAME).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.REMARK).append(COLUMN_TYPE.TEXT).append(COMMA);

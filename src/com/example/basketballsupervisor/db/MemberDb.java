@@ -8,7 +8,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
-import com.example.basketballsupervisor.db.GroupDb.Table;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
@@ -50,7 +49,7 @@ public class MemberDb extends BaseDb {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(CREATE_TABLE_PREFIX).append(Table.TABLE_NAME).append(BRACKET_LEFT);
-		sb.append(Table._ID).append(COLUMN_TYPE.LONG).append(PRIMARY_KEY_AUTOINCREMENT).append(COMMA);
+		sb.append(Table._ID).append(COLUMN_TYPE.LONG).append(PRIMARY_KEY).append(COMMA);
 		sb.append(Table.GAME_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.GROUP_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.NAME).append(COLUMN_TYPE.TEXT).append(COMMA);

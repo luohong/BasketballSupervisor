@@ -40,7 +40,7 @@ public class PlayingTimeDb extends BaseDb {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(CREATE_TABLE_PREFIX).append(Table.TABLE_NAME).append(BRACKET_LEFT);
-		sb.append(Table._ID).append(COLUMN_TYPE.LONG).append(PRIMARY_KEY_AUTOINCREMENT).append(COMMA);
+		sb.append(Table._ID).append(COLUMN_TYPE.INTEGER).append(PRIMARY_KEY_AUTOINCREMENT).append(COMMA);
 		sb.append(Table.GAME_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.GROUP_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.MEMBER_ID).append(COLUMN_TYPE.LONG).append(COMMA);
