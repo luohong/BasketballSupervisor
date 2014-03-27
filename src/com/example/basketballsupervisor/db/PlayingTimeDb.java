@@ -36,8 +36,7 @@ public class PlayingTimeDb extends BaseDb {
 		return Table.TABLE_NAME;
 	}
 
-	@Override
-	protected String getCreateTableSQL() {
+	protected static String getCreateTableSQL() {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(CREATE_TABLE_PREFIX).append(Table.TABLE_NAME).append(BRACKET_LEFT);
@@ -52,8 +51,7 @@ public class PlayingTimeDb extends BaseDb {
 		return sb.toString();
 	}
 
-	@Override
-	protected String getDropTableSQL() {
+	protected static String getDropTableSQL() {
 		return DROP_TABLE_PREFIX + Table.TABLE_NAME;
 	}
 

@@ -16,16 +16,14 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Toast;
 
-import com.android.framework.core.cache.ACache;
 import com.android.framework.core.image.ImageFetcher;
 import com.android.framework.core.image.ImageFetcherFactory;
-import com.example.basketballsupervisor.IApplication;
 import com.example.basketballsupervisor.R;
 import com.umeng.analytics.MobclickAgent;
 
 public abstract class BaseActivity extends FragmentActivity {
 
-	public ACache mACache;
+//	public ACache mACache;
 
 	public ImageFetcher mImageFetcher;
 
@@ -53,8 +51,8 @@ public abstract class BaseActivity extends FragmentActivity {
 
 		mImageFetcher = ImageFetcherFactory.getImageFetcher(this);
 
-		IApplication app = (IApplication) this.getApplication();
-		mACache = app.getACache();
+//		IApplication app = (IApplication) this.getApplication();
+//		mACache = app.getACache();
 	}
 
 	@Override

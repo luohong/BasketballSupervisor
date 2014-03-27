@@ -56,7 +56,7 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void loadDataInBackground() {
-		GameDb gameDb = Config.getDbHelper().getGameDb();
+		GameDb gameDb = new GameDb(this);
 		if (gameDb.isHasData()) {
 			loadLocalData();
 		} else {
@@ -65,19 +65,19 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void loadLocalData() {
-		GameDb gameDb = Config.getDbHelper().getGameDb();
+		GameDb gameDb = new GameDb(this);
 		List<Game> gameList = gameDb.getAll();
 		if (gameList != null && gameList.size() > 0) {
 			mGame = gameList.get(0);
 			
 			if (mGame != null) {
-				GroupDb groupDb = Config.getDbHelper().getGroupDb();
+				GroupDb groupDb = new GroupDb(this);
 				List<Group> groupList = groupDb.getGameGroups(mGame.gId);
 				
 				mGame.groupList = groupList;
 				
 				if (groupList != null && groupList.size() >= 2) {
-					MemberDb memberDb = Config.getDbHelper().getMemberDb();
+					MemberDb memberDb = new MemberDb(this);
 					
 					mThisGroup = groupList.get(0);
 					if (mThisGroup != null) {
@@ -154,11 +154,11 @@ public class MainActivity extends BaseActivity {
 	}
 
 	private void saveGameData(List<Game> gameList) {
-		GameDb gameDb = Config.getDbHelper().getGameDb();
+		GameDb gameDb = new GameDb(this);
 		gameDb.saveAll(gameList);
 
-		GroupDb groupDb = Config.getDbHelper().getGroupDb();
-		MemberDb memberDb = Config.getDbHelper().getMemberDb();
+		GroupDb groupDb = new GroupDb(this);
+		MemberDb memberDb = new MemberDb(this);
 		for (Game game : gameList) {
 			if (game != null) {
 				List<Group> groupList = game.groupList;

@@ -92,9 +92,13 @@ public abstract class BaseDb {
 
     protected abstract String getTableName();
     
-    protected abstract String getCreateTableSQL();
+    protected static String getCreateTableSQL() {
+    	return null;
+    }
     
-    protected abstract String getDropTableSQL();
+    protected static String getDropTableSQL() {
+    	return null;
+    }
     
     protected abstract Object parseCursor(Cursor cursor);
 }

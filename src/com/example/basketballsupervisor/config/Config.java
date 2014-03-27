@@ -62,10 +62,6 @@ public class Config extends Library {
 		return mHttp;
 	}
 	
-	public static DbHelper getDbHelper() {
-		return DbHelper.getInstance(mContext);
-	}
-
 	/**
 	 * 主要用于解决 跟服务器交互获取好友时JSON串被截断的问题 HttpURLConnection post方式请求服务器
 	 * 
