@@ -1,10 +1,8 @@
 package com.example.basketballsupervisor.activity.common;
 
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
-import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
@@ -12,6 +10,8 @@ import android.view.animation.Animation.AnimationListener;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.activity.BaseActivity;
 import com.example.basketballsupervisor.activity.MainActivity;
+import com.example.basketballsupervisor.config.Config;
+import com.example.basketballsupervisor.model.User;
 
 public class SplashActivity extends BaseActivity {
 
@@ -20,8 +20,6 @@ public class SplashActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		setContentView(R.layout.activity_splash);
 
 		startSplash();
@@ -65,9 +63,15 @@ public class SplashActivity extends BaseActivity {
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
-				Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-		        startActivity(intent);
-		        
+				User user = Config.getUser();
+				Intent intent = null;
+				if (user != null) {
+					intent = new Intent(SplashActivity.this, MainActivity.class);
+				} else {
+					intent = new Intent(SplashActivity.this, LoginActivity.class);
+				}
+				startActivity(intent);
+				
 		        finish();
 			}
 		});
