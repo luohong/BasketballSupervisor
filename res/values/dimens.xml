@@ -11,5 +11,12 @@
     <dimen name="edittext_height">40dp</dimen>
     
     <dimen name="text_input">16sp</dimen>
+    
+    <dimen name="group_name">16sp</dimen>
+    <dimen name="group_score">20sp</dimen>
+    
+    <dimen name="game_half">12sp</dimen>
+    
+    <dimen name="operate_btn">40dp</dimen>
 
 </resources>
