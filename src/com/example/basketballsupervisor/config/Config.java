@@ -31,7 +31,7 @@ public class Config extends Library {
 
 	public static final String SERVER = "http://42.121.236.56:8099/PT_SERVER/interface.s";
 
-	public static final String KEY = "233&*Adc^%$$per";
+	public static final String KEY = "yes_bb";
 	public static long HEART_BEAT_DELAY = 1 * 60 * 1000; // 心跳周期
 	public static Gson mGson = new Gson();
 
