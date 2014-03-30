@@ -131,10 +131,10 @@ public class Config extends Library {
 		if (context != null) {
 			try {
 				tDialog = new ProgressDialog(context);
+				tDialog.show();
 				tDialog.setMessage(msg);
 				tDialog.setCancelable(true);
 				tDialog.setCanceledOnTouchOutside(false);
-				tDialog.show();
 			} catch (Exception e) {
 			}
 		}
