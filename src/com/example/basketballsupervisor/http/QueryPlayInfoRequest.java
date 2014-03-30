@@ -7,7 +7,7 @@ public class QueryPlayInfoRequest extends BaseRequest<QueryPlayInfoResponse> {
 	public int isAll;//[int][not null][0:未读，1:全部]
 	
 	public QueryPlayInfoRequest(int isAll) {
-		super("40002");
+		super("400002");
 		this.isAll = isAll;
 	}
 

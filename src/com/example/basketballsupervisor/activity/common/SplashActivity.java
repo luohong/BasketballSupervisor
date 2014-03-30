@@ -65,11 +65,11 @@ public class SplashActivity extends BaseActivity {
 			public void onAnimationEnd(Animation animation) {
 				User user = SpUtil.getInstance(getActivity()).getUser();
 				Intent intent = null;
-//				if (user != null && user.isLogin()) {
+				if (user != null && user.isLogin()) {
 					intent = new Intent(SplashActivity.this, MainActivity.class);
-//				} else {
-//					intent = new Intent(SplashActivity.this, LoginActivity.class);
-//				}
+				} else {
+					intent = new Intent(SplashActivity.this, LoginActivity.class);
+				}
 				startActivity(intent);
 				
 		        finish();

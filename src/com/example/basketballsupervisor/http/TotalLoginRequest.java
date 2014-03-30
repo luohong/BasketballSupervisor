@@ -8,7 +8,7 @@ public class TotalLoginRequest extends BaseRequest<TotalLoginResponse> {
 	public String pass_word;// [String][not null][密码]
 	
 	public TotalLoginRequest(String username, String password) {
-		super("40001");
+		super("400001");
 		this.username = username;
 		this.pass_word = password;
 	}

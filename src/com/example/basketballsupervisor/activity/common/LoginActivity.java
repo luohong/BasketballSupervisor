@@ -52,10 +52,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	@Override
 	public void onInitViewData() {
 		tvTitle.setText("登录");
-		btnRegister.setText("注册");
-		btnRegister.setVisibility(View.VISIBLE);
-		Drawable rightArrow = getResources().getDrawable(R.drawable.ic_right_arrow);
-		btnRegister.setCompoundDrawablesWithIntrinsicBounds(null, null, rightArrow, null);
+//		btnRegister.setText("注册");
+		btnRegister.setVisibility(View.GONE);
+//		Drawable rightArrow = getResources().getDrawable(R.drawable.ic_right_arrow);
+//		btnRegister.setCompoundDrawablesWithIntrinsicBounds(null, null, rightArrow, null);
 	}
 
 	@Override
@@ -82,11 +82,11 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		
 		boolean check = false;
 		if (TextUtils.isEmpty(username)) {
-			showToast("请输入手机号码");
+			showToast("请输入用户名");
 		} else if (username.contains(" ")) {
-			showToast("手机号码不能包含空格");
-		} else if (username.length() != 11) {
-			showToast("手机号码长度不对");
+			showToast("用户名不能包含空格");
+//		} else if (username.length() != 11) {
+//			showToast("手机号码长度不对");
 		} else {
 			check = true;
 		}

@@ -17,11 +17,11 @@
          android:layout_marginRight="10dp"
          android:layout_marginTop="10dp"
          android:background="@drawable/bg_input"
-         android:hint="请输入手机号码"
+         android:hint="请输入用户名"
          android:textColorHint="@color/login_hint"
          android:textColor="@color/login_input"
          android:textSize="@dimen/text_input"
-         android:inputType="number"/>
+         android:inputType="textEmailAddress"/>
      
      <EditText 
          android:id="@+id/et_password"
@@ -58,6 +58,7 @@
          android:layout_marginTop="10dp"
          android:gravity="center"
          android:textColor="@color/login_forget_password"
-         android:text="找回密码"/>
+         android:text="找回密码"
+         android:visibility="gone"/>
 
 </LinearLayout>

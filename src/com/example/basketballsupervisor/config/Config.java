@@ -23,7 +23,6 @@ import android.text.TextUtils;
 import com.android.framework.core.widget.ProgressDialog;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.config.http.IgnitedHttpResponse;
-import com.example.basketballsupervisor.db.DbHelper;
 import com.example.basketballsupervisor.util.SystemUtil;
 import com.google.gson.Gson;
 
@@ -31,7 +30,7 @@ public class Config extends Library {
 
 	private static final String TAG = Config.class.getSimpleName();
 
-	public static final String SERVER = "http://android1.putao.so/PT_SERVER/interface.s";
+	public static final String SERVER = "http://42.121.236.56:8099/PT_SERVER/interface.s";
 	public static final String ACTION_HTTP_REQUEST = "so.putao.community.httprequest";
 
 	public static final String PREFERENCES = "preferences";
@@ -135,6 +134,7 @@ public class Config extends Library {
 				tDialog.setMessage(msg);
 				tDialog.setCancelable(true);
 				tDialog.setCanceledOnTouchOutside(false);
+				tDialog.show();
 			} catch (Exception e) {
 			}
 		}
