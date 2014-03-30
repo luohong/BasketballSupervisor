@@ -31,10 +31,7 @@ public class Config extends Library {
 	private static final String TAG = Config.class.getSimpleName();
 
 	public static final String SERVER = "http://42.121.236.56:8099/PT_SERVER/interface.s";
-	public static final String ACTION_HTTP_REQUEST = "so.putao.community.httprequest";
 
-	public static final String PREFERENCES = "preferences";
-	public static final String APP_PREFERENCES = "app_preferences";
 	public static final String KEY = "233&*Adc^%$$per";
 	public static long HEART_BEAT_DELAY = 1 * 60 * 1000; // 心跳周期
 	public static Gson mGson = new Gson();
