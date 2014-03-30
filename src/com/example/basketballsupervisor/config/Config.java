@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.concurrent.ExecutorService;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.HttpEntity;
@@ -38,8 +37,6 @@ public class Config extends Library {
 
 	public static Context mContext;
 	private static Http mHttp;
-
-	private static ExecutorService mExecutorService;
 
 	public Config(Application application) {
 		super(application);

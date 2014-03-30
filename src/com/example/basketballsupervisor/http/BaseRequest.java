@@ -9,7 +9,6 @@ import org.apache.http.protocol.HTTP;
 import android.content.Context;
 import android.util.Log;
 
-import com.android.framework.core.util.Md5Util;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.config.Config;
 import com.example.basketballsupervisor.util.SpUtil;
@@ -20,6 +19,7 @@ public abstract class BaseRequest<T extends BaseResponse> {
 	public String action_code;// [string][not null][指令码]
 	public String token;// [string][null able][用户令牌,云端生成]
 	public long timestamp;// [long][not null][时间戳：毫秒数]
+	public UaInfo ua;// [UaInfo][null able][Ua系统]
 	public VersionInfo version;// [VersionInfo][not null][版本结构]
 	public String secret_key;// [string][not null][交互密钥]
 
@@ -29,8 +29,9 @@ public abstract class BaseRequest<T extends BaseResponse> {
 		action_code = actionCode;
 		token = SpUtil.getInstance(context).getUser().token;
 		timestamp = System.currentTimeMillis();
+		ua = new UaInfo();
 		version = new VersionInfo(SystemUtil.getAppVersion(context) + "", null, null);
-		secret_key = Md5Util.MD5Encode(actionCode + version.app_version + timestamp
+		secret_key = Md5Util.md5(actionCode + version.app_version + timestamp
 				+ Config.KEY);
 	}
 
