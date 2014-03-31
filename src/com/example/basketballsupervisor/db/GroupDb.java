@@ -62,7 +62,7 @@ public class GroupDb extends BaseDb {
 	protected Object parseCursor(Cursor cursor) {
 		Group group = new Group();
 		
-		group.gruopId = cursor.getLong(cursor.getColumnIndexOrThrow(Table._ID));
+		group.groupId = cursor.getLong(cursor.getColumnIndexOrThrow(Table._ID));
 		group.Slogan = cursor.getString(cursor.getColumnIndexOrThrow(Table.SLOGAN));
 		group.groupName = cursor.getString(cursor.getColumnIndexOrThrow(Table.NAME));
 		
@@ -116,7 +116,7 @@ public class GroupDb extends BaseDb {
 			checkDb();
 			
 			ContentValues values = new ContentValues();
-			values.put(Table._ID, group.gruopId);
+			values.put(Table._ID, group.groupId);
 			values.put(Table.GAME_ID, game.gId);
 			values.put(Table.NAME, group.groupName);
 			values.put(Table.SLOGAN, group.Slogan);

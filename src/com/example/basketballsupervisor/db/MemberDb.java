@@ -126,7 +126,7 @@ public class MemberDb extends BaseDb {
 			
 			ContentValues values = new ContentValues();
 			values.put(Table._ID, member.memberId);
-			values.put(Table.GROUP_ID, group.gruopId);
+			values.put(Table.GROUP_ID, group.groupId);
 			values.put(Table.GAME_ID, game.gId);
 			values.put(Table.NAME, member.name);
 			values.put(Table.NUMBER, member.number);

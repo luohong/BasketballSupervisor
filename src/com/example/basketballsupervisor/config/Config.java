@@ -130,6 +130,7 @@ public class Config extends Library {
 				tDialog.setCancelable(true);
 				tDialog.setCanceledOnTouchOutside(false);
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 		final ProgressDialog dialog = tDialog;
@@ -172,7 +173,7 @@ public class Config extends Library {
 					handler.sendMessage(msg);
 				} catch (IOException e) {
 					Message msg = handler.obtainMessage(2);
-					msg.obj = "Read stram error.";
+					msg.obj = "Read stream error.";
 					handler.sendMessage(msg);
 				}
 			}

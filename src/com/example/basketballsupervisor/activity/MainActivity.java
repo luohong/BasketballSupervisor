@@ -46,7 +46,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		setContentView(R.layout.activity_main);
 		
 		loadDataInBackground();
@@ -148,13 +147,13 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 					
 					mGroupA = groupList.get(0);
 					if (mGroupA != null) {
-						mGroupAMemberList = memberDb.getGroupMembers(mGroupA.gruopId);
+						mGroupAMemberList = memberDb.getGroupMembers(mGroupA.groupId);
 						mGroupA.memberList = mGroupAMemberList;
 					}
 					
 					mGroupB = groupList.get(1);
 					if (mGroupB != null) {
-						mGroupBMemberList = memberDb.getGroupMembers(mGroupB.gruopId);
+						mGroupBMemberList = memberDb.getGroupMembers(mGroupB.groupId);
 						mGroupA.memberList = mGroupBMemberList;
 					}
 				}
