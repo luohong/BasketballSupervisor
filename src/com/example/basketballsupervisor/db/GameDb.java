@@ -55,7 +55,7 @@ public class GameDb extends BaseDb {
 		sb.append(Table.NAME).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.REMARK).append(COLUMN_TYPE.TEXT).append(COMMA);
 //		sb.append(Table.GROUP_LIST).append(COLUMN_TYPE.TEXT).append(COMMA);
-		sb.append(Table.ROLE).append(COLUMN_TYPE.INTEGER);
+		sb.append(Table.ROLE).append(COLUMN_TYPE.TEXT);
 		sb.append(Table.TIME).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.LOCATION).append(COLUMN_TYPE.TEXT);
 		sb.append(BRACKET_RIGHT);
