@@ -8,6 +8,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.framework.core.widget.ConfirmDialog;
@@ -41,7 +42,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	private ImageView mIvSubstitueLeft, mIvSubstitueRight;
 	private ImageView mIvPauseLeft, mIvPauseRight;
 	private ImageView mIvInfoLeft, mIvInfoRight;
-	private ImageView mIvUpload;
+	private LinearLayout mLlUpload;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		mIvInfoLeft = (ImageView) findViewById(R.id.iv_info_left);
 		mIvInfoRight = (ImageView) findViewById(R.id.iv_info_right);
 		
-		mIvUpload = (ImageView) findViewById(R.id.iv_upload);
+		mLlUpload = (LinearLayout) findViewById(R.id.ll_upload);
 	}
 
 	@Override
@@ -118,7 +119,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		mIvInfoLeft.setOnClickListener(this);
 		mIvInfoRight.setOnClickListener(this);
 		
-		mIvUpload.setOnClickListener(this);
+		mLlUpload.setOnClickListener(this);
 	}
 
 	private void loadDataInBackground() {
@@ -264,7 +265,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		case R.id.iv_info_right:
 			
 			break;
-		case R.id.iv_upload:
+		case R.id.ll_upload:
 			uploadGameData();
 			break;
 		}
