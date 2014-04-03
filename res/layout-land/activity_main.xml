@@ -1,0 +1,300 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity" 
+    android:background="@color/black">
+    
+    <!-- android:background="@drawable/bg_board" -->
+	
+    <LinearLayout
+        android:id="@+id/ll_menu_left"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="40dp"
+        android:gravity="center_horizontal|top"
+        android:orientation="vertical" 
+        android:background="@drawable/bgti"
+        android:paddingTop="25dp"
+        android:paddingBottom="5dp">
+        
+        <!-- android:layout_below="@+id/ll_game_info" -->
+
+        <ImageView
+            android:id="@+id/iv_substitute_left"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_06" />
+
+        <ImageView
+            android:id="@+id/iv_pause_left"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_13" />
+
+        <ImageView
+            android:id="@+id/iv_info_left"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_20" />
+    </LinearLayout>
+    
+    <FrameLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="40dp"
+        android:layout_toLeftOf="@+id/ll_menu_right"
+        android:layout_toRightOf="@+id/ll_menu_left" 
+        android:background="@drawable/bg_basketball_repeat"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp">
+        
+        <!-- android:layout_below="@+id/ll_game_info" -->
+        
+	    <GridView
+	        android:id="@+id/gv_court"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent" 
+	        android:numColumns="50">
+	        
+	    </GridView>
+        
+        <LinearLayout 
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+            
+            <ImageView 
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/basketball_left"
+                android:scaleType="fitStart"/>
+            
+            <ImageView 
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:src="@drawable/basketball_middle"
+                android:scaleType="fitCenter"/>
+            
+            <ImageView 
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:src="@drawable/basketball_right"
+                android:scaleType="fitEnd"/>
+            
+        </LinearLayout>
+    
+    </FrameLayout>
+    
+    <LinearLayout
+        android:id="@+id/ll_menu_right"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="40dp"
+        android:gravity="center_horizontal|top"
+        android:orientation="vertical" 
+        android:background="@drawable/bgti"
+        android:paddingTop="25dp"
+        android:paddingBottom="5dp">
+        
+        <!-- android:layout_alignTop="@+id/ll_menu_left" -->
+
+        <ImageView
+            android:id="@+id/iv_substitute_right"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_06" />
+
+        <ImageView
+            android:id="@+id/iv_pause_right"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_13" />
+
+        <ImageView
+            android:id="@+id/iv_info_right"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:scaleType="centerInside"
+            android:src="@drawable/btn_20" />
+        
+        <LinearLayout 
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_upload_normal"
+            android:orientation="vertical"
+            android:gravity="center">
+
+	        <ImageView
+	            android:id="@+id/iv_upload"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:scaleType="centerInside"
+	            android:src="@drawable/earth" 
+	            android:gravity="center"
+	            android:layout_gravity="center"/>
+	        
+	        <TextView 
+	            android:layout_width="20dp"
+	            android:layout_height="wrap_content"
+	            android:text="上传"
+	            android:textSize="@dimen/text_input"
+	            android:textStyle="bold"
+	            android:gravity="center"
+	            android:layout_gravity="center"
+	            android:paddingRight="1dp"/>
+        
+        </LinearLayout>
+
+    </LinearLayout>
+    
+    <LinearLayout 
+        android:id="@+id/ll_game_info"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="@drawable/topbanner_hui">
+        
+        <LinearLayout 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+           	android:layout_weight="1">
+        
+	        <TextView 
+	            android:id="@+id/tv_group_a_name"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:text="上海泰迪熊队"
+	            android:textSize="@dimen/group_name"
+	            android:textColor="@color/white"
+	            android:layout_weight="1"
+	            android:gravity="center"
+	            android:ellipsize="end"
+	            android:singleLine="true"
+	            android:paddingLeft="10dp"/>
+	        
+	        <TextView 
+	            android:id="@+id/tv_group_a_score"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="90"
+	            android:textSize="@dimen/group_score"
+	            android:textStyle="bold"
+	            android:textColor="@color/white"
+	            android:layout_weight="0"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:layout_marginLeft="10dp"
+	            android:layout_marginRight="10dp"/>
+        
+        </LinearLayout>
+        
+        <LinearLayout 
+            android:id="@+id/ll_game_info"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentTop="true"
+	        android:orientation="vertical"
+	        android:gravity="center_horizontal"
+            android:layout_weight="0"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/topbanner_red">
+            
+            <TextView 
+	            android:id="@+id/tv_game_time"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:text="12:09 | 24"
+	            android:textSize="@dimen/group_name"
+	            android:textColor="@color/white"
+	            android:layout_weight="0"
+	            android:gravity="center"
+            	android:singleLine="true"/>
+            
+            <LinearLayout 
+                android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:orientation="horizontal"
+        		android:gravity="center_vertical">
+                
+	            <TextView 
+		            android:id="@+id/tv_game_first_half"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="上半场"
+		            android:textSize="@dimen/game_half"
+		            android:textColor="@color/white"
+		            android:layout_weight="0"
+	            	android:singleLine="true"/>
+	            
+	            <TextView 
+		            android:id="@+id/tv_game_second_half"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:text="下半场"
+		            android:textSize="@dimen/game_half"
+		            android:textColor="@color/white"
+		            android:layout_weight="0"
+	            	android:singleLine="true"
+	            	android:layout_marginLeft="5dp"/>
+            
+            </LinearLayout>
+            
+        </LinearLayout>
+        
+        <LinearLayout 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+           	android:layout_weight="1">
+        
+		    <TextView 
+		        android:id="@+id/tv_group_b_score"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="78"
+		        android:textSize="@dimen/group_score"
+		        android:textStyle="bold"
+		        android:textColor="@color/white"
+		        android:layout_weight="0"
+		        android:gravity="center"
+		        android:padding="5dp"
+		        android:singleLine="true"
+		        android:layout_marginLeft="10dp"
+		        android:layout_marginRight="10dp"/>
+		    
+		    <TextView 
+		        android:id="@+id/tv_group_b_name"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:text="辽宁大个子队"
+		        android:layout_weight="1"
+		        android:gravity="center"
+		        android:textSize="@dimen/group_name"
+		        android:textColor="@color/white"
+		        android:ellipsize="end"
+		        android:singleLine="true"
+		        android:paddingRight="10dp"/>
+        
+        </LinearLayout>
+        
+    </LinearLayout>
+
+</RelativeLayout>
