@@ -263,7 +263,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_weight="0"
-        android:background="@drawable/topbanner_red"
+        android:background="@drawable/btn_topbanner"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         android:paddingBottom="5dp"
