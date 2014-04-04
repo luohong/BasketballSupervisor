@@ -72,7 +72,7 @@ public class GroupDb extends BaseDb {
 	public List<Group> getGameGroups(long gId) {
 		List<Group> groupList = new ArrayList<Group>();
 		
-        String selection = String.format(" %s = 0 ", Table.GAME_ID);
+        String selection = String.format(" %s = ? ", Table.GAME_ID);
         String[] selectionArgs = new String[] { String.valueOf(gId) };
 
         Cursor cursor = null;
