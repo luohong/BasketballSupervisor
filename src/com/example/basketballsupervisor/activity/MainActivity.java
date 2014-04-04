@@ -43,6 +43,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	private ImageView mIvPauseLeft, mIvPauseRight;
 	private ImageView mIvInfoLeft, mIvInfoRight;
 	private LinearLayout mLlUpload;
+	
+	private boolean pausing = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -259,7 +261,11 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			break;
 		case R.id.iv_pause_left:
 		case R.id.iv_pause_right:
-			pauseGame();
+			if (!pausing) {
+				pauseGame();
+			} else {
+				continueGame();
+			}
 			break;
 		case R.id.iv_info_left:
 		case R.id.iv_info_right:
@@ -270,7 +276,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			break;
 		}
 	}
-	
+
 	private void substitute() {
 		// 换人
 		
@@ -309,10 +315,21 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 			
 			@Override
 			public void onClick(View arg0) {
+				pausing = true;
 				
+				mIvPauseLeft.setImageResource(R.drawable.btn_continue);
+				mIvPauseRight.setImageResource(R.drawable.btn_continue);
 			}
 		});
 		dialog.show();
+	}
+	
+	private void continueGame() {
+		// 继续比赛
+		
+		pausing = false;
+		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
+		mIvPauseRight.setImageResource(R.drawable.btn_pause);
 	}
 
 	private void uploadGameData() {
