@@ -159,23 +159,6 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 					mGroupB = groupList.get(1);
 					if (mGroupB != null) {
 						mGroupBMemberList = memberDb.getGroupMembers(mGroupB.groupId);		
-						
-						// TODO only for test
-						if (mGroupBMemberList == null || mGroupBMemberList.size() == 0) {
-							mGroupBMemberList = new ArrayList<Member>();
-
-							String[] names = new String[]{"张三", "李四", "王五", "黄阁", "王伟"};
-							String[] pos = new String[]{"中锋", "前锋", "后卫", "大前锋", "中卫"};
-							
-							for (int i = 0; i < 5; i++) {
-								Member member = new Member();
-								member.isLeader = i == 0 ? 1 : 0;
-								member.memberId = i + 1;
-								member.name = names[i];
-								member.site = pos[i];
-							}
-						}
-						
 						mGroupB.memberList = mGroupBMemberList;
 					}
 				}
