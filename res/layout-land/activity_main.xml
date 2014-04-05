@@ -86,8 +86,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
-                android:scaleType="center"
-                android:src="@drawable/basketball_middle" />
+                android:src="@drawable/basketball_middle" 
+                android:scaleType="center"/>
 
             <ImageView
                 android:layout_width="wrap_content"

@@ -107,7 +107,6 @@ public class MemberDb extends BaseDb {
 		beginTransaction();
 		try {
 			if (memberList != null && memberList.size() > 0) {
-				clearAllData();
 				for (Member member : memberList) {
 					insert(member, group, game);
 				}

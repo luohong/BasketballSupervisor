@@ -24,6 +24,7 @@ import com.example.basketballsupervisor.http.QueryPlayInfoResponse;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
+import com.example.basketballsupervisor.widget.PlayerEventDialog;
 
 public class MainActivity extends BaseActivity implements OnClickListener {
 
@@ -256,6 +257,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 				if (groupList != null && groupList.size() > 0) {
 					groupDb.saveAll(groupList, game);
 					
+					memberDb.clearAllData();
 					for (Group group : groupList) {
 						if (group != null) {
 							List<Member> memberList = group.memberList;
@@ -311,6 +313,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		// 显示换人面板
 		
 		// 左边场上球员playerInTheGame，右边整队球员groupMembers
+		PlayerEventDialog dialog = new PlayerEventDialog(this);
 		
 		// 1.选择首发球员
 		// 2.开始比赛的按钮

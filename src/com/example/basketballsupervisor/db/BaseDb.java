@@ -66,7 +66,7 @@ public abstract class BaseDb {
 		 */
 	}
 
-	protected void clearAllData() {
+	public void clearAllData() {
 		try {
 			checkDb();
 			String sql = "delete from " + getTableName() + ";";
