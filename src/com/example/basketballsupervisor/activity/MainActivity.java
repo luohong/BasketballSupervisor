@@ -3,7 +3,6 @@ package com.example.basketballsupervisor.activity;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -25,6 +24,7 @@ import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
 import com.example.basketballsupervisor.widget.PlayerEventDialog;
+import com.example.basketballsupervisor.widget.SelectPlayersDialog;
 
 public class MainActivity extends BaseActivity implements OnClickListener {
 
@@ -35,10 +35,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	private Game mGame;
 	private Group mGroupA;
 	private Group mGroupB;
+	
+	private List<Member> mPlayingMemberList;
 	private List<Member> mGroupAMemberList;
 	private List<Member> mGroupBMemberList;
 	
-	private TextView mTvGameTime, mTvGameFirstHalf, mTvGameSecondHalf;
+	private TextView mTvGameStart, mTvGameTime, mTvGameFirstHalf, mTvGameSecondHalf;
 	private TextView mTvGroupAName, mTvGroupBName;
 	private TextView mTvGroupAScore, mTvGroupBScore;
 	private ImageView mIvSubstitueLeft, mIvSubstitueRight;
@@ -46,6 +48,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	private ImageView mIvInfoLeft, mIvInfoRight;
 	private LinearLayout mLlUpload;
 	
+	private boolean running = false;
 	private boolean pausing = false;
 
 	@Override
@@ -58,11 +61,12 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
 	@Override
 	public void onInit() {
-		
+		mPlayingMemberList = new ArrayList<Member>();
 	}
 
 	@Override
 	public void onFindViews() {
+		mTvGameStart = (TextView) findViewById(R.id.tv_game_start);
 		mTvGameTime = (TextView) findViewById(R.id.tv_game_time);
 		mTvGameFirstHalf = (TextView) findViewById(R.id.tv_game_first_half);
 		mTvGameSecondHalf = (TextView) findViewById(R.id.tv_game_second_half);
@@ -114,6 +118,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
 	@Override
 	public void onBindListener() {
+		mTvGameStart.setOnClickListener(this);
+		
 		mIvSubstitueLeft.setOnClickListener(this);
 		mIvSubstitueRight.setOnClickListener(this);
 		
@@ -258,6 +264,9 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	@Override
 	public void onClick(View view) {
 		switch (view.getId()) {
+		case R.id.tv_game_start:
+			startGame();
+			break;
 		case R.id.iv_substitute_left:
 		case R.id.iv_substitute_right:
 			substitute();
@@ -280,26 +289,42 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		}
 	}
 
+	private void startGame() {
+		// 开始比赛
+		
+		// 选择首发球员
+		selectStartPlayers();
+	}
+
+	private void selectStartPlayers() {
+		// 选择首发球员
+		
+		SelectPlayersDialog dialog = new SelectPlayersDialog(this);
+		dialog.show();
+		dialog.fillGroupData(mGroupA, mGroupB);
+		dialog.fillPlayersData(mPlayingMemberList, mGroupBMemberList);
+	}
+
 	private void substitute() {
 		// 换人
 		
 		// 判断当前比赛状态是否允许换人
 		boolean allowSubstitute = true;
 		if (allowSubstitute) {
-			showSubstitutePanel();
+			showSubstituteDialog();
 		} else {
 			showToastLong("不允许换人");
 		}
 	}
 
-	private void showSubstitutePanel() {
+	private void showSubstituteDialog() {
 		// 显示换人面板
 		
 		// 左边场上球员playerInTheGame，右边整队球员groupMembers
-		PlayerEventDialog dialog = new PlayerEventDialog(this);
-		
-		// 1.选择首发球员
-		// 2.开始比赛的按钮
+		SelectPlayersDialog dialog = new SelectPlayersDialog(this);
+		dialog.show();
+		dialog.fillGroupData(mGroupA, mGroupB);
+		dialog.fillPlayersData(mPlayingMemberList, mGroupAMemberList);
 	}
 
 	private void pauseGame() {
