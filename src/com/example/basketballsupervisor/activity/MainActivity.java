@@ -333,7 +333,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private void selectStartPlayers() {
 		// 选择首发球员
 		
-		SelectPlayersDialog dialog = new SelectPlayersDialog(this);
+		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SELECT_STARTS);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
 		dialog.fillPlayersData(mPlayingMemberList, mGroupAMemberList);
@@ -367,7 +367,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 显示换人面板
 		
 		// 左边场上球员playerInTheGame，右边整队球员groupMembers
-		SelectPlayersDialog dialog = new SelectPlayersDialog(this);
+		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SUBSTITUTE);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
 		dialog.fillPlayersData(mPlayingMemberList, mGroupAMemberList);
