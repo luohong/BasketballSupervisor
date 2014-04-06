@@ -3,6 +3,8 @@ package com.example.basketballsupervisor.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -23,10 +25,11 @@ import com.example.basketballsupervisor.http.QueryPlayInfoResponse;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
-import com.example.basketballsupervisor.widget.PlayerEventDialog;
+import com.example.basketballsupervisor.util.CountDown;
+import com.example.basketballsupervisor.util.CountDown.OnCountDownListener;
 import com.example.basketballsupervisor.widget.SelectPlayersDialog;
 
-public class MainActivity extends BaseActivity implements OnClickListener {
+public class MainActivity extends BaseActivity implements OnClickListener, OnCountDownListener {
 
 	private long mGameTime = 0l;
 	private int mGroupAScore = 0;
@@ -48,6 +51,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	private ImageView mIvInfoLeft, mIvInfoRight;
 	private LinearLayout mLlUpload;
 	
+	private CountDown mCountDown;
+	
 	private boolean running = false;
 	private boolean pausing = false;
 
@@ -62,6 +67,10 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 	@Override
 	public void onInit() {
 		mPlayingMemberList = new ArrayList<Member>();
+		
+		int timeout = 4 * 10 * 60 * 1000;// 四节比赛，每节比赛10分钟
+		mCountDown = new CountDown(timeout, 1000);
+		mCountDown.setOnCountDownListener(this);
 	}
 
 	@Override
@@ -91,7 +100,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
 	@Override
 	public void onInitViewData() {
-		String formedGameTime = formGameTime();
+		String formedGameTime = formGameTime(0);
 		mTvGameTime.setText(formedGameTime);
 		
 		if (mGameTime <= 20 * 60 * 1000) {
@@ -112,8 +121,33 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 	}
 
-	private String formGameTime() {
-		return "00:00 | 00";
+	private String formGameTime(int count) {
+		StringBuffer gameTime = new StringBuffer();
+		
+		int time = count / 1000;
+		
+		int minutes = time / 60;
+		if (minutes < 10) {
+			gameTime.append("0");
+		}
+		gameTime.append(minutes);
+
+		gameTime.append(":");
+		
+		int second = time % 60;
+		if (second < 10) {
+			gameTime.append("0");
+		}
+		gameTime.append(second);
+		
+		gameTime.append(" | ");
+		int milisecends = (count % 1000) / 100;
+		if (milisecends < 10) {
+			gameTime.append("0");
+		}
+		gameTime.append(milisecends);
+		
+		return gameTime.toString();
 	}
 
 	@Override
@@ -302,14 +336,26 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		SelectPlayersDialog dialog = new SelectPlayersDialog(this);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
-		dialog.fillPlayersData(mPlayingMemberList, mGroupBMemberList);
+		dialog.fillPlayersData(mPlayingMemberList, mGroupAMemberList);
+		dialog.setOnCancelListener(new OnCancelListener() {
+			
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				running = true;
+				
+				mTvGameStart.setVisibility(View.GONE);
+				
+				mCountDown.start();// 计时开始
+				mGameTime = System.currentTimeMillis();
+			}
+		});
 	}
 
 	private void substitute() {
 		// 换人
 		
 		// 判断当前比赛状态是否允许换人
-		boolean allowSubstitute = true;
+		boolean allowSubstitute = running;
 		if (allowSubstitute) {
 			showSubstituteDialog();
 		} else {
@@ -331,7 +377,7 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		// 暂停比赛
 		
 		// 判断当前比赛状态是否允许请求暂停比赛, 比如A队暂停已经用完，或者出现事故临时暂停比赛
-		boolean allowPause = true;
+		boolean allowPause = running;
 		if (allowPause) {
 			showPauseGameDialog();
 		} else {
@@ -348,6 +394,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 				
 				mIvPauseLeft.setImageResource(R.drawable.btn_continue);
 				mIvPauseRight.setImageResource(R.drawable.btn_continue);
+				
+				mCountDown.setPauseWork(true);
 			}
 		});
 		dialog.show();
@@ -359,6 +407,8 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 		pausing = false;
 		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
 		mIvPauseRight.setImageResource(R.drawable.btn_pause);
+		
+		mCountDown.setPauseWork(false);
 	}
 
 	private void uploadGameData() {
@@ -386,7 +436,16 @@ public class MainActivity extends BaseActivity implements OnClickListener {
 
 	private void reportGameData() {
 		
-		
+	}
+
+	@Override
+	public void OnCountDownTimeout() {
+		// 比赛完成
+	}
+
+	@Override
+	public void onCountDownIntervalReach(int last) {
+		mTvGameTime.setText(formGameTime(last));
 	}
 
 }
