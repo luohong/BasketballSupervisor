@@ -15,6 +15,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewFlipper;
 
 import com.android.framework.core.widget.BaseDialog;
@@ -210,6 +211,8 @@ public class RecordEventDialog extends BaseDialog {
 		} else if (mRole == 2) {
 			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime, mCoordinate);
 		}
+		
+		Toast.makeText(context, "记录成功", Toast.LENGTH_SHORT).show();
 	}
 
 	protected void showNextStat() {

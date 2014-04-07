@@ -32,12 +32,18 @@ import com.example.basketballsupervisor.db.GameTimeDb;
 import com.example.basketballsupervisor.db.GroupDb;
 import com.example.basketballsupervisor.db.MemberDb;
 import com.example.basketballsupervisor.db.PlayingTimeDb;
+import com.example.basketballsupervisor.db.RecordDb;
 import com.example.basketballsupervisor.http.QueryPlayInfoRequest;
 import com.example.basketballsupervisor.http.QueryPlayInfoResponse;
+import com.example.basketballsupervisor.http.ReportGameRecordRequest;
+import com.example.basketballsupervisor.http.ReportGameRecordResponse;
 import com.example.basketballsupervisor.model.Action;
+import com.example.basketballsupervisor.model.BBGameRecord;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
+import com.example.basketballsupervisor.model.Record;
+import com.example.basketballsupervisor.model.RoleRecord;
 import com.example.basketballsupervisor.util.CountDown;
 import com.example.basketballsupervisor.util.CountDown.OnCountDownListener;
 import com.example.basketballsupervisor.widget.RecordEventDialog;
@@ -505,7 +511,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 上传比赛数据
 		// 检查是否有比赛数据，有则准备比赛数据，无则提示用户无比赛数据
 		
-		boolean hasGameData = true;
+		RecordDb db = new RecordDb(this);
+		
+		boolean hasGameData = db.isHasData();
 		if (hasGameData) {
 			showConfirmUploadGameDataDialog();
 		} else {
@@ -525,7 +533,64 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void reportGameData() {
+		List<RoleRecord> records = new ArrayList<RoleRecord>();
 		
+		RecordDb db = new RecordDb(this);
+		List<Record> recordList = db.getAll(mGame);
+		
+		long groupId = 0;
+		if (mRole == 1) {
+			groupId = mGroupA.groupId;
+		} else if (mRole == 2) {
+			groupId = mGroupB.groupId;
+		} else if (mRole == 3) {
+			
+		}
+		
+		RoleRecord roleRecord = new RoleRecord();
+		roleRecord.game_id = mGame.gId;
+		roleRecord.group_id = groupId;
+		roleRecord.recordType = mRole;
+		
+		List<BBGameRecord> gameRecords = new ArrayList<BBGameRecord>();
+		roleRecord.bb_game_record = gameRecords;
+		
+		for (Record record : recordList) {
+			BBGameRecord gameRecord = new BBGameRecord(record);
+			gameRecords.add(gameRecord);
+		}
+		
+		records.add(roleRecord);
+		
+		final ReportGameRecordRequest request = new ReportGameRecordRequest(records);
+		Config.asynPost(this, "正在上传，请稍候...", request.getData(), new CallBack() {
+			
+			@Override
+			public void onSuccess(String o) {
+				ReportGameRecordResponse response = request.getObject(o);
+				if (response != null) {
+					if (response.isSuccess()) {
+						showToastShort("上传数据成功");	
+					} else {
+						onFail(response.error_remark);
+					}
+				} else {
+					onFail(null);
+				}
+			}
+			
+			@Override
+			public void onFinish(Object obj) {
+			}
+			
+			@Override
+			public void onFail(String msg) {
+				if (TextUtils.isEmpty(msg)) {
+					msg = "上传数据失败，请检查网络后重试";
+				}
+				showToastShort(msg);
+			}
+		});
 	}
 
 	@Override
@@ -564,6 +629,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 显示记录球员事件的对话框
 		
 		// TODO only for test
+		if (mGroupAPlayingMemberList.isEmpty()) {
+			mGroupAPlayingMemberList.addAll(mGroupAMemberList);
+		}
 		if (mGroupBPlayingMemberList.isEmpty()) {
 			mGroupBPlayingMemberList.addAll(mGroupBMemberList);
 		}
