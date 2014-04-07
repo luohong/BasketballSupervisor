@@ -27,8 +27,10 @@ import com.example.basketballsupervisor.config.Config;
 import com.example.basketballsupervisor.config.Config.CallBack;
 import com.example.basketballsupervisor.db.ActionDb;
 import com.example.basketballsupervisor.db.GameDb;
+import com.example.basketballsupervisor.db.GameTimeDb;
 import com.example.basketballsupervisor.db.GroupDb;
 import com.example.basketballsupervisor.db.MemberDb;
+import com.example.basketballsupervisor.db.PlayingTimeDb;
 import com.example.basketballsupervisor.http.QueryPlayInfoRequest;
 import com.example.basketballsupervisor.http.QueryPlayInfoResponse;
 import com.example.basketballsupervisor.model.Action;
@@ -42,6 +44,7 @@ import com.example.basketballsupervisor.widget.SelectPlayersDialog;
 
 public class MainActivity extends BaseActivity implements OnClickListener, OnCountDownListener, OnItemClickListener {
 
+	private int mRole = 1;
 	private long mGameTime = 0l;
 	private int mGroupAScore = 0;
 	private int mGroupBScore = 0;
@@ -121,6 +124,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	@Override
 	public void onInitViewData() {
 		onCountDownIntervalReach(0);
+
+		int drawable = R.drawable.st_07;
+		
+		if (mGame != null && mGame.role != null) {
+			mRole = mGame.role.get(0);
+		}
+		if (mRole == 1) {
+			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
+			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+		} else {
+			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
+		}
 		
 		String groupAName = (mGroupA != null && !TextUtils.isEmpty(mGroupA.groupName)) ? mGroupA.groupName : "A队";
 		mTvGroupAName.setText(groupAName);
@@ -172,6 +188,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	@Override
 	public void onBindListener() {
 		mTvGameStart.setOnClickListener(this);
+		mTvGameTime.setOnClickListener(this);
 		
 		mIvSubstitueLeft.setOnClickListener(this);
 		mIvSubstitueRight.setOnClickListener(this);
@@ -334,6 +351,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		case R.id.tv_game_start:
 			startGame();
 			break;
+		case R.id.tv_game_time:
+			doPauseGame();
+			break;
 		case R.id.iv_substitute_left:
 		case R.id.iv_substitute_right:
 			substitute();
@@ -369,7 +389,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SELECT_STARTS);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
-		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
+		if (mRole == 1) {
+			dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
+		} else {
+			dialog.fillPlayersData(mGroupBPlayingMemberList, mGroupBMemberList);
+		}
 		dialog.setOnCancelListener(new OnCancelListener() {
 			
 			@Override
@@ -380,6 +404,18 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				
 				mCountDown.start();// 计时开始
 				mGameTime = System.currentTimeMillis();
+				
+				// 记录比赛开始时间
+				GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
+				gameTimeDb.startOrContinueGame(mGame, null, mGameTime);
+				
+				// 记录首发球员上场时间
+				PlayingTimeDb db = new PlayingTimeDb(getActivity());
+				if (mRole == 1) {
+					db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+				} else if (mRole == 2) {
+					db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+				}
 			}
 		});
 	}
@@ -398,12 +434,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void showSubstituteDialog() {
 		// 显示换人面板
+		if (!pausing) {
+			doPauseGame();
+		}
 		
 		// 左边场上球员playerInTheGame，右边整队球员groupMembers
 		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SUBSTITUTE);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
-		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
+		if (mRole == 1) {
+			dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
+		} else if (mRole == 2) {
+			dialog.fillPlayersData(mGroupBPlayingMemberList, mGroupBMemberList);
+		}
 	}
 
 	private void pauseGame() {
@@ -423,12 +466,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			
 			@Override
 			public void onClick(View arg0) {
-				pausing = true;
-				
-				mIvPauseLeft.setImageResource(R.drawable.btn_continue);
-				mIvPauseRight.setImageResource(R.drawable.btn_continue);
-				
-				mCountDown.setPauseWork(true);
+				doPauseGame();
 			}
 		});
 		dialog.show();
@@ -442,6 +480,24 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mIvPauseRight.setImageResource(R.drawable.btn_pause);
 		
 		mCountDown.setPauseWork(false);
+		
+		mGameTime = System.currentTimeMillis();
+		
+		// 记录比赛开始时间
+		GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
+		if (mRole == 1) {
+			gameTimeDb.startOrContinueGame(mGame, mGroupA, mGameTime);
+		} else if (mRole == 2) {
+			gameTimeDb.startOrContinueGame(mGame, mGroupB, mGameTime);
+		}
+		
+		// 记录首发球员上场时间
+		PlayingTimeDb db = new PlayingTimeDb(getActivity());
+		if (mRole == 1) {
+			db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+		} else if (mRole == 2) {
+			db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+		}
 	}
 
 	private void uploadGameData() {
@@ -528,6 +584,33 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 	}
 	
+	private void doPauseGame() {
+		pausing = true;
+		
+		mIvPauseLeft.setImageResource(R.drawable.btn_continue);
+		mIvPauseRight.setImageResource(R.drawable.btn_continue);
+		
+		mCountDown.setPauseWork(true);
+		
+		mGameTime = System.currentTimeMillis();
+		
+		// 记录比赛开始时间
+		GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
+		if (mRole == 1) {
+			gameTimeDb.pauseOrEndGame(mGame, mGroupA, mGameTime);
+		} else if (mRole == 2) {
+			gameTimeDb.pauseOrEndGame(mGame, mGroupB, mGameTime);
+		}
+		
+		// 记录首发球员上场时间
+		PlayingTimeDb db = new PlayingTimeDb(getActivity());
+		if (mRole == 1) {
+			db.pauseOrEndGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+		} else if (mRole == 2) {
+			db.pauseOrEndGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+		}
+	}
+
 	private class CourtAdapter extends BaseAdapter {
 
 		private LayoutInflater mInflater;

@@ -143,7 +143,7 @@ public class SelectPlayersDialog extends BaseDialog {
 		// 检查是否符合换人的条件
 		
 		if (mSelectedPlayingPos >= 0 && mSelectedBenchPos >= 0) {
-			ConfirmDialog dialog = new ConfirmDialog(context, "确认换人？", true, "取消", "确认", new View.OnClickListener() {
+			final ConfirmDialog dialog = new ConfirmDialog(context, "确认换人？", true, "取消", "确认", new View.OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
 					dismiss();
@@ -154,15 +154,11 @@ public class SelectPlayersDialog extends BaseDialog {
 
 					mBenchMembers.add(playingMember);
 					mPlayingMembers.add(benchMember);
-					
-//					mPlayingAdapter.setData(mPlayingMembers);
-//					mAllAdapter.setData(mBenchMembers);
-					// 记录球员上场时间
 				}
 			}, new View.OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-					dismiss();
+					cancel();
 					
 					mSelectedPlayingPos = -1;
 					mSelectedBenchPos = -1;

@@ -1,8 +1,13 @@
 package com.example.basketballsupervisor.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+
+import com.example.basketballsupervisor.model.Game;
+import com.example.basketballsupervisor.model.GameTime;
+import com.example.basketballsupervisor.model.Group;
 
 /**
  * 比赛时间表（包括暂停时间等）
@@ -56,6 +61,73 @@ public class GameTimeDb extends BaseDb {
 	@Override
 	protected Object parseCursor(Cursor cursor) {
 		return null;
+	}
+
+	public void pauseOrEndGame(Game game, Group group, long time) {
+		checkDb();
+		beginTransaction();
+		try {
+			if (game != null && group != null && time > 0) {
+				GameTime gameTime = new GameTime();
+				gameTime.gameId = game.gId;
+				gameTime.groupRequestId = group.groupId;
+				gameTime.suspendTime = String.valueOf(time);
+				
+				update(gameTime);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			endTransaction();
+		}
+	}
+	
+	public void update(GameTime gameTime) {
+		if (gameTime != null) {
+			checkDb();
+			
+			String whereClause = String.format(" %s = ? and %s is null ", Table.GAME_ID, Table.SUSPEND_TIME);
+	        String[] whereArgs = new String[] { String.valueOf(gameTime.gameId)};
+			
+			ContentValues values = new ContentValues();
+			values.put(Table.GROUP_REQUEST_ID, gameTime.groupRequestId);
+			values.put(Table.SUSPEND_TIME, gameTime.suspendTime);
+			
+			db.update(Table.TABLE_NAME, values, whereClause, whereArgs);
+		}
+	}
+
+	public void insert(GameTime gameTime) {
+		if (gameTime != null) {
+			checkDb();
+			
+			ContentValues values = new ContentValues();
+			values.put(Table.GAME_ID, gameTime.gameId);
+			values.put(Table.GROUP_REQUEST_ID, gameTime.groupRequestId);
+			values.put(Table.SUSPEND_TIME, gameTime.suspendTime);
+			values.put(Table.CONTINUE_TIME, gameTime.continueTime);
+			
+			db.insert(Table.TABLE_NAME, null, values);
+		}
+	}
+
+	public void startOrContinueGame(Game game, Group group, long time) {
+		checkDb();
+		beginTransaction();
+		try {
+			if (game != null && time > 0) {
+				GameTime gameTime = new GameTime();
+				gameTime.gameId = game.gId;
+				gameTime.groupRequestId = group != null ? group.groupId : 0;
+				gameTime.continueTime = String.valueOf(time);
+				
+				insert(gameTime);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			endTransaction();
+		}
 	}
 
 }
