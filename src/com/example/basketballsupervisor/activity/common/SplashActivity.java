@@ -7,6 +7,7 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
+import com.example.basketballsupervisor.IApplication;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.activity.BaseActivity;
 import com.example.basketballsupervisor.activity.MainActivity;
@@ -22,7 +23,11 @@ public class SplashActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash);
 
-		startSplash();
+		if (!IApplication.hasStart) {
+			startSplash();
+		} else {
+			finish();
+		}
 	}
 
 	@Override
@@ -63,6 +68,8 @@ public class SplashActivity extends BaseActivity {
 
 			@Override
 			public void onAnimationEnd(Animation animation) {
+				IApplication.hasStart = true;
+				
 				User user = SpUtil.getInstance(getActivity()).getUser();
 				Intent intent = null;
 				if (user != null && user.isLogin()) {

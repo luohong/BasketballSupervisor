@@ -32,11 +32,11 @@ public class RecordDb extends BaseDb {
 		public static final String ACTION_ID = "a_id"; 
 		public static final String SHOW_TIME = "show_time"; 
 		public static final String CRATE_TIME = "create_time"; 
-		public static final String REMARK = "remark"; 
+		public static final String COORDINATE = "coordinate"; 
 
 		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
 
-		public static final String[] PROJECTION = { _ID, GAME_ID, GROUP_ID, MEMBER_ID, ACTION_ID, SHOW_TIME, CRATE_TIME, REMARK };
+		public static final String[] PROJECTION = { _ID, GAME_ID, GROUP_ID, MEMBER_ID, ACTION_ID, SHOW_TIME, CRATE_TIME, COORDINATE };
 	}
 	
 	public RecordDb(Context context) {
@@ -59,7 +59,7 @@ public class RecordDb extends BaseDb {
 		sb.append(Table.ACTION_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.SHOW_TIME).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.CRATE_TIME).append(COLUMN_TYPE.TEXT).append(COMMA);
-		sb.append(Table.REMARK).append(COLUMN_TYPE.TEXT);
+		sb.append(Table.COORDINATE).append(COLUMN_TYPE.TEXT);
 		sb.append(BRACKET_RIGHT);
 
 		return sb.toString();
@@ -74,7 +74,7 @@ public class RecordDb extends BaseDb {
 		return null;
 	}
 
-	public void saveRecord(Game game, Group group, Member member, Action action, long time) {
+	public void saveRecord(Game game, Group group, Member member, Action action, long time, String coordinate) {
 		if (game != null && group != null && time > 0 && member != null && action != null) {
 			Record record = new Record();
 			record.gameId = game.gId;
@@ -83,8 +83,8 @@ public class RecordDb extends BaseDb {
 			record.actionId = action.id;
 			record.showTime = String.valueOf(time);
 			record.createTime = String.valueOf(System.currentTimeMillis());
-			record.remark = "";
-			
+			record.coordinate = coordinate;
+
 			insert(record);
 		}
 	}
@@ -100,7 +100,7 @@ public class RecordDb extends BaseDb {
 			values.put(Table.ACTION_ID, record.actionId);
 			values.put(Table.CRATE_TIME, record.createTime);
 			values.put(Table.SHOW_TIME, record.showTime);
-			values.put(Table.REMARK, record.remark);
+			values.put(Table.COORDINATE, record.coordinate);
 			
 			long result = db.insert(Table.TABLE_NAME, null, values);
 			Log.d(TAG, "insert result : " + result + ", actionId: " + record.actionId);

@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.framework.core.widget.ConfirmDialog;
+import com.example.basketballsupervisor.IApplication;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.config.Config;
 import com.example.basketballsupervisor.config.Config.CallBack;
@@ -568,14 +569,23 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 		
 		mGameTime = System.currentTimeMillis();
+		
+		String coordinate = parseCoordinate(position);
 
 		RecordEventDialog dialog = new RecordEventDialog(this, mActionList);
 		dialog.show();
-		dialog.fillGameData(mGame, mRole, mGameTime);
+		dialog.fillGameData(mGame, mRole, mGameTime, coordinate);
 		dialog.fillGroupData(mGroupA, mGroupB);
 		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupBPlayingMemberList);
 	}
 	
+	private String parseCoordinate(int position) {
+		// 解析位置的坐标
+		StringBuffer coordinate = new StringBuffer();
+		coordinate.append(position % 32).append(",").append(position / 32);
+		return coordinate.toString();
+	}
+
 	@Override
 	public void onWindowFocusChanged(boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
@@ -651,8 +661,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-//			R.layout.item_event_coordinate, R.id.tv_coordinate, 
-			convertView = mInflater.inflate(R.layout.item_event_coordinate, parent, false);
+			if (convertView == null) {
+				convertView = mInflater.inflate(R.layout.item_event_coordinate, parent, false);
+			}
 			
 			if (columnHeight > 0) {
 				AbsListView.LayoutParams params = new AbsListView.LayoutParams(columnWidth, columnHeight);
@@ -662,6 +673,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			return convertView;
 		}
 		
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		IApplication.hasStart = false;
 	}
 
 }

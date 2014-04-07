@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.basketballsupervisor.IApplication;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.activity.BaseActivity;
 import com.example.basketballsupervisor.activity.MainActivity;
@@ -165,6 +166,12 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		startActivity(intent);
 		
 		finish();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		IApplication.hasStart = false;
 	}
 
 }

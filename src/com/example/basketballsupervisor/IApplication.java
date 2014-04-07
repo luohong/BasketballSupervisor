@@ -15,6 +15,8 @@ public class IApplication extends Application {
 	
 //	private ACache mCache;
 	
+	public static boolean hasStart = false;
+
 	@Override
 	public void onCreate() {
 		super.onCreate();

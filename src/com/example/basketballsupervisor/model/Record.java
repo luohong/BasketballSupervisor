@@ -12,6 +12,6 @@ public class Record implements Serializable {
 	public long actionId;
 	public String showTime;
 	public String createTime;
-	public String remark;
+	public String coordinate;
 	
 }

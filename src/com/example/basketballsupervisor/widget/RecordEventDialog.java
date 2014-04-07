@@ -62,6 +62,7 @@ public class RecordEventDialog extends BaseDialog {
 	private Game mGame;
 	private int mRole;
 	private long mGameTime;
+	private String mCoordinate;
 
 	private Group mGroupA;
 	private Group mGroupB;
@@ -205,9 +206,9 @@ public class RecordEventDialog extends BaseDialog {
 		// 记录动作行为
 		RecordDb db = new RecordDb(getContext());
 		if (mRole == 1) {
-			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime);
+			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime, mCoordinate);
 		} else if (mRole == 2) {
-			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime);
+			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime, mCoordinate);
 		}
 	}
 
@@ -306,10 +307,11 @@ public class RecordEventDialog extends BaseDialog {
 		}
 	}
 	
-	public void fillGameData(Game game, int role, long time) {
+	public void fillGameData(Game game, int role, long time, String coordinate) {
 		mGame = game;
 		mRole = role;
 		mGameTime = time;
+		mCoordinate = coordinate;
 	}
 
 	public void fillGroupData(Group groupA, Group groupB) {
