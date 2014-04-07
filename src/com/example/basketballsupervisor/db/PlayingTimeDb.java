@@ -7,9 +7,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
-import com.example.basketballsupervisor.db.MemberDb.Table;
 import com.example.basketballsupervisor.model.Game;
-import com.example.basketballsupervisor.model.GameTime;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
 import com.example.basketballsupervisor.model.PlayingTime;
@@ -125,7 +123,6 @@ public class PlayingTimeDb extends BaseDb {
 					update(playingTime);
 				}
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

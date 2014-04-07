@@ -3,16 +3,12 @@ package com.example.basketballsupervisor.db;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.basketballsupervisor.config.Config;
-import com.example.basketballsupervisor.db.GameDb.Table;
-import com.example.basketballsupervisor.model.Action;
-import com.example.basketballsupervisor.model.Game;
-import com.google.gson.reflect.TypeToken;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+
+import com.example.basketballsupervisor.model.Action;
 
 /**
  * 球员发生动作行为表（包括投篮二分不中等）
@@ -140,7 +136,6 @@ public class ActionDb extends BaseDb {
 					insert(action);
 				}
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

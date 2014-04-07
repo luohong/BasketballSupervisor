@@ -1,8 +1,16 @@
 package com.example.basketballsupervisor.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
+import android.util.Log;
+
+import com.example.basketballsupervisor.model.Action;
+import com.example.basketballsupervisor.model.Game;
+import com.example.basketballsupervisor.model.Group;
+import com.example.basketballsupervisor.model.Member;
+import com.example.basketballsupervisor.model.Record;
 
 /**
  * 得分记录表
@@ -10,6 +18,8 @@ import android.provider.BaseColumns;
  *
  */
 public class RecordDb extends BaseDb {
+	
+	public static final String TAG = RecordDb.class.getSimpleName();
 	
 	public static class Table implements BaseColumns {
 
@@ -62,6 +72,39 @@ public class RecordDb extends BaseDb {
 	@Override
 	protected Object parseCursor(Cursor cursor) {
 		return null;
+	}
+
+	public void saveRecord(Game game, Group group, Member member, Action action, long time) {
+		if (game != null && group != null && time > 0 && member != null && action != null) {
+			Record record = new Record();
+			record.gameId = game.gId;
+			record.groupId = group.groupId;
+			record.memberId = member.memberId;
+			record.actionId = action.id;
+			record.showTime = String.valueOf(time);
+			record.createTime = String.valueOf(System.currentTimeMillis());
+			record.remark = "";
+			
+			insert(record);
+		}
+	}
+
+	public void insert(Record record) {
+		if (record != null) {
+			checkDb();
+			
+			ContentValues values = new ContentValues();
+			values.put(Table.GAME_ID, record.gameId);
+			values.put(Table.GROUP_ID, record.groupId);
+			values.put(Table.MEMBER_ID, record.memberId);
+			values.put(Table.ACTION_ID, record.actionId);
+			values.put(Table.CRATE_TIME, record.createTime);
+			values.put(Table.SHOW_TIME, record.showTime);
+			values.put(Table.REMARK, record.remark);
+			
+			long result = db.insert(Table.TABLE_NAME, null, values);
+			Log.d(TAG, "insert result : " + result + ", actionId: " + record.actionId);
+		}
 	}
 
 }

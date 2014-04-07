@@ -561,13 +561,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void showRecordEventDialog(int position) {
 		// 显示记录球员事件的对话框
-		showToast("显示记录球员事件的对话框");
 		
 		// TODO only for test
-		mGroupBPlayingMemberList.addAll(mGroupBMemberList);
+		if (mGroupBPlayingMemberList.isEmpty()) {
+			mGroupBPlayingMemberList.addAll(mGroupBMemberList);
+		}
+		
+		mGameTime = System.currentTimeMillis();
 
 		RecordEventDialog dialog = new RecordEventDialog(this, mActionList);
 		dialog.show();
+		dialog.fillGameData(mGame, mRole, mGameTime);
 		dialog.fillGroupData(mGroupA, mGroupB);
 		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupBPlayingMemberList);
 	}

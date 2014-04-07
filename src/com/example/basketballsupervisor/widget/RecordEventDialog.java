@@ -20,7 +20,9 @@ import android.widget.ViewFlipper;
 import com.android.framework.core.widget.BaseDialog;
 import com.android.framework.core.widget.ConfirmDialog;
 import com.example.basketballsupervisor.R;
+import com.example.basketballsupervisor.db.RecordDb;
 import com.example.basketballsupervisor.model.Action;
+import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
 
@@ -51,6 +53,13 @@ public class RecordEventDialog extends BaseDialog {
 	private GridView mGvPage3Event;
 
 	protected int lastNextActionId;
+
+	private Game mGame;
+	private int mRole;
+	private long mGameTime;
+
+	private Group mGroupA;
+	private Group mGroupB;
 
 	public RecordEventDialog(Context context, List<Action> actionList) {
 		super(context);
@@ -137,18 +146,35 @@ public class RecordEventDialog extends BaseDialog {
 				if (action.nextActionId == 0) {
 					dismiss();
 					
-					// 记录动作行为
+					saveRecordEvent(action);
 				} else {
-					String title = mSelectedMember.number + " " + mSelectedMember.name + " 创新统计";
-					mTvPage3Title.setText(title);
-					
 					lastNextActionId = action.nextActionId;
 					
-					showNext();
+					if (lastNextActionId == -1) {
+						showNewStat();
+					} else if (lastNextActionId > 0) {
+						showNextStat();
+					}
 				}
 			}
 		});
+	}
+
+	private void saveRecordEvent(Action action) {
+		// 记录动作行为
+		RecordDb db = new RecordDb(getContext());
+		if (mRole == 1) {
+			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime);
+		} else if (mRole == 2) {
+			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime);
+		}
+	}
+
+	protected void showNextStat() {
 		
+	}
+
+	private void showNewStat() {
 		// page3
 		List<Action> step3ActionList = filterActionListByStep(3);
 		EventAdapter page3Adapter = new EventAdapter(getContext(), 3, step3ActionList);
@@ -162,8 +188,14 @@ public class RecordEventDialog extends BaseDialog {
 				
 				// 记录动作行为
 				Action action = (Action) parent.getItemAtPosition(position);
+				saveRecordEvent(action);
 			}
 		});
+		
+		String title = mSelectedMember.number + " " + mSelectedMember.name + " 创新统计";
+		mTvPage3Title.setText(title);
+		
+		showNext();
 	}
 	
 	private List<Action> filterActionListByStep(int step) {
@@ -177,7 +209,7 @@ public class RecordEventDialog extends BaseDialog {
 			}
 		} else {
 			for (Action action : mActionList) {
-				if (action.nextActionId == lastNextActionId) {
+				if (action.nextActionId == lastNextActionId || (action.nextActionId < lastNextActionId && lastNextActionId == -1)) {
 					stepActionList.add(action);
 				}
 			}
@@ -212,8 +244,17 @@ public class RecordEventDialog extends BaseDialog {
 			dialog.show();
 		}
 	}
+	
+	public void fillGameData(Game game, int role, long time) {
+		mGame = game;
+		mRole = role;
+		mGameTime = time;
+	}
 
 	public void fillGroupData(Group groupA, Group groupB) {
+		mGroupA = groupA;
+		mGroupB = groupB;
+		
 		mTvGroupAName.setText(groupA.groupName);
 		mTvGroupBName.setText(groupB.groupName);
 	}
