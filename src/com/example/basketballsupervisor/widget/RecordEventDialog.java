@@ -1,5 +1,7 @@
 package com.example.basketballsupervisor.widget;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
@@ -47,6 +49,8 @@ public class RecordEventDialog extends BaseDialog {
 	
 	private TextView mTvPage3Title;
 	private GridView mGvPage3Event;
+
+	protected int lastNextActionId;
 
 	public RecordEventDialog(Context context, List<Action> actionList) {
 		super(context);
@@ -121,7 +125,8 @@ public class RecordEventDialog extends BaseDialog {
 		});
 		
 		// page2
-		EventAdapter adapter = new EventAdapter(getContext(), mActionList);
+		List<Action> step2ActionList = filterActionListByStep(2);
+		EventAdapter adapter = new EventAdapter(getContext(), 2, step2ActionList);
 		mGvPage2Event.setAdapter(adapter);
 		mGvPage2Event.setOnItemClickListener(new OnItemClickListener() {
 
@@ -137,13 +142,16 @@ public class RecordEventDialog extends BaseDialog {
 					String title = mSelectedMember.number + " " + mSelectedMember.name + " 创新统计";
 					mTvPage3Title.setText(title);
 					
+					lastNextActionId = action.nextActionId;
+					
 					showNext();
 				}
 			}
 		});
 		
 		// page3
-		EventAdapter page3Adapter = new EventAdapter(getContext(), mActionList);
+		List<Action> step3ActionList = filterActionListByStep(3);
+		EventAdapter page3Adapter = new EventAdapter(getContext(), 3, step3ActionList);
 		mGvPage3Event.setAdapter(page3Adapter);
 		mGvPage3Event.setOnItemClickListener(new OnItemClickListener() {
 
@@ -158,6 +166,26 @@ public class RecordEventDialog extends BaseDialog {
 		});
 	}
 	
+	private List<Action> filterActionListByStep(int step) {
+		
+		List<Action> stepActionList = new ArrayList<Action>();
+		if (step == 2) {
+			for (Action action : mActionList) {
+				if (action.nextActionId >= 0) {
+					stepActionList.add(action);
+				}
+			}
+		} else {
+			for (Action action : mActionList) {
+				if (action.nextActionId == lastNextActionId) {
+					stepActionList.add(action);
+				}
+			}
+		}
+		
+		return stepActionList;
+	}
+
 	protected void showConfirmSubstitudeDialog() {
 		// 检查是否符合换人的条件
 		
@@ -306,9 +334,12 @@ public class RecordEventDialog extends BaseDialog {
 		private LayoutInflater mInflater;
 
 		private List<Action> actionList;
+
+		private int step;
 		
-		public EventAdapter(Context context, List<Action> actionList) {
+		public EventAdapter(Context context, int step, List<Action> actionList) {
 			mInflater = LayoutInflater.from(context);
+			this.step = step;
 			this.actionList = actionList;
 		}
 
@@ -336,7 +367,7 @@ public class RecordEventDialog extends BaseDialog {
 			
 			TextView tvEvent = (TextView) convertView.findViewById(R.id.tv_event);
 			tvEvent.setText(action.name);
-			tvEvent.setBackgroundResource(action.nextActionId == 0 ? R.drawable.tan_bg03 : R.drawable.tanfont_redbg);
+			tvEvent.setBackgroundResource((step == 2 && action.nextActionId != -1) ? R.drawable.tan_bg03 : R.drawable.tanfont_redbg);
 			
 			return convertView;
 		}

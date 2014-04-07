@@ -3,5 +3,6 @@
     android:id="@+id/tv_event"
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
-    android:background="@drawable/tan_bg03">
+    android:background="@drawable/tan_bg03"
+    android:gravity="center">
 </TextView>

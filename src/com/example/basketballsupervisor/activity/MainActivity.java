@@ -331,6 +331,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private void loadActionData() {
 		// 加载动作数据
 		ActionDb db = new ActionDb(this);
+		if (!db.isHasData()) {
+			db.insertSampleData();
+		}
+		
 		mActionList = db.getAll();
 	}
 
