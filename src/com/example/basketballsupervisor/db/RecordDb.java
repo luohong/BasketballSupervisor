@@ -91,14 +91,14 @@ public class RecordDb extends BaseDb {
 		return record;
 	}
 
-	public List<Record> getAll(Game game) {
+	public List<Record> getAll(Game game, Group group) {
 		List<Record> recordList = new ArrayList<Record>();
         Cursor cursor = null;
         try {
         	checkDb();
     		
-            String selection = String.format(" %s = ? ", Table.GAME_ID);
-            String[] selectionArgs = new String[] { String.valueOf(game.gId) };
+            String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.GROUP_ID);
+            String[] selectionArgs = new String[] { String.valueOf(game.gId), String.valueOf(group.groupId) };
         	
             cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table.DEFAULT_SORT_ORDER);
             while (cursor != null && cursor.moveToNext()) {

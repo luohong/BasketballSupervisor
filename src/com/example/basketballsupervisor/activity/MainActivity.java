@@ -134,15 +134,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 		int drawable = R.drawable.st_07;
 		
+		// TODO 目前仅支持一种角色
 		if (mGame != null && mGame.role != null) {
 			mRole = mGame.role.get(0);
 		}
-		if (mRole == 1) {
+		if (mRole == 1) {// 记录A队数据
 			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
 			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-		} else {
+		} else if (mRole == 2) {// 记录B队数据
 			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
+		} else if (mRole == 3) {// 记录创新数据
+			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 		}
 		
 		String groupAName = (mGroupA != null && !TextUtils.isEmpty(mGroupA.groupName)) ? mGroupA.groupName : "A队";
@@ -154,6 +158,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		
+		// 填充网格
 		List<String> positions = new ArrayList<String>(17 * 32);// 长32个格子，宽17个格子
 		for (int i = 0; i < 17 * 32; i++) {
 			positions.add("");
@@ -387,7 +392,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 开始比赛
 		
 		// 选择首发球员
-		selectStartPlayers();
+		if (mRole != 3) {// 记录创新数据无需选择首发球员
+			selectStartPlayers();
+		} else {// 记录创新数据
+			running = true;
+			
+			mTvGameStart.setVisibility(View.GONE);
+			
+			mCountDown.start();// 计时开始
+			mGameTime = System.currentTimeMillis();
+		}
 	}
 
 	private void selectStartPlayers() {
@@ -396,10 +410,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SELECT_STARTS);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
-		if (mRole == 1) {
+		if (mRole == 1) {// 记录A队数据
 			dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
-		} else {
+		} else if (mRole == 2) {// 记录B队数据
 			dialog.fillPlayersData(mGroupBPlayingMemberList, mGroupBMemberList);
+		} else if (mRole == 3) {// 记录创新数据
+			// 不处理
 		}
 		dialog.setOnCancelListener(new OnCancelListener() {
 			
@@ -418,10 +434,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				
 				// 记录首发球员上场时间
 				PlayingTimeDb db = new PlayingTimeDb(getActivity());
-				if (mRole == 1) {
+				if (mRole == 1) {// 记录A队数据
 					db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
-				} else if (mRole == 2) {
+				} else if (mRole == 2) {// 记录B队数据
 					db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+				} else if (mRole == 3) {// 记录创新数据
+					// 不处理
 				}
 			}
 		});
@@ -431,7 +449,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 换人
 		
 		// 判断当前比赛状态是否允许换人
-		boolean allowSubstitute = running;
+		boolean allowSubstitute = running && mRole != 3;// 记录创新数据的角色不允许换人
 		if (allowSubstitute) {
 			showSubstituteDialog();
 		} else {
@@ -449,10 +467,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SUBSTITUTE);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
-		if (mRole == 1) {
+		if (mRole == 1) {// 记录A队数据
 			dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
-		} else if (mRole == 2) {
+		} else if (mRole == 2) {// 记录B队数据
 			dialog.fillPlayersData(mGroupBPlayingMemberList, mGroupBMemberList);
+		} else if (mRole == 3) {// 记录创新数据
+			// 不处理
 		}
 	}
 
@@ -492,25 +512,31 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		// 记录比赛开始时间
 		GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
-		if (mRole == 1) {
+		if (mRole == 1) {// 记录A队数据
 			gameTimeDb.startOrContinueGame(mGame, mGroupA, mGameTime);
-		} else if (mRole == 2) {
+		} else if (mRole == 2) {// 记录B队数据
 			gameTimeDb.startOrContinueGame(mGame, mGroupB, mGameTime);
+		} else if (mRole == 3) {// 记录创新数据
+			// 无需处理
 		}
 		
 		// 记录首发球员上场时间
 		PlayingTimeDb db = new PlayingTimeDb(getActivity());
-		if (mRole == 1) {
+		if (mRole == 1) {// 记录A队数据
 			db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
-		} else if (mRole == 2) {
+		} else if (mRole == 2) {// 记录B队数据
 			db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+		} else if (mRole == 3) {// 记录创新数据
+			// 无需处理
 		}
 	}
 
 	private void uploadGameData() {
 		// 上传比赛数据
-		// 检查是否有比赛数据，有则准备比赛数据，无则提示用户无比赛数据
 		
+		// TODO 比赛是否正在进行，是则等待比赛完成再上传数据，否则不允许上传
+		
+		// 检查是否有比赛数据，有则准备比赛数据，无则提示用户无比赛数据
 		RecordDb db = new RecordDb(this);
 		
 		boolean hasGameData = db.isHasData();
@@ -535,32 +561,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private void reportGameData() {
 		List<RoleRecord> records = new ArrayList<RoleRecord>();
 		
-		RecordDb db = new RecordDb(this);
-		List<Record> recordList = db.getAll(mGame);
-		
-		long groupId = 0;
-		if (mRole == 1) {
-			groupId = mGroupA.groupId;
-		} else if (mRole == 2) {
-			groupId = mGroupB.groupId;
-		} else if (mRole == 3) {
-			
+		if (mRole == 1) {// 记录A队数据
+			records.add(getRoleRecord(mGroupA));
+		} else if (mRole == 2) {// 记录B队数据
+			records.add(getRoleRecord(mGroupB));
+		} else if (mRole == 3) {// 记录创新数据
+			records.add(getRoleRecord(mGroupA));
+			records.add(getRoleRecord(mGroupB));
 		}
-		
-		RoleRecord roleRecord = new RoleRecord();
-		roleRecord.game_id = mGame.gId;
-		roleRecord.group_id = groupId;
-		roleRecord.recordType = mRole;
-		
-		List<BBGameRecord> gameRecords = new ArrayList<BBGameRecord>();
-		roleRecord.bb_game_record = gameRecords;
-		
-		for (Record record : recordList) {
-			BBGameRecord gameRecord = new BBGameRecord(record);
-			gameRecords.add(gameRecord);
-		}
-		
-		records.add(roleRecord);
 		
 		final ReportGameRecordRequest request = new ReportGameRecordRequest(records);
 		Config.asynPost(this, "正在上传，请稍候...", request.getData(), new CallBack() {
@@ -593,9 +601,34 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		});
 	}
 
+	/**
+	 * 获取角色记录
+	 * @param group 队伍
+	 * @return
+	 */
+	private RoleRecord getRoleRecord(Group group) {
+		RoleRecord roleRecord = new RoleRecord();
+		roleRecord.game_id = mGame.gId;
+		roleRecord.group_id = group.groupId;
+		roleRecord.recordType = mRole;
+		
+		List<BBGameRecord> gameRecords = new ArrayList<BBGameRecord>();
+		roleRecord.bb_game_record = gameRecords;
+
+		RecordDb db = new RecordDb(this);
+		List<Record> recordList = db.getAll(mGame, group);
+		for (Record record : recordList) {
+			BBGameRecord gameRecord = new BBGameRecord(record);
+			gameRecords.add(gameRecord);
+		}
+		
+		return roleRecord;
+	}
+
 	@Override
 	public void OnCountDownTimeout() {
 		// 比赛完成
+		showToastLong("比赛结束");
 	}
 
 	@Override
@@ -678,18 +711,22 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		// 记录比赛开始时间
 		GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
-		if (mRole == 1) {
+		if (mRole == 1) {// 记录A队数据
 			gameTimeDb.pauseOrEndGame(mGame, mGroupA, mGameTime);
-		} else if (mRole == 2) {
+		} else if (mRole == 2) {// 记录B队数据
 			gameTimeDb.pauseOrEndGame(mGame, mGroupB, mGameTime);
+		} else if (mRole == 3) {// 记录创新数据
+			// 无需处理
 		}
 		
 		// 记录首发球员上场时间
 		PlayingTimeDb db = new PlayingTimeDb(getActivity());
-		if (mRole == 1) {
+		if (mRole == 1) {// 记录A队数据
 			db.pauseOrEndGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
-		} else if (mRole == 2) {
+		} else if (mRole == 2) {// 记录B队数据
 			db.pauseOrEndGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+		} else if (mRole == 3) {// 记录创新数据
+			// 无需处理
 		}
 	}
 

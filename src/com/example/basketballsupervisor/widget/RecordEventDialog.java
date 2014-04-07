@@ -67,6 +67,7 @@ public class RecordEventDialog extends BaseDialog {
 
 	private Group mGroupA;
 	private Group mGroupB;
+	private Group mSelectedGroup;
 
 	public RecordEventDialog(Context context, List<Action> actionList) {
 		super(context);
@@ -118,15 +119,20 @@ public class RecordEventDialog extends BaseDialog {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				mSelectedGroupAPlayingPos = position;
-				mGroupAPlayingAdapter.notifyDataSetChanged();
-				
-				mSelectedMember = (Member) parent.getItemAtPosition(position);
-				String title = mSelectedMember.number + " " + mSelectedMember.name + " 技术统计";
-				mTvPage2Title.setText(title);
-				
-//				showConfirmSubstitudeDialog();
-				showNext();
+				if (mRole == 1 || mRole == 3) {// 记录A队数据或创新数据
+					mSelectedGroupAPlayingPos = position;
+					mGroupAPlayingAdapter.notifyDataSetChanged();
+					
+					mSelectedGroup = mGroupA;
+					
+					mSelectedMember = (Member) parent.getItemAtPosition(position);
+					String title = mSelectedMember.number + " " + mSelectedMember.name + " 技术统计";
+					mTvPage2Title.setText(title);
+					
+					showNext();
+				} else {
+					Toast.makeText(context, "您没有权限记录" + mGroupB.groupName + "队的技术数据", Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 		mLvBench.setOnItemClickListener(new OnItemClickListener() {
@@ -134,15 +140,21 @@ public class RecordEventDialog extends BaseDialog {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				mSelectedGroupBPlayingPos = position;
-				mGroupBPlayingAdapter.notifyDataSetChanged();
-				
-				mSelectedMember = (Member) parent.getItemAtPosition(position);
-				String title = mSelectedMember.number + " " + mSelectedMember.name + " 技术统计";
-				mTvPage2Title.setText(title);
-				
-//				showConfirmSubstitudeDialog();
-				showNext();
+				if (mRole == 2 || mRole == 3) {// 记录B队数据或创新数据
+
+					mSelectedGroupBPlayingPos = position;
+					mGroupBPlayingAdapter.notifyDataSetChanged();
+
+					mSelectedGroup = mGroupB;
+					
+					mSelectedMember = (Member) parent.getItemAtPosition(position);
+					String title = mSelectedMember.number + " " + mSelectedMember.name + " 技术统计";
+					mTvPage2Title.setText(title);
+					
+					showNext();
+				} else {
+					Toast.makeText(context, "您没有权限记录" + mGroupA.groupName + "队的技术数据", Toast.LENGTH_SHORT).show();
+				}
 			}
 		});
 		
@@ -157,16 +169,24 @@ public class RecordEventDialog extends BaseDialog {
 					int position, long id) {
 				Action action = (Action) parent.getItemAtPosition(position);
 				if (action.nextActionId == 0) {
-					dismiss();
-					
-					saveRecordEvent(action);
+					if (mRole == 3) {// 记录创新数据
+						Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
+					} else {
+						dismiss();
+						
+						saveRecordEvent(action);
+					}
 				} else {
 					mNextAction = action;
 					
 					if (mNextAction.nextActionId == -1) {
 						showNewStat();
 					} else if (mNextAction.nextActionId > 0) {
-						showNextStat();
+						if (mRole == 3) {// 记录创新数据
+							Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
+						} else {
+							showNextStat();
+						}
 					}
 				}
 			}
@@ -185,7 +205,7 @@ public class RecordEventDialog extends BaseDialog {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				dismiss();
-				
+
 				mSelectedMember = (Member) parent.getItemAtPosition(position);
 				saveRecordEvent(mNextAction);
 			}
@@ -206,10 +226,12 @@ public class RecordEventDialog extends BaseDialog {
 	private void saveRecordEvent(Action action) {
 		// 记录动作行为
 		RecordDb db = new RecordDb(getContext());
-		if (mRole == 1) {
+		if (mRole == 1) {// 记录A队数据
 			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime, mCoordinate);
-		} else if (mRole == 2) {
+		} else if (mRole == 2) {// 记录B队数据
 			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime, mCoordinate);
+		} else if (mRole == 3) {// 记录创新数据
+			db.saveRecord(mGame, mSelectedGroup, mSelectedMember, action, mGameTime, mCoordinate);
 		}
 		
 		Toast.makeText(context, "记录成功", Toast.LENGTH_SHORT).show();
