@@ -131,7 +131,7 @@ public class RecordEventDialog extends BaseDialog {
 					
 					showNext();
 				} else {
-					Toast.makeText(context, "您没有权限记录" + mGroupB.groupName + "队的技术数据", Toast.LENGTH_SHORT).show();
+					Toast.makeText(context, "您没有权限记录" + mGroupB.groupName + "的技术数据", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -153,7 +153,7 @@ public class RecordEventDialog extends BaseDialog {
 					
 					showNext();
 				} else {
-					Toast.makeText(context, "您没有权限记录" + mGroupA.groupName + "队的技术数据", Toast.LENGTH_SHORT).show();
+					Toast.makeText(context, "您没有权限记录" + mGroupA.groupName + "的技术数据", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
