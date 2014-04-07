@@ -33,7 +33,6 @@ public class RecordEventDialog extends BaseDialog {
 	protected ViewFlipper vFlipper;
 	
 	private TextView mTvGroupAName, mTvGroupBName;
-	
 	private ListView mLvPlaying, mLvBench;
 	
 	private PlayerAdapter mGroupAPlayingAdapter;
@@ -51,8 +50,14 @@ public class RecordEventDialog extends BaseDialog {
 	
 	private TextView mTvPage3Title;
 	private GridView mGvPage3Event;
+	
+	private TextView mTvPage4GroupAName, mTvPage4GroupBName;
+	private ListView mLvPage4Playing, mLvPage4Bench;
+	
+	private PlayerAdapter mPage4GroupAPlayingAdapter;
+	private PlayerAdapter mPage4GroupBPlayingAdapter;
 
-	protected int lastNextActionId;
+	protected Action mNextAction;
 
 	private Game mGame;
 	private int mRole;
@@ -87,6 +92,12 @@ public class RecordEventDialog extends BaseDialog {
 		
 		mTvPage3Title = (TextView) findViewById(R.id.tv_page3_title);
 		mGvPage3Event = (GridView) findViewById(R.id.gv_page3_event);
+		
+		mTvPage4GroupAName = (TextView) findViewById(R.id.tv_page4_group_a_name);
+		mTvPage4GroupBName = (TextView) findViewById(R.id.tv_page4_group_b_name);
+		
+		mLvPage4Playing = (ListView) findViewById(R.id.lv_page4_playing);
+		mLvPage4Bench = (ListView) findViewById(R.id.lv_page4_bench);
 		
 	}
 
@@ -148,14 +159,44 @@ public class RecordEventDialog extends BaseDialog {
 					
 					saveRecordEvent(action);
 				} else {
-					lastNextActionId = action.nextActionId;
+					mNextAction = action;
 					
-					if (lastNextActionId == -1) {
+					if (mNextAction.nextActionId == -1) {
 						showNewStat();
-					} else if (lastNextActionId > 0) {
+					} else if (mNextAction.nextActionId > 0) {
 						showNextStat();
 					}
 				}
+			}
+		});
+		
+		// page4		
+		mPage4GroupAPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_A);
+		mLvPage4Playing.setAdapter(mPage4GroupAPlayingAdapter);
+
+		mPage4GroupBPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_B);
+		mLvPage4Bench.setAdapter(mPage4GroupBPlayingAdapter);
+		
+		mLvPage4Playing.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				dismiss();
+				
+				mSelectedMember = (Member) parent.getItemAtPosition(position);
+				saveRecordEvent(mNextAction);
+			}
+		});
+		mLvPage4Bench.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				dismiss();
+				
+				mSelectedMember = (Member) parent.getItemAtPosition(position);
+				saveRecordEvent(mNextAction);
 			}
 		});
 	}
@@ -171,7 +212,26 @@ public class RecordEventDialog extends BaseDialog {
 	}
 
 	protected void showNextStat() {
+		Action action = null;
+		for (Action temp : mActionList) {
+			if (temp.id == mNextAction.nextActionId) {
+				action = temp;
+				break;
+			}
+		}
+		mNextAction = action;
 		
+		mTvPage4GroupAName.setText(mGroupA.groupName);
+		mTvPage4GroupBName.setText(mGroupB.groupName);
+		
+		mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+		mPage4GroupBPlayingAdapter.setData(mGroupBPlayingMembers);
+		
+		mSelectedGroupAPlayingPos = -1;
+		mSelectedGroupBPlayingPos = -1;
+		
+		showNext();
+		showNext();
 	}
 
 	private void showNewStat() {
@@ -209,7 +269,8 @@ public class RecordEventDialog extends BaseDialog {
 			}
 		} else {
 			for (Action action : mActionList) {
-				if (action.nextActionId == lastNextActionId || (action.nextActionId < lastNextActionId && lastNextActionId == -1)) {
+				if (action.nextActionId == mNextAction.nextActionId || 
+						(action.nextActionId < mNextAction.nextActionId && mNextAction.nextActionId == -1)) {
 					stepActionList.add(action);
 				}
 			}
@@ -255,8 +316,8 @@ public class RecordEventDialog extends BaseDialog {
 		mGroupA = groupA;
 		mGroupB = groupB;
 		
-		mTvGroupAName.setText(groupA.groupName);
-		mTvGroupBName.setText(groupB.groupName);
+		mTvGroupAName.setText(mGroupA.groupName);
+		mTvGroupBName.setText(mGroupB.groupName);
 	}
 	
 	public void fillPlayersData(List<Member> groupAPlayingMembers, List<Member> groupBPlayingMembers) {
