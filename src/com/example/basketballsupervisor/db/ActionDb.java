@@ -115,17 +115,17 @@ public class ActionDb extends BaseDb {
 		sampleActions.add(new Action(13,0,"犯规",0,0));
 		sampleActions.add(new Action(14,0,"被犯规",0,0));
 		sampleActions.add(new Action(15,-1,"创新",0,1));
-		sampleActions.add(new Action(16,-1,"超远3分",0,0));
-		sampleActions.add(new Action(17,-1,"绝杀",0,0));
-		sampleActions.add(new Action(18,-1,"最后3秒得分",0,0));
-		sampleActions.add(new Action(19,-1,"晃倒",0,0));
-		sampleActions.add(new Action(20,-1,"2+1",0,0));
-		sampleActions.add(new Action(21,-1,"3+1",0,0));
-		sampleActions.add(new Action(22,-1,"扣篮",0,0));
-		sampleActions.add(new Action(23,-1,"快攻",0,0));
-		sampleActions.add(new Action(24,-1,"2罚不中",0,0));
-		sampleActions.add(new Action(25,-1,"3罚不中",0,0));
-		sampleActions.add(new Action(26,-1,"被晃倒",0,0));
+		sampleActions.add(new Action(16,-2,"超远3分",0,0));
+		sampleActions.add(new Action(17,-2,"绝杀",0,0));
+		sampleActions.add(new Action(18,-2,"最后3秒得分",0,0));
+		sampleActions.add(new Action(19,-2,"晃倒",0,0));
+		sampleActions.add(new Action(20,-2,"2+1",0,0));
+		sampleActions.add(new Action(21,-2,"3+1",0,0));
+		sampleActions.add(new Action(22,-2,"扣篮",0,0));
+		sampleActions.add(new Action(23,-2,"快攻",0,0));
+		sampleActions.add(new Action(24,-2,"2罚不中",0,0));
+		sampleActions.add(new Action(25,-2,"3罚不中",0,0));
+		sampleActions.add(new Action(26,-2,"被晃倒",0,0));
 		
 		saveAll(sampleActions);
 	}

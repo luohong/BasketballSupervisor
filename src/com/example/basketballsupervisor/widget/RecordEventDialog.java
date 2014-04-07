@@ -171,7 +171,7 @@ public class RecordEventDialog extends BaseDialog {
 		List<Action> stepActionList = new ArrayList<Action>();
 		if (step == 2) {
 			for (Action action : mActionList) {
-				if (action.nextActionId >= 0) {
+				if (action.nextActionId >= -1) {
 					stepActionList.add(action);
 				}
 			}
