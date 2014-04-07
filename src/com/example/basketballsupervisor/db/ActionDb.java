@@ -1,5 +1,14 @@
 package com.example.basketballsupervisor.db;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.example.basketballsupervisor.config.Config;
+import com.example.basketballsupervisor.db.GameDb.Table;
+import com.example.basketballsupervisor.model.Action;
+import com.example.basketballsupervisor.model.Game;
+import com.google.gson.reflect.TypeToken;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
@@ -55,7 +64,35 @@ public class ActionDb extends BaseDb {
 
 	@Override
 	protected Object parseCursor(Cursor cursor) {
-		return null;
+		Action action = new Action();
+		
+		action.id = cursor.getLong(cursor.getColumnIndexOrThrow(Table._ID));
+		action.name = cursor.getString(cursor.getColumnIndexOrThrow(Table.NAME));
+		action.nextActionId = cursor.getLong(cursor.getColumnIndexOrThrow(Table.NEXT_ACTION_ID));
+		action.score = cursor.getInt(cursor.getColumnIndexOrThrow(Table.SCORE));
+		action.cancelable = cursor.getInt(cursor.getColumnIndexOrThrow(Table.CANCELABLE));
+		
+		return action;
+	}
+
+	public List<Action> getAll() {
+		List<Action> actionList = new ArrayList<Action>();
+        Cursor cursor = null;
+        try {
+        	checkDb();
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, null, null, null, null, Table.DEFAULT_SORT_ORDER);
+            while (cursor != null && cursor.moveToNext()) {
+            	Action action = (Action)parseCursor(cursor);
+            	actionList.add(action);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return actionList;
 	}
 
 }

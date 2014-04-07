@@ -17,5 +17,8 @@
     <dimen name="game_half">12sp</dimen>
     
     <dimen name="operate_btn">40dp</dimen>
+    
+    
+    <dimen name="dialog_group_name">14sp</dimen>
 
 </resources>

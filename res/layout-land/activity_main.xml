@@ -54,13 +54,6 @@
         android:paddingTop="5dp">
 
         <!-- android:layout_below="@+id/ll_game_info" -->
-
-        <GridView
-            android:id="@+id/gv_court"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:numColumns="50" >
-        </GridView>
         
         <View 
             android:layout_width="match_parent"
@@ -98,6 +91,18 @@
 		        android:paddingBottom="15dp"
 		        android:paddingTop="15dp"/>
         </LinearLayout>
+
+        <GridView
+            android:id="@+id/gv_court"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:numColumns="32" 
+            android:stretchMode="columnWidth"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="5dp">
+        </GridView>
+        
     </FrameLayout>
 
     <LinearLayout

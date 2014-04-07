@@ -3,12 +3,20 @@ package com.example.basketballsupervisor.activity;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -17,19 +25,22 @@ import com.android.framework.core.widget.ConfirmDialog;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.config.Config;
 import com.example.basketballsupervisor.config.Config.CallBack;
+import com.example.basketballsupervisor.db.ActionDb;
 import com.example.basketballsupervisor.db.GameDb;
 import com.example.basketballsupervisor.db.GroupDb;
 import com.example.basketballsupervisor.db.MemberDb;
 import com.example.basketballsupervisor.http.QueryPlayInfoRequest;
 import com.example.basketballsupervisor.http.QueryPlayInfoResponse;
+import com.example.basketballsupervisor.model.Action;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
 import com.example.basketballsupervisor.util.CountDown;
 import com.example.basketballsupervisor.util.CountDown.OnCountDownListener;
+import com.example.basketballsupervisor.widget.RecordEventDialog;
 import com.example.basketballsupervisor.widget.SelectPlayersDialog;
 
-public class MainActivity extends BaseActivity implements OnClickListener, OnCountDownListener {
+public class MainActivity extends BaseActivity implements OnClickListener, OnCountDownListener, OnItemClickListener {
 
 	private long mGameTime = 0l;
 	private int mGroupAScore = 0;
@@ -39,7 +50,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private Group mGroupA;
 	private Group mGroupB;
 	
-	private List<Member> mPlayingMemberList;
+	private List<Member> mGroupAPlayingMemberList;
+	private List<Member> mGroupBPlayingMemberList;
+	
 	private List<Member> mGroupAMemberList;
 	private List<Member> mGroupBMemberList;
 	
@@ -50,11 +63,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private ImageView mIvPauseLeft, mIvPauseRight;
 	private ImageView mIvInfoLeft, mIvInfoRight;
 	private LinearLayout mLlUpload;
+	private GridView mGvCourt;
+	private CourtAdapter mCourtAdapter;
 	
 	private CountDown mCountDown;
 	
 	private boolean running = false;
 	private boolean pausing = false;
+	
+	private List<Action> mActionList;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +83,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	@Override
 	public void onInit() {
-		mPlayingMemberList = new ArrayList<Member>();
+		mGroupAPlayingMemberList = new ArrayList<Member>();
+		mGroupBPlayingMemberList = new ArrayList<Member>();
 		
 		int timeout = 4 * 10 * 60 * 1000;// 四节比赛，每节比赛10分钟
 		mCountDown = new CountDown(timeout, 1000);
@@ -96,6 +114,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mIvInfoRight = (ImageView) findViewById(R.id.iv_info_right);
 		
 		mLlUpload = (LinearLayout) findViewById(R.id.ll_upload);
+		
+		mGvCourt = (GridView) findViewById(R.id.gv_court);
 	}
 
 	@Override
@@ -119,6 +139,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
+		
+		List<String> positions = new ArrayList<String>(17 * 32);// 长32个格子，宽17个格子
+		for (int i = 0; i < 17 * 32; i++) {
+			positions.add("");// + i);
+		}
+//		Collections.fill(positions, "0");
+		
+		mCourtAdapter = new CourtAdapter(this, positions);
+		mGvCourt.setAdapter(mCourtAdapter);
 	}
 
 	private String formGameTime(int count) {
@@ -164,6 +193,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mIvInfoRight.setOnClickListener(this);
 		
 		mLlUpload.setOnClickListener(this);
+		
+		mGvCourt.setOnItemClickListener(this);
 	}
 
 	private void loadDataInBackground() {
@@ -173,6 +204,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		} else {
 			requestGameData();
 		}
+		
+		loadActionData();
 	}
 
 	private void loadLocalData() {
@@ -294,6 +327,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			}
 		}
 	}
+	
+	private void loadActionData() {
+		// 加载动作数据
+		ActionDb db = new ActionDb(this);
+		mActionList = db.getAll();
+	}
 
 	@Override
 	public void onClick(View view) {
@@ -336,7 +375,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SELECT_STARTS);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
-		dialog.fillPlayersData(mPlayingMemberList, mGroupAMemberList);
+		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
 		dialog.setOnCancelListener(new OnCancelListener() {
 			
 			@Override
@@ -370,7 +409,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SUBSTITUTE);
 		dialog.show();
 		dialog.fillGroupData(mGroupA, mGroupB);
-		dialog.fillPlayersData(mPlayingMemberList, mGroupAMemberList);
+		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
 	}
 
 	private void pauseGame() {
@@ -446,6 +485,91 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	@Override
 	public void onCountDownIntervalReach(int last) {
 		mTvGameTime.setText(formGameTime(last));
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		boolean allowRecordEvent = running;
+		if (allowRecordEvent) {
+			showRecordEventDialog(position);
+		} else {
+			showToast("当前不允许记录球员事件");
+		}
+	}
+
+	private void showRecordEventDialog(int position) {
+		// 显示记录球员事件的对话框
+		showToast("显示记录球员事件的对话框");
+		
+		// TODO only for test
+		mGroupBPlayingMemberList.addAll(mGroupBMemberList);
+
+		RecordEventDialog dialog = new RecordEventDialog(this, mActionList);
+		dialog.show();
+		dialog.fillGroupData(mGroupA, mGroupB);
+		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupBPlayingMemberList);
+	}
+	
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		if (hasFocus) {
+			int columnWidth = mGvCourt.getWidth() / 32;
+			mGvCourt.setColumnWidth(columnWidth);
+			
+			int columnHeight  = mGvCourt.getHeight() / 17;
+			mCourtAdapter.setColumn(columnWidth, columnHeight);
+		}
+	}
+	
+	private class CourtAdapter extends BaseAdapter {
+
+		private LayoutInflater mInflater;
+		private List<String> positions;
+		
+		private int columnWidth;
+		private int columnHeight;
+
+		public CourtAdapter(Context context, List<String> positions) {
+			mInflater = LayoutInflater.from(context);
+			this.positions = positions;
+		}
+
+		public void setColumn(int columnWidth, int columnHeight) {
+			this.columnWidth = columnWidth;
+			this.columnHeight = columnHeight;
+			notifyDataSetChanged();
+		}
+
+		@Override
+		public int getCount() {
+			return positions.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return positions.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return position;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+//			R.layout.item_event_coordinate, R.id.tv_coordinate, 
+			convertView = mInflater.inflate(R.layout.item_event_coordinate, parent, false);
+			
+			if (columnHeight > 0) {
+				AbsListView.LayoutParams params = new AbsListView.LayoutParams(columnWidth, columnHeight);
+				convertView.setLayoutParams(params);
+			}
+			
+			return convertView;
+		}
+		
 	}
 
 }

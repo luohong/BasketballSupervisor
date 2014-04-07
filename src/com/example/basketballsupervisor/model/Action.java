@@ -6,8 +6,8 @@ public class Action implements Serializable {
 
 	public long id;
 	public long nextActionId;
-	public long name;
-	public long score;
+	public String name;
+	public int score;
 	public int cancelable;
 	
 }
