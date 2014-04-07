@@ -453,7 +453,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 判断当前比赛状态是否允许换人
 		boolean allowSubstitute = running && mRole != 3;// 记录创新数据的角色不允许换人
 		if (allowSubstitute) {
-			showSubstituteDialog();
+			if (mRole == 1) {// 记录A队数据
+				allowSubstitute = !(mGroupAPlayingMemberList.size() == mGroupAMemberList.size());
+			} else if (mRole == 2) {// 记录B队数据
+				allowSubstitute = !(mGroupBPlayingMemberList.size() == mGroupBMemberList.size());
+			} else if (mRole == 3) {// 记录创新数据
+				// 不处理
+			}
+			
+			if (allowSubstitute) {
+				showSubstituteDialog();
+			} else {
+				showToastLong("无替补队员");
+			}
 		} else {
 			showToastLong("不允许换人");
 		}
