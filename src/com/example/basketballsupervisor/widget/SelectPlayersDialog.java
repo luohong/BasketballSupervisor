@@ -142,7 +142,8 @@ public class SelectPlayersDialog extends BaseDialog {
 	protected void showConfirmSubstitudeDialog() {
 		// 检查是否符合换人的条件
 		
-		if (mSelectedPlayingPos >= 0 && mSelectedBenchPos >= 0) {
+		if ((mSelectedPlayingPos >= 0 && mSelectedBenchPos >= 0)
+				|| (mSelectedPlayingPos >= 0 && mBenchMembers.size() == 0)) {
 			final ConfirmDialog dialog = new ConfirmDialog(context, "确认换人？", true, "取消", "确认", new View.OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
@@ -150,10 +151,13 @@ public class SelectPlayersDialog extends BaseDialog {
 					
 					Toast.makeText(context, "换人成功", Toast.LENGTH_SHORT).show();
 					Member playingMember = mPlayingMembers.remove(mSelectedPlayingPos);
-					Member benchMember = mBenchMembers.remove(mSelectedBenchPos);
+					
+					if (mSelectedBenchPos >= 0) {
+						Member benchMember = mBenchMembers.remove(mSelectedBenchPos);
+						mPlayingMembers.add(benchMember);
+					}
 
 					mBenchMembers.add(playingMember);
-					mPlayingMembers.add(benchMember);
 				}
 			}, new View.OnClickListener() {
 				@Override
