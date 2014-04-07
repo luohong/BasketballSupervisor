@@ -406,6 +406,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void selectStartPlayers() {
 		// 选择首发球员
+		showToastShort("选择首发球员");
 		
 		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SELECT_STARTS);
 		dialog.show();
@@ -421,6 +422,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			
 			@Override
 			public void onCancel(DialogInterface dialog) {
+				showToastShort("比赛开始");
 				running = true;
 				
 				mTvGameStart.setVisibility(View.GONE);
@@ -501,6 +503,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private void continueGame() {
 		// 继续比赛
+		showToastShort("比赛继续");
 		
 		pausing = false;
 		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
@@ -700,6 +703,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 	
 	private void doPauseGame() {
+		showToastShort("比赛暂停");
+		
 		pausing = true;
 		
 		mIvPauseLeft.setImageResource(R.drawable.btn_continue);
