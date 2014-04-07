@@ -1,10 +1,10 @@
 package com.example.basketballsupervisor.widget;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -331,6 +331,7 @@ public class RecordEventDialog extends BaseDialog {
 	
 	private class EventAdapter extends BaseAdapter {
 
+		private Resources mResources;
 		private LayoutInflater mInflater;
 
 		private List<Action> actionList;
@@ -338,6 +339,7 @@ public class RecordEventDialog extends BaseDialog {
 		private int step;
 		
 		public EventAdapter(Context context, int step, List<Action> actionList) {
+			mResources = context.getResources();
 			mInflater = LayoutInflater.from(context);
 			this.step = step;
 			this.actionList = actionList;
@@ -367,7 +369,10 @@ public class RecordEventDialog extends BaseDialog {
 			
 			TextView tvEvent = (TextView) convertView.findViewById(R.id.tv_event);
 			tvEvent.setText(action.name);
-			tvEvent.setBackgroundResource((step == 2 && action.nextActionId != -1) ? R.drawable.tan_bg03 : R.drawable.tanfont_redbg);
+			
+			boolean newStat = (step == 2 && action.nextActionId == -1);
+			tvEvent.setBackgroundResource(!newStat ? R.drawable.tan_bg03 : R.drawable.tanfont_redbg);
+			tvEvent.setTextColor(!newStat ? mResources.getColor(R.color.black) : mResources.getColor(R.color.white));
 			
 			return convertView;
 		}

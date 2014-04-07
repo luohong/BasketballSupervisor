@@ -9,4 +9,7 @@
     <color name="login_hint">#999999</color>
     
     <color name="input_border">#dcdcdc</color>
+    
+    <color name="game_progress">#8C7F78</color>
+    
 </resources>

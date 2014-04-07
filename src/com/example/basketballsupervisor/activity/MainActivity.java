@@ -120,16 +120,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	@Override
 	public void onInitViewData() {
-		String formedGameTime = formGameTime(0);
-		mTvGameTime.setText(formedGameTime);
-		
-		if (mGameTime <= 20 * 60 * 1000) {
-			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.red));
-			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.white));
-		} else {
-			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.white));
-			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.red));
-		}
+		onCountDownIntervalReach(0);
 		
 		String groupAName = (mGroupA != null && !TextUtils.isEmpty(mGroupA.groupName)) ? mGroupA.groupName : "A队";
 		mTvGroupAName.setText(groupAName);
@@ -142,9 +133,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		List<String> positions = new ArrayList<String>(17 * 32);// 长32个格子，宽17个格子
 		for (int i = 0; i < 17 * 32; i++) {
-			positions.add("");// + i);
+			positions.add("");
 		}
-//		Collections.fill(positions, "0");
 		
 		mCourtAdapter = new CourtAdapter(this, positions);
 		mGvCourt.setAdapter(mCourtAdapter);
@@ -489,6 +479,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	@Override
 	public void onCountDownIntervalReach(int last) {
 		mTvGameTime.setText(formGameTime(last));
+		
+		if (last > 0 && last <= 20 * 60 * 1000) {
+			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.game_progress));
+			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.white));
+		} else if (last > 20 * 60 * 1000) {
+			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.white));
+			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.game_progress));
+		} else {
+			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.white));
+			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.white));
+		}
 	}
 
 	@Override
