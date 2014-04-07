@@ -593,7 +593,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				ReportGameRecordResponse response = request.getObject(o);
 				if (response != null) {
 					if (response.isSuccess()) {
-						showToastShort("上传数据成功");	
+						showToastShort("比赛数据上传成功");	
 					} else {
 						onFail(response.error_remark);
 					}
