@@ -180,7 +180,11 @@ public class RecordEventDialog extends BaseDialog {
 					mNextAction = action;
 					
 					if (mNextAction.nextActionId == -1) {
-						showNewStat();
+						if (mRole == 3) {// 记录创新数据
+							showNewStat();
+						} else {
+							Toast.makeText(context, "您没有权限记录创新数据", Toast.LENGTH_SHORT).show();
+						}
 					} else if (mNextAction.nextActionId > 0) {
 						if (mRole == 3) {// 记录创新数据
 							Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
