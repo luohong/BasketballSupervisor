@@ -9,14 +9,11 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 import android.util.Log;
 
-import com.example.basketballsupervisor.config.Config;
-import com.example.basketballsupervisor.db.GameDb.Table;
 import com.example.basketballsupervisor.model.Action;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
 import com.example.basketballsupervisor.model.Record;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * 得分记录表

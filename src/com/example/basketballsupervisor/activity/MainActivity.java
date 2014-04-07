@@ -662,6 +662,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 	}
 
+	public void updateGroupAScore(int score) {
+		mGroupAScore += score;
+		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
+	}
+
+	public void updateGroupBScore(int score) {
+		mGroupBScore += score;
+		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
+	}
+
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {

@@ -21,6 +21,7 @@ import android.widget.ViewFlipper;
 import com.android.framework.core.widget.BaseDialog;
 import com.android.framework.core.widget.ConfirmDialog;
 import com.example.basketballsupervisor.R;
+import com.example.basketballsupervisor.activity.MainActivity;
 import com.example.basketballsupervisor.db.RecordDb;
 import com.example.basketballsupervisor.model.Action;
 import com.example.basketballsupervisor.model.Game;
@@ -28,6 +29,8 @@ import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
 
 public class RecordEventDialog extends BaseDialog {
+
+	private MainActivity mMainActivity;
 
 	private List<Action> mActionList;
 
@@ -71,6 +74,7 @@ public class RecordEventDialog extends BaseDialog {
 
 	public RecordEventDialog(Context context, List<Action> actionList) {
 		super(context);
+		mMainActivity = (MainActivity) context;
 		mActionList = actionList;
 	}
 
@@ -228,20 +232,30 @@ public class RecordEventDialog extends BaseDialog {
 	}
 
 	private void saveRecordEvent(Action action) {
+		saveRecordEvent(action, true);
+	}
+	
+	private void saveRecordEvent(Action action, boolean toast) {
 		// 记录动作行为
 		RecordDb db = new RecordDb(getContext());
 		if (mRole == 1) {// 记录A队数据
+			mMainActivity.updateGroupAScore(action.score);
 			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime, mCoordinate);
 		} else if (mRole == 2) {// 记录B队数据
+			mMainActivity.updateGroupBScore(action.score);
 			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime, mCoordinate);
 		} else if (mRole == 3) {// 记录创新数据
 			db.saveRecord(mGame, mSelectedGroup, mSelectedMember, action, mGameTime, mCoordinate);
 		}
 		
-		Toast.makeText(context, "记录成功", Toast.LENGTH_SHORT).show();
+		if (toast) {
+			Toast.makeText(context, "记录成功", Toast.LENGTH_SHORT).show();
+		}
 	}
 
 	protected void showNextStat() {
+		saveRecordEvent(mNextAction, false);
+		
 		Action action = null;
 		for (Action temp : mActionList) {
 			if (temp.id == mNextAction.nextActionId) {
