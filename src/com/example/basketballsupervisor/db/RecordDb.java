@@ -145,4 +145,20 @@ public class RecordDb extends BaseDb {
 		}
 	}
 
+	public void saveAll(List<Record> recordList) {
+		checkDb();
+		beginTransaction();
+		try {
+			if (recordList != null && recordList.size() > 0) {
+				for (Record record : recordList) {
+					insert(record);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			endTransaction();
+		}
+	}
+
 }

@@ -33,6 +33,8 @@ import com.example.basketballsupervisor.db.GroupDb;
 import com.example.basketballsupervisor.db.MemberDb;
 import com.example.basketballsupervisor.db.PlayingTimeDb;
 import com.example.basketballsupervisor.db.RecordDb;
+import com.example.basketballsupervisor.http.QueryBBGameRecordRequest;
+import com.example.basketballsupervisor.http.QueryBBGameRecordResponse;
 import com.example.basketballsupervisor.http.QueryPlayInfoRequest;
 import com.example.basketballsupervisor.http.QueryPlayInfoResponse;
 import com.example.basketballsupervisor.http.ReportGameRecordRequest;
@@ -40,6 +42,7 @@ import com.example.basketballsupervisor.http.ReportGameRecordResponse;
 import com.example.basketballsupervisor.model.Action;
 import com.example.basketballsupervisor.model.BBGameRecord;
 import com.example.basketballsupervisor.model.Game;
+import com.example.basketballsupervisor.model.GameRecord;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
 import com.example.basketballsupervisor.model.Record;
@@ -82,6 +85,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private boolean pausing = false;
 	
 	private List<Action> mActionList;
+	private boolean isRequiredUpdateGameRecord = true;// 默认需要获取最新的比赛记录
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -380,7 +384,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			break;
 		case R.id.iv_info_left:
 		case R.id.iv_info_right:
-			
+			updateGameRecord();
 			break;
 		case R.id.ll_upload:
 			uploadGameData();
@@ -544,6 +548,68 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		} else if (mRole == 3) {// 记录创新数据
 			// 无需处理
 		}
+	}
+
+	private void updateGameRecord() {
+		// 更新比赛记录，显示统计信息表
+		
+		if (isRequiredUpdateGameRecord) {
+			final QueryBBGameRecordRequest request = new QueryBBGameRecordRequest(mGame.gId);
+			Config.asynPost(this, "正在更新比赛记录，请稍候...", request.getData(), new CallBack() {
+				
+				@Override
+				public void onSuccess(String o) {
+					QueryBBGameRecordResponse response = request.getObject(o);
+					if (response != null) {
+						if (response.isSuccess()) {
+							showToastShort("比赛记录更新成功");	
+							
+							isRequiredUpdateGameRecord = response.is_complete == 0;
+							
+							saveGameRecord(response.game_record_list);
+							showStatPanel();
+						} else {
+							onFail(response.error_remark);
+						}
+					} else {
+						onFail(null);
+					}
+				}
+
+				private void saveGameRecord(List<GameRecord> gameRecordList) {
+					if (gameRecordList != null && gameRecordList.size() > 0) {
+						List<Record> recordList = new ArrayList<Record>();
+						
+						for (GameRecord gameRecord : gameRecordList) {
+							Record record = new Record(gameRecord);
+							recordList.add(record);
+						}
+						
+						RecordDb db = new RecordDb(getActivity());
+						db.saveAll(recordList);
+					}
+				}
+				
+				@Override
+				public void onFinish(Object obj) {
+				}
+				
+				@Override
+				public void onFail(String msg) {
+					if (TextUtils.isEmpty(msg)) {
+						msg = "上传数据失败，请检查网络后重试";
+					}
+					showToastShort(msg);
+				}
+			});
+		} else {
+			showStatPanel();
+		}
+	}
+
+	private void showStatPanel() {
+		// 显示统计信息画板
+		
 	}
 
 	private void uploadGameData() {
