@@ -3,6 +3,6 @@
     android:id="@+id/iv_coordinate"
     android:layout_width="match_parent"
     android:layout_height="match_parent" 
-    android:src="@drawable/basketball_square"
+    android:src="@null"
     android:scaleType="fitXY">
 </ImageView>
