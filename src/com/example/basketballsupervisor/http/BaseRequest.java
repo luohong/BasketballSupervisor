@@ -36,10 +36,12 @@ public abstract class BaseRequest<T extends BaseResponse> {
 	}
 
 	public HttpEntity getData() {
-	    String cotent = Config.mGson.toJson(this);
+	    String content = Config.mGson.toJson(this);
+		Log.d("HTTP", "Http Request: " + content);
+		
 		StringEntity entity = null;
 		try {
-			entity = new StringEntity(cotent, HTTP.UTF_8);
+			entity = new StringEntity(content, HTTP.UTF_8);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

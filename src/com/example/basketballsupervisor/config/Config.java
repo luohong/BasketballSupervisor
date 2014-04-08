@@ -18,6 +18,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.android.framework.core.widget.ProgressDialog;
 import com.example.basketballsupervisor.R;
@@ -158,6 +159,7 @@ public class Config extends Library {
 				try {
 					IgnitedHttpResponse httpResponse = getApiHttp().post(SERVER, entity).send();
 					String content = httpResponse.getResponseBodyAsString();
+					Log.d("HTTP", "Http Response: " + content);
 					if (!TextUtils.isEmpty(content)) {
 						Message msg = handler.obtainMessage(0);
 						msg.obj = content;
