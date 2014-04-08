@@ -76,8 +76,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private ImageView mIvPauseLeft, mIvPauseRight;
 	private ImageView mIvInfoLeft, mIvInfoRight;
 	private LinearLayout mLlUpload;
+	
 	private GridView mGvCourt;
 	private CourtAdapter mCourtAdapter;
+	private ArrayList<Action> mCourtPositions;
 	
 	private CountDown mCountDown;
 	
@@ -163,12 +165,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		
 		// 填充网格
-		List<String> positions = new ArrayList<String>(17 * 32);// 长32个格子，宽17个格子
+		mCourtPositions = new ArrayList<Action>(17 * 32);// 长32个格子，宽17个格子
 		for (int i = 0; i < 17 * 32; i++) {
-			positions.add("");
+			mCourtPositions.add(null);
 		}
 		
-		mCourtAdapter = new CourtAdapter(this, positions);
+		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
 		mGvCourt.setAdapter(mCourtAdapter);
 	}
 
@@ -738,6 +740,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 	}
 
+	public void setCurrentRecordCoordinate(Action action, String coordinate) {
+		String[] split = coordinate.split(",");
+		
+		int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+		
+		mCourtPositions.set(position, action);
+		mCourtAdapter.notifyDataSetChanged();
+	}
+
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position,
 			long id) {
@@ -826,12 +837,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private class CourtAdapter extends BaseAdapter {
 
 		private LayoutInflater mInflater;
-		private List<String> positions;
+		private List<Action> positions;
 		
 		private int columnWidth;
 		private int columnHeight;
 
-		public CourtAdapter(Context context, List<String> positions) {
+		public CourtAdapter(Context context, List<Action> positions) {
 			mInflater = LayoutInflater.from(context);
 			this.positions = positions;
 		}
@@ -866,6 +877,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			if (columnHeight > 0) {
 				AbsListView.LayoutParams params = new AbsListView.LayoutParams(columnWidth, columnHeight);
 				convertView.setLayoutParams(params);
+			}
+			
+			ImageView image = (ImageView) convertView.findViewById(R.id.iv_coordinate);
+
+			Action action = (Action) getItem(position);
+			if (action == null) {
+				image.setImageResource(R.drawable.basketball_square);
+			} else {
+				if (action.type == 0) {
+					image.setImageResource(R.drawable.position_03);
+				} else {
+					image.setImageResource(R.drawable.position_07);
+				}
 			}
 			
 			return convertView;

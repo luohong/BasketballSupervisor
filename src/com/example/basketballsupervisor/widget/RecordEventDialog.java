@@ -73,6 +73,8 @@ public class RecordEventDialog extends BaseDialog {
 	private Group mGroupB;
 	private Group mSelectedGroup;
 
+	private boolean isSetRecordCoordinate;
+
 	public RecordEventDialog(Context context, List<Action> actionList) {
 		super(context);
 		mMainActivity = (MainActivity) context;
@@ -253,6 +255,12 @@ public class RecordEventDialog extends BaseDialog {
 		
 		if (toast) {
 			Toast.makeText(context, "记录成功", Toast.LENGTH_SHORT).show();
+		}
+		
+		// 仅记录首次操作的状态显示在球场上，而非
+		if (!isSetRecordCoordinate) {
+			isSetRecordCoordinate = true;
+			mMainActivity.setCurrentRecordCoordinate(action, mCoordinate);
 		}
 	}
 

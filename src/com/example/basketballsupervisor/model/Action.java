@@ -9,6 +9,7 @@ public class Action implements Serializable {
 	public String name;
 	public int score;
 	public int cancelable;
+	public int type;// 1 表示得分, 0表示失分
 
 	public Action() {
 		
