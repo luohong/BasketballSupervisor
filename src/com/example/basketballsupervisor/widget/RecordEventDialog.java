@@ -55,6 +55,7 @@ public class RecordEventDialog extends BaseDialog {
 	private TextView mTvPage3Title;
 	private GridView mGvPage3Event;
 	
+	private TextView mTvPage4Title;
 	private TextView mTvPage4GroupAName, mTvPage4GroupBName;
 	private ListView mLvPage4Playing, mLvPage4Bench;
 	
@@ -99,6 +100,8 @@ public class RecordEventDialog extends BaseDialog {
 		
 		mTvPage3Title = (TextView) findViewById(R.id.tv_page3_title);
 		mGvPage3Event = (GridView) findViewById(R.id.gv_page3_event);
+
+		mTvPage4Title = (TextView) findViewById(R.id.tv_page4_title);
 		
 		mTvPage4GroupAName = (TextView) findViewById(R.id.tv_page4_group_a_name);
 		mTvPage4GroupBName = (TextView) findViewById(R.id.tv_page4_group_b_name);
@@ -135,7 +138,7 @@ public class RecordEventDialog extends BaseDialog {
 					
 					showNext();
 				} else {
-					Toast.makeText(context, "您没有权限记录" + mGroupB.groupName + "的技术数据", Toast.LENGTH_SHORT).show();
+					Toast.makeText(context, "您没有权限记录" + mGroupA.groupName + "的技术数据", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -157,7 +160,7 @@ public class RecordEventDialog extends BaseDialog {
 					
 					showNext();
 				} else {
-					Toast.makeText(context, "您没有权限记录" + mGroupA.groupName + "的技术数据", Toast.LENGTH_SHORT).show();
+					Toast.makeText(context, "您没有权限记录" + mGroupB.groupName + "的技术数据", Toast.LENGTH_SHORT).show();
 				}
 			}
 		});
@@ -264,6 +267,8 @@ public class RecordEventDialog extends BaseDialog {
 			}
 		}
 		mNextAction = action;
+		
+		mTvPage4Title.setText(mNextAction.name + "球员选项");
 		
 		mTvPage4GroupAName.setText(mGroupA.groupName);
 		mTvPage4GroupBName.setText(mGroupB.groupName);
