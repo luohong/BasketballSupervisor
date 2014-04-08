@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+    
+    <LinearLayout
+        android:id="@+id/ll_column"
+        android:layout_width="1300.0dip"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tv_column1"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="球队"
+            android:textSize="@dimen/data_stat_column" >
+        </TextView>
+
+	    <LinearLayout
+	        android:id="@+id/ll_column_head"
+	        android:layout_width="1200.0dip"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal" >
+	
+	        <TextView
+	            android:id="@+id/tv_column2"
+	            android:layout_width="@dimen/data_stat_width"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/basketball_square"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:text="不动列头2"
+	            android:textColor="@android:color/black"
+	            android:textSize="@dimen/data_stat_column" >
+	        </TextView>
+	
+	        <TextView
+	            android:id="@+id/tv_column3"
+	            android:layout_width="@dimen/data_stat_width"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/basketball_square"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:text="不动列头3"
+	            android:textSize="@dimen/data_stat_column" >
+	        </TextView>
+	
+	        <TextView
+	            android:id="@+id/tv_column4"
+	            android:layout_width="@dimen/data_stat_width"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/basketball_square"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:text="不动列头4"
+	            android:textColor="@android:color/black"
+	            android:textSize="@dimen/data_stat_column" >
+	        </TextView>
+	
+	        <TextView
+	            android:id="@+id/tv_column5"
+	            android:layout_width="@dimen/data_stat_width"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/basketball_square"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:text="不动列头5"
+	            android:textSize="@dimen/data_stat_column" >
+	        </TextView>
+	
+	        <TextView
+	            android:id="@+id/tv_column6"
+	            android:layout_width="@dimen/data_stat_width"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/basketball_square"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:text="不动列头6"
+	            android:textColor="@android:color/black"
+	            android:textSize="@dimen/data_stat_column" >
+	        </TextView>
+	
+	        <TextView
+	            android:id="@+id/tv_column7"
+	            android:layout_width="@dimen/data_stat_width"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/basketball_square"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:text="不动列头7"
+	            android:textSize="@dimen/data_stat_column" >
+	        </TextView>
+	
+	        <TextView
+	            android:id="@+id/tv_column8"
+	            android:layout_width="@dimen/data_stat_width"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/basketball_square"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:text="不动列头8"
+	            android:textColor="@android:color/black"
+	            android:textSize="@dimen/data_stat_column" >
+	        </TextView>
+	
+	        <TextView
+	            android:id="@+id/tv_column9"
+	            android:layout_width="@dimen/data_stat_width"
+	            android:layout_height="wrap_content"
+	            android:background="@drawable/basketball_square"
+	            android:gravity="center"
+	            android:padding="5dp"
+	            android:singleLine="true"
+	            android:text="不动列头9"
+	            android:textSize="@dimen/data_stat_column" >
+	        </TextView>
+	    </LinearLayout>
+	</LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_content"
+        android:layout_width="1300.0dip"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/tv_content1"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头1"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_content2"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头2"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_content3"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头3"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_content4"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头4"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_content5"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头5"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_content6"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头6"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_content7"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头7"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_content8"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头8"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+
+        <TextView
+            android:id="@+id/tv_content9"
+            android:layout_width="@dimen/data_stat_width"
+            android:layout_height="wrap_content"
+            android:background="@drawable/basketball_square"
+            android:gravity="center"
+            android:padding="5dp"
+            android:singleLine="true"
+            android:text="不动列头9"
+            android:textSize="@dimen/data_stat_content" >
+        </TextView>
+    </LinearLayout>
+
+</LinearLayout>

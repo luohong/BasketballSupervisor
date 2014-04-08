@@ -22,5 +22,10 @@
     <dimen name="dialog_group_name">14sp</dimen>
     
     <dimen name="item_height">32dp</dimen>
+    
+    <dimen name="data_stat_width">100dp</dimen>
+    <dimen name="data_stat_title">18sp</dimen>
+    <dimen name="data_stat_column">16sp</dimen>
+    <dimen name="data_stat_content">16sp</dimen>
 
 </resources>
