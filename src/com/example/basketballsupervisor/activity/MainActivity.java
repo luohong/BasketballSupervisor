@@ -883,7 +883,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 			Action action = (Action) getItem(position);
 			if (action == null) {
-				image.setImageResource(R.drawable.basketball_square);
+//				image.setImageResource(R.drawable.basketball_square);
+				image.setImageResource(0);
 			} else {
 				if (action.type == 0) {
 					image.setImageResource(R.drawable.position_03);
