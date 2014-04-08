@@ -49,6 +49,7 @@ import com.example.basketballsupervisor.model.Record;
 import com.example.basketballsupervisor.model.RoleRecord;
 import com.example.basketballsupervisor.util.CountDown;
 import com.example.basketballsupervisor.util.CountDown.OnCountDownListener;
+import com.example.basketballsupervisor.widget.DataStatDialog;
 import com.example.basketballsupervisor.widget.RecordEventDialog;
 import com.example.basketballsupervisor.widget.SelectPlayersDialog;
 
@@ -79,7 +80,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private GridView mGvCourt;
 	private CourtAdapter mCourtAdapter;
-	private ArrayList<Action> mCourtPositions;
+	private ArrayList<Integer> mCourtPositions;
 	
 	private CountDown mCountDown;
 	
@@ -165,7 +166,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		
 		// 填充网格
-		mCourtPositions = new ArrayList<Action>(17 * 32);// 长32个格子，宽17个格子
+		mCourtPositions = new ArrayList<Integer>(17 * 32);// 长32个格子，宽17个格子
 		for (int i = 0; i < 17 * 32; i++) {
 			mCourtPositions.add(null);
 		}
@@ -401,13 +402,20 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (mRole != 3) {// 记录创新数据无需选择首发球员
 			selectStartPlayers();
 		} else {// 记录创新数据
-			running = true;
-			
-			mTvGameStart.setVisibility(View.GONE);
-			
-			mCountDown.start();// 计时开始
-			mGameTime = System.currentTimeMillis();
+			doStartGame();
 		}
+	}
+
+	private void doStartGame() {
+		running = true;
+		
+		mTvGameStart.setVisibility(View.GONE);
+		
+		mCountDown.start();// 计时开始
+		mGameTime = System.currentTimeMillis();
+		
+		RecordDb db = new RecordDb(this);
+		db.clearAllData();
 	}
 
 	private void selectStartPlayers() {
@@ -429,12 +437,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			@Override
 			public void onCancel(DialogInterface dialog) {
 				showToastShort("比赛开始");
-				running = true;
-				
-				mTvGameStart.setVisibility(View.GONE);
-				
-				mCountDown.start();// 计时开始
-				mGameTime = System.currentTimeMillis();
+				doStartGame();
 				
 				// 记录比赛开始时间
 				GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
@@ -611,7 +614,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void showStatPanel() {
 		// 显示统计信息画板
+		RecordDb db = new RecordDb(this);
+		List<Record> recordList = db.getAll(mGame);
+		for (Record record : recordList) {
+			if (TextUtils.isEmpty(record.coordinate)) {
+				String[] split = record.coordinate.split(",");
+				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+				mCourtPositions.set(position, 0);
+			}
+		}
+		mCourtAdapter.notifyDataSetChanged();
 		
+		DataStatDialog dialog = new DataStatDialog(this);
+		dialog.show();
 	}
 
 	private void uploadGameData() {
@@ -745,7 +760,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
 		
-		mCourtPositions.set(position, action);
+		mCourtPositions.set(position, action.type);
 		mCourtAdapter.notifyDataSetChanged();
 	}
 
@@ -837,12 +852,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private class CourtAdapter extends BaseAdapter {
 
 		private LayoutInflater mInflater;
-		private List<Action> positions;
+		private List<Integer> positions;
 		
 		private int columnWidth;
 		private int columnHeight;
 
-		public CourtAdapter(Context context, List<Action> positions) {
+		public CourtAdapter(Context context, List<Integer> positions) {
 			mInflater = LayoutInflater.from(context);
 			this.positions = positions;
 		}
@@ -881,12 +896,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			
 			ImageView image = (ImageView) convertView.findViewById(R.id.iv_coordinate);
 
-			Action action = (Action) getItem(position);
-			if (action == null) {
+			Integer type = (Integer) getItem(position);
+			if (type == null) {
 //				image.setImageResource(R.drawable.basketball_square);
 				image.setImageResource(0);
 			} else {
-				if (action.type == 0) {
+				if (type == 0) {
 					image.setImageResource(R.drawable.position_03);
 				} else {
 					image.setImageResource(R.drawable.position_07);
