@@ -97,7 +97,7 @@ public class RecordDb extends BaseDb {
             String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.GROUP_ID);
             String[] selectionArgs = new String[] { String.valueOf(game.gId), String.valueOf(group.groupId) };
         	
-            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table.DEFAULT_SORT_ORDER);
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, null);
             while (cursor != null && cursor.moveToNext()) {
             	Record record = (Record)parseCursor(cursor);
             	recordList.add(record);

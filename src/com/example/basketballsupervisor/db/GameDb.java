@@ -89,7 +89,7 @@ public class GameDb extends BaseDb {
         Cursor cursor = null;
         try {
         	checkDb();
-            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, null, null, null, null, Table.DEFAULT_SORT_ORDER);
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, null, null, null, null, null);
             while (cursor != null && cursor.moveToNext()) {
             	Game game = (Game)parseCursor(cursor);
             	gameList.add(game);

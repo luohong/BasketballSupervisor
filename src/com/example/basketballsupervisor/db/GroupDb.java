@@ -78,7 +78,7 @@ public class GroupDb extends BaseDb {
         Cursor cursor = null;
         try {
         	checkDb();
-            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table.DEFAULT_SORT_ORDER );
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, null );
             while (cursor != null && cursor.moveToNext()) {
                 Group group = (Group) parseCursor(cursor);
                 groupList.add(group);
