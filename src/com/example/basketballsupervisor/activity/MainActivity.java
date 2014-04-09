@@ -319,7 +319,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				
 				mGroupB = groupList.get(1);
 				if (mGroupB != null) {
-					mGroupBMemberList = mGroupA.memberList;
+					mGroupBMemberList = mGroupB.memberList;
 				}
 			}
 		}
