@@ -145,4 +145,9 @@ public class PlayingTimeDb extends BaseDb {
 		}
 	}
 
+	public List<String> getGroupMemberPlayingTime(Group group, Member member) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }
