@@ -1,6 +1,7 @@
 package com.example.basketballsupervisor.activity;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
@@ -41,6 +42,7 @@ import com.example.basketballsupervisor.http.ReportGameRecordRequest;
 import com.example.basketballsupervisor.http.ReportGameRecordResponse;
 import com.example.basketballsupervisor.model.Action;
 import com.example.basketballsupervisor.model.BBGameRecord;
+import com.example.basketballsupervisor.model.DataStat;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.GameRecord;
 import com.example.basketballsupervisor.model.Group;
@@ -54,6 +56,13 @@ import com.example.basketballsupervisor.widget.RecordEventDialog;
 import com.example.basketballsupervisor.widget.SelectPlayersDialog;
 
 public class MainActivity extends BaseActivity implements OnClickListener, OnCountDownListener, OnItemClickListener {
+	
+	private static String[] DATA_STAT_COLUMNS = new String[] { "总得分", "总出手命中次数（不含罚球）",
+			"总出手次数（不含罚球）", "总命中率（总命中率中不含罚球命中率）", "2分球命中次数", "2分球出手次数",
+			"2分球命中率", "3分球命中次数", "3分球出手次数", "3分球命中率", "罚球命中次数", "罚球出手次数",
+			"罚球命中率", "前场篮板", "后场篮板", "总篮板", "助攻", "抢断", "封盖", "被犯规", "犯规",
+			"失误", "上场时间" };
+	private static String[] INNOVATE_DATA_STAT_COLUMNS = new String[] { "一条龙", "超远三分", "绝杀", "最后三秒得分", "晃倒", "2+1,3+1", "扣篮", "快攻", "2罚不中", "三罚不中", "被晃倒" };
 
 	private int mRole = 1;
 	private long mGameTime = 0l;
@@ -625,7 +634,54 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 		mCourtAdapter.notifyDataSetChanged();
 		
-		DataStatDialog dialog = new DataStatDialog(this);
+		// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误 上场时间
+		// 一条龙，超远三分，绝杀，最后三秒得分，晃倒，2+1,3+1，扣篮，快攻，2罚不中，三罚不中，被晃倒
+		
+		List<DataStat> list = new ArrayList<DataStat>();
+		
+		List<String> columns = Arrays.asList(DATA_STAT_COLUMNS);
+		List<String> innovateColumns = Arrays.asList(INNOVATE_DATA_STAT_COLUMNS);
+		
+		// 球队统计标题
+		DataStat groupDataStatTitle = new DataStat();
+		groupDataStatTitle.type = DataStatDialog.TYPE_TITLE;
+		groupDataStatTitle.dataList = new ArrayList<String>();
+		groupDataStatTitle.dataList.add("球队统计");
+		list.add(groupDataStatTitle);
+		
+		// 球队统计列名
+		DataStat groupDataStatColumn = new DataStat();
+		groupDataStatColumn.type = DataStatDialog.TYPE_COLUMN;
+		groupDataStatColumn.dataList = columns.subList(0, columns.size() - 2);
+		list.add(groupDataStatColumn);
+		
+		// 球员统计标题
+		DataStat memberDataStatTitle = new DataStat();
+		memberDataStatTitle.type = DataStatDialog.TYPE_TITLE;
+		memberDataStatTitle.dataList = new ArrayList<String>();
+		memberDataStatTitle.dataList.add("球员统计");
+		list.add(memberDataStatTitle);
+		
+		// 球员统计列名
+		DataStat memberDataStatColumn = new DataStat();
+		memberDataStatColumn.type = DataStatDialog.TYPE_COLUMN;
+		memberDataStatColumn.dataList = columns;
+		list.add(memberDataStatColumn);
+		
+		// 创新数据标题
+		DataStat innovateDataStatTitle = new DataStat();
+		innovateDataStatTitle.type = DataStatDialog.TYPE_TITLE;
+		innovateDataStatTitle.dataList = new ArrayList<String>();
+		innovateDataStatTitle.dataList.add("创新数据");
+		list.add(innovateDataStatTitle);
+		
+		// 创新数据列名
+		DataStat innovateDataStatColumn = new DataStat();
+		innovateDataStatColumn.type = DataStatDialog.TYPE_COLUMN;
+		innovateDataStatColumn.dataList = innovateColumns;
+		list.add(innovateDataStatColumn);
+		
+		DataStatDialog dialog = new DataStatDialog(this, list);
 		dialog.show();
 	}
 

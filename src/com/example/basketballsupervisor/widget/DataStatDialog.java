@@ -1,5 +1,7 @@
 package com.example.basketballsupervisor.widget;
 
+import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,13 +11,20 @@ import android.widget.TextView;
 
 import com.android.framework.core.widget.BaseDialog;
 import com.example.basketballsupervisor.R;
+import com.example.basketballsupervisor.model.DataStat;
 
 public class DataStatDialog extends BaseDialog {
 
-	private HorizontalListView mListView;
+	public static final int TYPE_TITLE = 0;
+	public static final int TYPE_COLUMN = 1;
+	public static final int TYPE_CONTENT = 2;
 
-	public DataStatDialog(Context context) {
+	private HorizontalListView mListView;
+	private List<DataStat> list;
+
+	public DataStatDialog(Context context, List<DataStat> list) {
 		super(context);
+		this.list = list;
 	}
 
 	@Override
@@ -35,10 +44,6 @@ public class DataStatDialog extends BaseDialog {
 	}
 
 	private class DataStatAdapter extends BaseAdapter {
-
-		private static final int TYPE_TITLE = 0;
-		private static final int TYPE_COLUMN = 1;
-		private static final int TYPE_CONTENT = 2;
 		
 		private LayoutInflater mInflater;
 
@@ -48,7 +53,7 @@ public class DataStatDialog extends BaseDialog {
 
 		@Override
 		public int getCount() {
-			return 6;
+			return list != null ? list.size() : 0;
 		}
 		
 		@Override
@@ -58,11 +63,21 @@ public class DataStatDialog extends BaseDialog {
 		
 		@Override
 		public int getItemViewType(int position) {
-			return position % 2 == 0 ? TYPE_TITLE : TYPE_COLUMN;
+			DataStat dataStat = (DataStat) getItem(position);
+			return dataStat.type;
 		}
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
+			
+			DataStat dataStat = (DataStat) getItem(position);
+			if (dataStat == null) {
+				return convertView;
+			}
+			List<String> dataList = dataStat.dataList;
+			if (dataList == null || dataList.size() == 0) {
+				return convertView;
+			}
 			
 			int viewType = getItemViewType(position);
 			switch (viewType) {
@@ -71,20 +86,7 @@ public class DataStatDialog extends BaseDialog {
 					convertView = mInflater.inflate(R.layout.item_data_stat_title, null);
 				}
 				
-				String title = "";
-				switch (position) {
-				case 1:
-					title = "球队统计";
-					break;
-				case 3:
-					title = "球员统计";
-					break;
-				case 5:
-					title = "创新数据";
-					break;
-				}
-				
-				((TextView) convertView.findViewById(R.id.tv_title)).setText(title);
+				((TextView) convertView.findViewById(R.id.tv_title)).setText(dataList.get(0));
 				break;
 			case TYPE_COLUMN:
 				if (convertView == null) {
@@ -92,10 +94,18 @@ public class DataStatDialog extends BaseDialog {
 				}
 
 				// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误 上场时间
+				for (int i = 0; i < dataList.size(); i++) {
+					((TextView) convertView.findViewById(R.id.tv_column2 + i)).setText(dataList.get(i));
+				}
+				break;
+			case TYPE_CONTENT:
+				if (convertView == null) {
+					convertView = mInflater.inflate(R.layout.item_data_stat, null);
+				}
+
 				// 一条龙，超远三分，绝杀，最后三秒得分，晃倒，2+1,3+1，扣篮，快攻，2罚不中，三罚不中，被晃倒
-				for (int i = 0; i < 8; i++) {
-					((TextView) convertView.findViewById(R.id.tv_column2 + i)).setText("数据" + position + "行" + (i + 2) + "列");
-					((TextView) convertView.findViewById(R.id.tv_content2 + i)).setText("数据" + position + "行" + (i + 2) + "列");
+				for (int i = 0; i < dataList.size(); i++) {
+					((TextView) convertView.findViewById(R.id.tv_column2 + i)).setText(dataList.get(i));
 				}
 				break;
 			}
@@ -111,12 +121,12 @@ public class DataStatDialog extends BaseDialog {
 
 		@Override
 		public Object getItem(int position) {
-			return null;
+			return list.get(position);
 		}
 
 		@Override
 		public long getItemId(int position) {
-			return 0;
+			return position;
 		}
 	}
 
