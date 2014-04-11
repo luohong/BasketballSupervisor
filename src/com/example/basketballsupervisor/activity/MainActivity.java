@@ -577,7 +577,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private void updateGameRecord() {
 		// 更新比赛记录，显示统计信息表
 		
-		if (isRequiredUpdateGameRecord) {
+		if (!isRequiredUpdateGameRecord) {
 			final QueryBBGameRecordRequest request = new QueryBBGameRecordRequest(mGame.gId);
 			Config.asynPost(this, "正在更新比赛记录，请稍候...", request.getData(), new CallBack() {
 				
@@ -760,101 +760,28 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 	
 	private void addGroupDataStatContent(Map<Long, Map<Long, Integer>> mGroupActionMap, List<DataStat> list, Group group) {
-		// A队球员创新数据列值
-		List<String> dataList = new ArrayList<String>();
-		// A队队名
-		dataList.add(group.groupName);
-		
 		// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误
 		Map<Long, Integer> actionCountMap = mGroupActionMap.get(group.groupId);
-		
-		int dichotomyHitCount = actionCountMap.get(1);// 2分球命中次数
-		int dichotomyMissCount = actionCountMap.get(2);// 2分球不中次数
-		int dichotomyShootCount = dichotomyHitCount + dichotomyMissCount;// 2分球出手次数
-		float dichotomyHitRate = (float) dichotomyHitCount / (float) dichotomyShootCount;// 2分球命中率 
-		int dichotomyScore = dichotomyHitCount * mActionMap.get(1).score;// 2分球总得分
-		
-		int trisectionHitCount = actionCountMap.get(3);// 3分球命中次数
-		int trisectionMissCount = actionCountMap.get(4);// 3分球不中次数
-		int trisectionShootCount = trisectionHitCount + trisectionMissCount;// 3分球出手次数
-		float trisectionHitRate = (float) trisectionHitCount / (float) trisectionShootCount;// 3分球命中率 
-		int trisectionScore = trisectionHitCount * mActionMap.get(3).score;// 3分球总得分
-		
-		int penaltyHitCount = actionCountMap.get(5);// 罚球命中次数
-		int penaltyMissCount = actionCountMap.get(6);// 罚球命中次数
-		int penaltyShootCount = penaltyHitCount + penaltyMissCount;// 罚球出手次数
-		float penaltyHitRate = (float) penaltyHitCount / (float) penaltyShootCount;// 罚球命中率 
-		int penaltyScore = penaltyHitCount * mActionMap.get(5).score;// 罚球总得分
-		
-		int totalScore = dichotomyScore + trisectionScore + penaltyScore;// 总得分
-		int totalHitCount = dichotomyHitCount + trisectionHitCount;// 总出手命中次数（不含罚球）
-		int totalShootCount = dichotomyShootCount + trisectionShootCount;// 总出手次数（不含罚球） 
-		float totalHitRate = (float) totalHitCount / (float) totalShootCount;// 总命中率（总命中率中不含罚球命中率）  
-		
-		int offensiveReboundCount = actionCountMap.get(9);// 前场篮板
-		int defensiveReboundCount = actionCountMap.get(10);// 后场篮板 
-		int totalReboundCount = offensiveReboundCount + defensiveReboundCount;// 总篮板
-		int assistCount = actionCountMap.get(8);// 助攻 
-		int stealCount = actionCountMap.get(7);// 抢断 
-		int blockedShotsCount = actionCountMap.get(12);// 封盖 
-		int fouledCount = actionCountMap.get(14);// 被犯规 
-		int foulCount = actionCountMap.get(13);// 犯规 
-		int missCount = actionCountMap.get(11);// 失误 
-		
-		dataList.add(String.valueOf(totalScore));// 总得分 
-		dataList.add(String.valueOf(totalHitCount));// 总出手命中次数（不含罚球）
-		dataList.add(String.valueOf(totalShootCount));// 总出手次数（不含罚球） 
-		dataList.add(String.valueOf(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
-		dataList.add(String.valueOf(dichotomyHitCount));// 2分球命中次数 
-		dataList.add(String.valueOf(dichotomyShootCount));// 2分球出手次数 
-		dataList.add(String.valueOf(dichotomyHitRate));// 2分球命中率 
-		dataList.add(String.valueOf(trisectionHitCount));// 3分球命中次数 
-		dataList.add(String.valueOf(trisectionShootCount));// 3分球出手次数 
-		dataList.add(String.valueOf(trisectionHitRate));// 3分球命中率 
-		dataList.add(String.valueOf(penaltyHitCount));// 罚球命中次数 
-		dataList.add(String.valueOf(penaltyShootCount));// 罚球出手次数 
-		dataList.add(String.valueOf(penaltyHitRate));// 罚球命中率 
-		dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
-		dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
-		dataList.add(String.valueOf(totalReboundCount));// 总篮板 
-		dataList.add(String.valueOf(assistCount));// 助攻 
-		dataList.add(String.valueOf(stealCount));// 抢断 
-		dataList.add(String.valueOf(blockedShotsCount));// 封盖 
-		dataList.add(String.valueOf(fouledCount));// 被犯规 
-		dataList.add(String.valueOf(foulCount));// 犯规 
-		dataList.add(String.valueOf(missCount));// 失误 
-		
-		DataStat innovateDataStatContent = new DataStat();
-		innovateDataStatContent.type = DataStatDialog.TYPE_CONTENT;
-		innovateDataStatContent.dataList = dataList;
-		list.add(innovateDataStatContent);
-	}
-	
-	private void addMemberDataStatContent(Map<Long, Map<Long, Integer>> mMemberActionMap, List<DataStat> list, List<Member> memberList, Group group) {
-		// 某队球员创新数据列值
-		for (Member member : memberList) {
+		if (actionCountMap != null) {
+			// A队球员创新数据列值
 			List<String> dataList = new ArrayList<String>();
-			// 某队队名
+			// A队队名
 			dataList.add(group.groupName);
-			dataList.add(member.name);
-			
-			// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误 上场时间
-			Map<Long, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
-			
-			int dichotomyHitCount = actionCountMap.get(1);// 2分球命中次数
-			int dichotomyMissCount = actionCountMap.get(2);// 2分球不中次数
+		
+			int dichotomyHitCount = actionCountMap.containsKey(1) ? actionCountMap.get(1) : 0;// 2分球命中次数
+			int dichotomyMissCount = actionCountMap.containsKey(2) ? actionCountMap.get(2) : 0;// 2分球不中次数
 			int dichotomyShootCount = dichotomyHitCount + dichotomyMissCount;// 2分球出手次数
 			float dichotomyHitRate = (float) dichotomyHitCount / (float) dichotomyShootCount;// 2分球命中率 
 			int dichotomyScore = dichotomyHitCount * mActionMap.get(1).score;// 2分球总得分
 			
-			int trisectionHitCount = actionCountMap.get(3);// 3分球命中次数
-			int trisectionMissCount = actionCountMap.get(4);// 3分球不中次数
+			int trisectionHitCount = actionCountMap.containsKey(3) ? actionCountMap.get(3) : 0;// 3分球命中次数
+			int trisectionMissCount = actionCountMap.containsKey(4) ? actionCountMap.get(4) : 0;// 3分球不中次数
 			int trisectionShootCount = trisectionHitCount + trisectionMissCount;// 3分球出手次数
 			float trisectionHitRate = (float) trisectionHitCount / (float) trisectionShootCount;// 3分球命中率 
 			int trisectionScore = trisectionHitCount * mActionMap.get(3).score;// 3分球总得分
 			
-			int penaltyHitCount = actionCountMap.get(5);// 罚球命中次数
-			int penaltyMissCount = actionCountMap.get(6);// 罚球命中次数
+			int penaltyHitCount = actionCountMap.containsKey(5) ? actionCountMap.get(5) : 0;// 罚球命中次数
+			int penaltyMissCount = actionCountMap.containsKey(6) ? actionCountMap.get(6) : 0;// 罚球命中次数
 			int penaltyShootCount = penaltyHitCount + penaltyMissCount;// 罚球出手次数
 			float penaltyHitRate = (float) penaltyHitCount / (float) penaltyShootCount;// 罚球命中率 
 			int penaltyScore = penaltyHitCount * mActionMap.get(5).score;// 罚球总得分
@@ -864,19 +791,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			int totalShootCount = dichotomyShootCount + trisectionShootCount;// 总出手次数（不含罚球） 
 			float totalHitRate = (float) totalHitCount / (float) totalShootCount;// 总命中率（总命中率中不含罚球命中率）  
 			
-			int offensiveReboundCount = actionCountMap.get(9);// 前场篮板
-			int defensiveReboundCount = actionCountMap.get(10);// 后场篮板 
+			int offensiveReboundCount = actionCountMap.containsKey(9) ? actionCountMap.get(9) : 0;// 前场篮板
+			int defensiveReboundCount = actionCountMap.containsKey(10) ? actionCountMap.get(10) : 0;// 后场篮板 
 			int totalReboundCount = offensiveReboundCount + defensiveReboundCount;// 总篮板
-			int assistCount = actionCountMap.get(8);// 助攻 
-			int stealCount = actionCountMap.get(7);// 抢断 
-			int blockedShotsCount = actionCountMap.get(12);// 封盖 
-			int fouledCount = actionCountMap.get(14);// 被犯规 
-			int foulCount = actionCountMap.get(13);// 犯规 
-			int missCount = actionCountMap.get(11);// 失误 
-			String playingTime = "00:00";// 上场时间
-			
-//			PlayingTimeDb db = new PlayingTimeDb(this);
-//			List<String> playingTimeList = db.getGroupMemberPlayingTime(group, member);
+			int assistCount = actionCountMap.containsKey(8) ? actionCountMap.get(8) : 0;// 助攻 
+			int stealCount = actionCountMap.containsKey(7) ? actionCountMap.get(7) : 0;// 抢断 
+			int blockedShotsCount = actionCountMap.containsKey(12) ? actionCountMap.get(12) : 0;// 封盖 
+			int fouledCount = actionCountMap.containsKey(14) ? actionCountMap.get(14) : 0;// 被犯规 
+			int foulCount = actionCountMap.containsKey(13) ? actionCountMap.get(13) : 0;// 犯规 
+			int missCount = actionCountMap.containsKey(11) ? actionCountMap.get(11) : 0;// 失误 
 			
 			dataList.add(String.valueOf(totalScore));// 总得分 
 			dataList.add(String.valueOf(totalHitCount));// 总出手命中次数（不含罚球）
@@ -900,7 +823,113 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(String.valueOf(fouledCount));// 被犯规 
 			dataList.add(String.valueOf(foulCount));// 犯规 
 			dataList.add(String.valueOf(missCount));// 失误 
-			dataList.add(String.valueOf(playingTime));// 上场时间
+			
+			DataStat innovateDataStatContent = new DataStat();
+			innovateDataStatContent.type = DataStatDialog.TYPE_CONTENT;
+			innovateDataStatContent.dataList = dataList;
+			list.add(innovateDataStatContent);
+		}
+	}
+	
+	private void addMemberDataStatContent(Map<Long, Map<Long, Integer>> mMemberActionMap, List<DataStat> list, List<Member> memberList, Group group) {
+		// 某队球员创新数据列值
+		for (Member member : memberList) {
+			List<String> dataList = new ArrayList<String>();
+			// 某队队名
+			dataList.add(group.groupName);
+			dataList.add(member.name);
+			
+			// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误 上场时间
+			Map<Long, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
+			if (actionCountMap != null) {
+				
+				int dichotomyHitCount = actionCountMap.containsKey(1) ? actionCountMap.get(1) : 0;// 2分球命中次数
+				int dichotomyMissCount = actionCountMap.containsKey(2) ? actionCountMap.get(2) : 0;// 2分球不中次数
+				int dichotomyShootCount = dichotomyHitCount + dichotomyMissCount;// 2分球出手次数
+				float dichotomyHitRate = (float) dichotomyHitCount / (float) dichotomyShootCount;// 2分球命中率 
+				int dichotomyScore = dichotomyHitCount * mActionMap.get(1).score;// 2分球总得分
+				
+				int trisectionHitCount = actionCountMap.containsKey(3) ? actionCountMap.get(3) : 0;// 3分球命中次数
+				int trisectionMissCount = actionCountMap.containsKey(4) ? actionCountMap.get(4) : 0;// 3分球不中次数
+				int trisectionShootCount = trisectionHitCount + trisectionMissCount;// 3分球出手次数
+				float trisectionHitRate = (float) trisectionHitCount / (float) trisectionShootCount;// 3分球命中率 
+				int trisectionScore = trisectionHitCount * mActionMap.get(3).score;// 3分球总得分
+				
+				int penaltyHitCount = actionCountMap.containsKey(5) ? actionCountMap.get(5) : 0;// 罚球命中次数
+				int penaltyMissCount = actionCountMap.containsKey(6) ? actionCountMap.get(6) : 0;// 罚球命中次数
+				int penaltyShootCount = penaltyHitCount + penaltyMissCount;// 罚球出手次数
+				float penaltyHitRate = (float) penaltyHitCount / (float) penaltyShootCount;// 罚球命中率 
+				int penaltyScore = penaltyHitCount * mActionMap.get(5).score;// 罚球总得分
+				
+				int totalScore = dichotomyScore + trisectionScore + penaltyScore;// 总得分
+				int totalHitCount = dichotomyHitCount + trisectionHitCount;// 总出手命中次数（不含罚球）
+				int totalShootCount = dichotomyShootCount + trisectionShootCount;// 总出手次数（不含罚球） 
+				float totalHitRate = (float) totalHitCount / (float) totalShootCount;// 总命中率（总命中率中不含罚球命中率）  
+				
+				int offensiveReboundCount = actionCountMap.containsKey(9) ? actionCountMap.get(9) : 0;// 前场篮板
+				int defensiveReboundCount = actionCountMap.containsKey(10) ? actionCountMap.get(10) : 0;// 后场篮板 
+				int totalReboundCount = offensiveReboundCount + defensiveReboundCount;// 总篮板
+				int assistCount = actionCountMap.containsKey(8) ? actionCountMap.get(8) : 0;// 助攻 
+				int stealCount = actionCountMap.containsKey(7) ? actionCountMap.get(7) : 0;// 抢断 
+				int blockedShotsCount = actionCountMap.containsKey(12) ? actionCountMap.get(12) : 0;// 封盖 
+				int fouledCount = actionCountMap.containsKey(14) ? actionCountMap.get(14) : 0;// 被犯规 
+				int foulCount = actionCountMap.containsKey(13) ? actionCountMap.get(13) : 0;// 犯规 
+				int missCount = actionCountMap.containsKey(11) ? actionCountMap.get(11) : 0;// 失误 
+				String playingTime = "00:00";// 上场时间
+				
+	//			PlayingTimeDb db = new PlayingTimeDb(this);
+	//			List<String> playingTimeList = db.getGroupMemberPlayingTime(group, member);
+				
+				dataList.add(String.valueOf(totalScore));// 总得分 
+				dataList.add(String.valueOf(totalHitCount));// 总出手命中次数（不含罚球）
+				dataList.add(String.valueOf(totalShootCount));// 总出手次数（不含罚球） 
+				dataList.add(String.valueOf(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
+				dataList.add(String.valueOf(dichotomyHitCount));// 2分球命中次数 
+				dataList.add(String.valueOf(dichotomyShootCount));// 2分球出手次数 
+				dataList.add(String.valueOf(dichotomyHitRate));// 2分球命中率 
+				dataList.add(String.valueOf(trisectionHitCount));// 3分球命中次数 
+				dataList.add(String.valueOf(trisectionShootCount));// 3分球出手次数 
+				dataList.add(String.valueOf(trisectionHitRate));// 3分球命中率 
+				dataList.add(String.valueOf(penaltyHitCount));// 罚球命中次数 
+				dataList.add(String.valueOf(penaltyShootCount));// 罚球出手次数 
+				dataList.add(String.valueOf(penaltyHitRate));// 罚球命中率 
+				dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
+				dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
+				dataList.add(String.valueOf(totalReboundCount));// 总篮板 
+				dataList.add(String.valueOf(assistCount));// 助攻 
+				dataList.add(String.valueOf(stealCount));// 抢断 
+				dataList.add(String.valueOf(blockedShotsCount));// 封盖 
+				dataList.add(String.valueOf(fouledCount));// 被犯规 
+				dataList.add(String.valueOf(foulCount));// 犯规 
+				dataList.add(String.valueOf(missCount));// 失误 
+				dataList.add(String.valueOf(playingTime));// 上场时间
+			} else {
+				
+				dataList.add("0");// 总得分 
+				dataList.add("0");// 总出手命中次数（不含罚球）
+				dataList.add("0");// 总出手次数（不含罚球） 
+				dataList.add("0");// 总命中率（总命中率中不含罚球命中率） 
+				dataList.add("0");// 2分球命中次数 
+				dataList.add("0");// 2分球出手次数 
+				dataList.add("0");// 2分球命中率 
+				dataList.add("0");// 3分球命中次数 
+				dataList.add("0");// 3分球出手次数 
+				dataList.add("0");// 3分球命中率 
+				dataList.add("0");// 罚球命中次数 
+				dataList.add("0");// 罚球出手次数 
+				dataList.add("0");// 罚球命中率 
+				dataList.add("0");// 前场篮板 
+				dataList.add("0");// 后场篮板 
+				dataList.add("0");// 总篮板 
+				dataList.add("0");// 助攻 
+				dataList.add("0");// 抢断 
+				dataList.add("0");// 封盖 
+				dataList.add("0");// 被犯规 
+				dataList.add("0");// 犯规 
+				dataList.add("0");// 失误 
+				dataList.add("00:00");// 上场时间
+				
+			}
 			
 			DataStat memberDataStatContent = new DataStat();
 			memberDataStatContent.type = DataStatDialog.TYPE_CONTENT;
@@ -919,19 +948,33 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(member.name);
 			
 			Map<Long, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
-			
-			dataList.add("0");// 一条龙 TODO 数据库未添加记录
-			dataList.add(actionCountMap.get(16).toString());// 超远三分
-			dataList.add(actionCountMap.get(17).toString());// 绝杀
-			dataList.add(actionCountMap.get(18).toString());// 最后三秒得分
-			dataList.add(actionCountMap.get(19).toString());// 晃倒
-			dataList.add(actionCountMap.get(20).toString());// 2+1
-			dataList.add(actionCountMap.get(21).toString());// 3+1
-			dataList.add(actionCountMap.get(22).toString());// 扣篮
-			dataList.add(actionCountMap.get(23).toString());// 快攻
-			dataList.add(actionCountMap.get(24).toString());// 2罚不中
-			dataList.add(actionCountMap.get(25).toString());// 三罚不中
-			dataList.add(actionCountMap.get(26).toString());// 被晃倒
+			if (actionCountMap != null) {
+				dataList.add("0");// 一条龙 TODO 数据库未添加记录
+				dataList.add(actionCountMap.get(16) != null ? actionCountMap.get(16).toString() : "0");// 超远三分
+				dataList.add(actionCountMap.get(17) != null ? actionCountMap.get(17).toString() : "0");// 绝杀
+				dataList.add(actionCountMap.get(18) != null ? actionCountMap.get(18).toString() : "0");// 最后三秒得分
+				dataList.add(actionCountMap.get(19) != null ? actionCountMap.get(19).toString() : "0");// 晃倒
+				dataList.add(actionCountMap.get(20) != null ? actionCountMap.get(20).toString() : "0");// 2+1
+				dataList.add(actionCountMap.get(21) != null ? actionCountMap.get(21).toString() : "0");// 3+1
+				dataList.add(actionCountMap.get(22) != null ? actionCountMap.get(22).toString() : "0");// 扣篮
+				dataList.add(actionCountMap.get(23) != null ? actionCountMap.get(23).toString() : "0");// 快攻
+				dataList.add(actionCountMap.get(24) != null ? actionCountMap.get(24).toString() : "0");// 2罚不中
+				dataList.add(actionCountMap.get(25) != null ? actionCountMap.get(25).toString() : "0");// 三罚不中
+				dataList.add(actionCountMap.get(26) != null ? actionCountMap.get(26).toString() : "0");// 被晃倒
+			} else {
+				dataList.add("0");// 一条龙 TODO 数据库未添加记录
+				dataList.add("0");// 超远三分
+				dataList.add("0");// 绝杀
+				dataList.add("0");// 最后三秒得分
+				dataList.add("0");// 晃倒
+				dataList.add("0");// 2+1
+				dataList.add("0");// 3+1
+				dataList.add("0");// 扣篮
+				dataList.add("0");// 快攻
+				dataList.add("0");// 2罚不中
+				dataList.add("0");// 三罚不中
+				dataList.add("0");// 被晃倒
+			}
 			
 			DataStat innovateDataStatContent = new DataStat();
 			innovateDataStatContent.type = DataStatDialog.TYPE_CONTENT;
