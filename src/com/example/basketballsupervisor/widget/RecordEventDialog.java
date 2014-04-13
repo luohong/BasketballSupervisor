@@ -5,9 +5,12 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -87,7 +90,7 @@ public class RecordEventDialog extends BaseDialog {
 	}
 
 	@Override
-	protected void initDialogViews() {
+	protected void onFindViews() {
 		
 		vFlipper = (ViewFlipper) findViewById(R.id.vf_events);
 		
@@ -114,7 +117,7 @@ public class RecordEventDialog extends BaseDialog {
 	}
 
 	@Override
-	protected void afterDialogViews() {
+	protected void onInitViewData() {
 		
 		// page1		
 		mGroupAPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_A);
@@ -234,6 +237,23 @@ public class RecordEventDialog extends BaseDialog {
 				saveRecordEvent(mNextAction);
 			}
 		});
+	}
+	
+	@Override
+	public void initWindowLayoutParams() {
+		Window win = getWindow();
+	    WindowManager m = win.getWindowManager();
+		DisplayMetrics  dm = new DisplayMetrics();    
+	    m.getDefaultDisplay().getMetrics(dm);    
+		
+	    int width = (int) (dm.widthPixels * 0.6);
+	    int height = (int) (dm.heightPixels * 0.8);
+
+		WindowManager.LayoutParams p = win.getAttributes();
+		p.width = width;
+		p.height = height;
+		
+	    win.setAttributes(p);
 	}
 
 	private void saveRecordEvent(Action action) {

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -59,7 +62,7 @@ public class SelectPlayersDialog extends BaseDialog {
 	}
 
 	@Override
-	protected void initDialogViews() {
+	protected void onFindViews() {
 		
 		mTvGroupAName = (TextView) findViewById(R.id.tv_group_a_name);
 		mTvGroupBName = (TextView) findViewById(R.id.tv_group_b_name);
@@ -72,7 +75,7 @@ public class SelectPlayersDialog extends BaseDialog {
 	}
 
 	@Override
-	protected void afterDialogViews() {
+	protected void onInitViewData() {
 		
 		mPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_A);
 		mLvPlaying.setAdapter(mPlayingAdapter);
@@ -139,6 +142,23 @@ public class SelectPlayersDialog extends BaseDialog {
 		
 //		mTvTrainers.setVisibility(View.GONE);
 		
+	}
+	
+	@Override
+	public void initWindowLayoutParams() {
+		Window win = getWindow();
+	    WindowManager m = win.getWindowManager();
+		DisplayMetrics  dm = new DisplayMetrics();    
+	    m.getDefaultDisplay().getMetrics(dm);    
+		
+	    int width = (int) (dm.widthPixels * 0.6);
+	    int height = (int) (dm.heightPixels * 0.8);
+
+		WindowManager.LayoutParams p = win.getAttributes();
+		p.width = width;
+		p.height = height;
+		
+	    win.setAttributes(p);
 	}
 	
 	protected void showConfirmSubstitudeDialog() {

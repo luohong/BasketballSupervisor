@@ -49,6 +49,7 @@ import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.GameRecord;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
+import com.example.basketballsupervisor.model.PlayingTime;
 import com.example.basketballsupervisor.model.Record;
 import com.example.basketballsupervisor.model.RoleRecord;
 import com.example.basketballsupervisor.util.CountDown;
@@ -63,7 +64,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			"总得分", "总出手命中次数（不含罚球）", "总出手次数（不含罚球）", "总命中率（总命中率中不含罚球命中率）",
 			"2分球命中次数", "2分球出手次数", "2分球命中率", "3分球命中次数", "3分球出手次数", "3分球命中率",
 			"罚球命中次数", "罚球出手次数", "罚球命中率", "前场篮板", "后场篮板", "总篮板", "助攻", "抢断",
-			"封盖", "被犯规", "犯规", "失误", "上场时间" };
+			"封盖", "被犯规", "犯规", "失误" };
 	private static String[] MEMBER_DATA_STAT_COLUMNS = new String[] { "球队",
 			"球员\\统计项", "总得分", "总出手命中次数（不含罚球）", "总出手次数（不含罚球）",
 			"总命中率（总命中率中不含罚球命中率）", "2分球命中次数", "2分球出手次数", "2分球命中率", "3分球命中次数",
@@ -435,6 +436,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		RecordDb db = new RecordDb(this);
 		db.clearAllData();
+		
+		PlayingTimeDb playingTimeDb = new PlayingTimeDb(this);
+		playingTimeDb.clearAllData();
+		
+		GameTimeDb gameTimeDb = new GameTimeDb(this);
+		gameTimeDb.clearAllData();
 	}
 
 	private void selectStartPlayers() {
@@ -636,7 +643,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		RecordDb db = new RecordDb(this);
 		List<Record> recordList = db.getAll(mGame);
 		for (Record record : recordList) {
-			if (TextUtils.isEmpty(record.coordinate)) {
+			if (!TextUtils.isEmpty(record.coordinate)) {
 				String[] split = record.coordinate.split(",");
 				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
 				mCourtPositions.set(position, 0);
@@ -652,39 +659,39 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private List<DataStat> initDataStat(List<Record> recordList) {
 		// 队记录次数map
-		Map<Long, Map<Long, Integer>> mGroupActionMap = new HashMap<Long, Map<Long, Integer>>();
+		Map<Long, Map<Integer, Integer>> mGroupActionMap = new HashMap<Long, Map<Integer, Integer>>();
 		// 成员记录次数map
-		Map<Long, Map<Long, Integer>> mMemberActionMap = new HashMap<Long, Map<Long, Integer>>();
+		Map<Long, Map<Integer, Integer>> mMemberActionMap = new HashMap<Long, Map<Integer, Integer>>();
 		
 		for (Record record : recordList) {
-			Map<Long, Integer> groupActionCountMap = mGroupActionMap.get(record.groupId);
+			Map<Integer, Integer> groupActionCountMap = mGroupActionMap.get(record.groupId);
 			if (groupActionCountMap == null) {
-				groupActionCountMap = new HashMap<Long, Integer>();
+				groupActionCountMap = new HashMap<Integer, Integer>();
 			}
 			
 			Integer groupActionCount = groupActionCountMap.get(record.actionId);
 			if (groupActionCount == null) {
-				groupActionCount = 0;
+				groupActionCount = 1;
 			} else {
 				groupActionCount ++;
 			}
-			groupActionCountMap.put(record.actionId, groupActionCount);
+			groupActionCountMap.put((int)record.actionId, groupActionCount);
 			
 			mGroupActionMap.put(record.groupId, groupActionCountMap);
 			
 			
-			Map<Long, Integer> memberActionCountMap = mMemberActionMap.get(record.memberId);
+			Map<Integer, Integer> memberActionCountMap = mMemberActionMap.get(record.memberId);
 			if (memberActionCountMap == null) {
-				memberActionCountMap = new HashMap<Long, Integer>();
+				memberActionCountMap = new HashMap<Integer, Integer>();
 			}
 			
 			Integer memberActionCount = memberActionCountMap.get(record.actionId);
 			if (memberActionCount == null) {
-				memberActionCount = 0;
+				memberActionCount = 1;
 			} else {
 				memberActionCount ++;
 			}
-			memberActionCountMap.put(record.actionId, memberActionCount);
+			memberActionCountMap.put((int)record.actionId, memberActionCount);
 			
 			mMemberActionMap.put(record.memberId, memberActionCountMap);
 		}
@@ -759,14 +766,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		return list;
 	}
 	
-	private void addGroupDataStatContent(Map<Long, Map<Long, Integer>> mGroupActionMap, List<DataStat> list, Group group) {
+	private void addGroupDataStatContent(Map<Long, Map<Integer, Integer>> mGroupActionMap, List<DataStat> list, Group group) {
+		
+		// A队球员创新数据列值
+		List<String> dataList = new ArrayList<String>();
+		// A队队名
+		dataList.add(group.groupName);
+		
 		// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误
-		Map<Long, Integer> actionCountMap = mGroupActionMap.get(group.groupId);
+		Map<Integer, Integer> actionCountMap = mGroupActionMap.get(group.groupId);
 		if (actionCountMap != null) {
-			// A队球员创新数据列值
-			List<String> dataList = new ArrayList<String>();
-			// A队队名
-			dataList.add(group.groupName);
 		
 			int dichotomyHitCount = actionCountMap.containsKey(1) ? actionCountMap.get(1) : 0;// 2分球命中次数
 			int dichotomyMissCount = actionCountMap.containsKey(2) ? actionCountMap.get(2) : 0;// 2分球不中次数
@@ -823,15 +832,61 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(String.valueOf(fouledCount));// 被犯规 
 			dataList.add(String.valueOf(foulCount));// 犯规 
 			dataList.add(String.valueOf(missCount));// 失误 
-			
-			DataStat innovateDataStatContent = new DataStat();
-			innovateDataStatContent.type = DataStatDialog.TYPE_CONTENT;
-			innovateDataStatContent.dataList = dataList;
-			list.add(innovateDataStatContent);
+		} else {
+
+			dataList.add("0");// 总得分 
+			dataList.add("0");// 总出手命中次数（不含罚球）
+			dataList.add("0");// 总出手次数（不含罚球） 
+			dataList.add("0");// 总命中率（总命中率中不含罚球命中率） 
+			dataList.add("0");// 2分球命中次数 
+			dataList.add("0");// 2分球出手次数 
+			dataList.add("0");// 2分球命中率 
+			dataList.add("0");// 3分球命中次数 
+			dataList.add("0");// 3分球出手次数 
+			dataList.add("0");// 3分球命中率 
+			dataList.add("0");// 罚球命中次数 
+			dataList.add("0");// 罚球出手次数 
+			dataList.add("0");// 罚球命中率 
+			dataList.add("0");// 前场篮板 
+			dataList.add("0");// 后场篮板 
+			dataList.add("0");// 总篮板 
+			dataList.add("0");// 助攻 
+			dataList.add("0");// 抢断 
+			dataList.add("0");// 封盖 
+			dataList.add("0");// 被犯规 
+			dataList.add("0");// 犯规 
+			dataList.add("0");// 失误 
 		}
+		
+		DataStat innovateDataStatContent = new DataStat();
+		innovateDataStatContent.type = DataStatDialog.TYPE_CONTENT;
+		innovateDataStatContent.dataList = dataList;
+		list.add(innovateDataStatContent);
 	}
 	
-	private void addMemberDataStatContent(Map<Long, Map<Long, Integer>> mMemberActionMap, List<DataStat> list, List<Member> memberList, Group group) {
+	private void addMemberDataStatContent(Map<Long, Map<Integer, Integer>> mMemberActionMap, List<DataStat> list, List<Member> memberList, Group group) {
+		
+		PlayingTimeDb db = new PlayingTimeDb(this);
+		List<PlayingTime> playingTimeList = db.getGroupMemberPlayingTime(mGame, group);
+		Map<Long, Long> playingTimeMap = new HashMap<Long, Long>();
+		for (PlayingTime playingTime : playingTimeList) {
+			String endTime = playingTime.endTime;
+			if (TextUtils.isEmpty(endTime)) {
+				endTime = String.valueOf(System.currentTimeMillis());
+			}
+			
+			String startTime = playingTime.startTime;
+			if (TextUtils.isEmpty(startTime)) {
+				startTime = String.valueOf(System.currentTimeMillis());
+			}
+			
+			Long period = Long.parseLong(endTime) - Long.parseLong(startTime);
+			
+			Long time = playingTimeMap.get(playingTime.memberId);
+			time = time == null ? (time = period) : (time = time + period);
+			playingTimeMap.put(playingTime.memberId, time);
+		}
+		
 		// 某队球员创新数据列值
 		for (Member member : memberList) {
 			List<String> dataList = new ArrayList<String>();
@@ -839,8 +894,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(group.groupName);
 			dataList.add(member.name);
 			
+			String playingTime = formatPlayingTime(playingTimeMap.get(member.memberId));// 上场时间
+			
 			// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误 上场时间
-			Map<Long, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
+			Map<Integer, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
 			if (actionCountMap != null) {
 				
 				int dichotomyHitCount = actionCountMap.containsKey(1) ? actionCountMap.get(1) : 0;// 2分球命中次数
@@ -875,10 +932,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				int fouledCount = actionCountMap.containsKey(14) ? actionCountMap.get(14) : 0;// 被犯规 
 				int foulCount = actionCountMap.containsKey(13) ? actionCountMap.get(13) : 0;// 犯规 
 				int missCount = actionCountMap.containsKey(11) ? actionCountMap.get(11) : 0;// 失误 
-				String playingTime = "00:00";// 上场时间
-				
-	//			PlayingTimeDb db = new PlayingTimeDb(this);
-	//			List<String> playingTimeList = db.getGroupMemberPlayingTime(group, member);
 				
 				dataList.add(String.valueOf(totalScore));// 总得分 
 				dataList.add(String.valueOf(totalHitCount));// 总出手命中次数（不含罚球）
@@ -902,9 +955,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				dataList.add(String.valueOf(fouledCount));// 被犯规 
 				dataList.add(String.valueOf(foulCount));// 犯规 
 				dataList.add(String.valueOf(missCount));// 失误 
-				dataList.add(String.valueOf(playingTime));// 上场时间
 			} else {
-				
 				dataList.add("0");// 总得分 
 				dataList.add("0");// 总出手命中次数（不含罚球）
 				dataList.add("0");// 总出手次数（不含罚球） 
@@ -927,9 +978,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				dataList.add("0");// 被犯规 
 				dataList.add("0");// 犯规 
 				dataList.add("0");// 失误 
-				dataList.add("00:00");// 上场时间
-				
 			}
+			
+			dataList.add(playingTime);// 上场时间
 			
 			DataStat memberDataStatContent = new DataStat();
 			memberDataStatContent.type = DataStatDialog.TYPE_CONTENT;
@@ -938,8 +989,32 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 	}
 
+	private String formatPlayingTime(Long time) {
+		StringBuffer playingTime = new StringBuffer();
+		if (time != null) {
+			time = time / 1000;
+			
+			long minutes = time / 60;
+			if (minutes < 10) {
+				playingTime.append("0");
+			}
+			playingTime.append(minutes);
+
+			playingTime.append(":");
+			
+			long second = time % 60;
+			if (second < 10) {
+				playingTime.append("0");
+			}
+			playingTime.append(second);
+		} else {
+			playingTime.append("00:00");
+		}
+		return playingTime.toString();
+	}
+
 	private void addInnovateDataStatContent(
-			Map<Long, Map<Long, Integer>> mMemberActionMap, List<DataStat> list, List<Member> memberList, Group group) {
+			Map<Long, Map<Integer, Integer>> mMemberActionMap, List<DataStat> list, List<Member> memberList, Group group) {
 		// A队球员创新数据列值
 		for (Member member : memberList) {
 			List<String> dataList = new ArrayList<String>();
@@ -947,7 +1022,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(group.groupName);
 			dataList.add(member.name);
 			
-			Map<Long, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
+			Map<Integer, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
 			if (actionCountMap != null) {
 				dataList.add("0");// 一条龙 TODO 数据库未添加记录
 				dataList.add(actionCountMap.get(16) != null ? actionCountMap.get(16).toString() : "0");// 超远三分

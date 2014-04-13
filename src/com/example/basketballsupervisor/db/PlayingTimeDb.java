@@ -1,5 +1,6 @@
 package com.example.basketballsupervisor.db;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -7,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
+import com.example.basketballsupervisor.db.MemberDb.Table;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
@@ -65,7 +67,16 @@ public class PlayingTimeDb extends BaseDb {
 
 	@Override
 	protected Object parseCursor(Cursor cursor) {
-		return null;
+		PlayingTime playingTime = new PlayingTime();
+		
+		playingTime.memberId = cursor.getLong(cursor.getColumnIndexOrThrow(Table._ID));
+		playingTime.gameId = cursor.getLong(cursor.getColumnIndexOrThrow(Table.GAME_ID));
+		playingTime.groupId = cursor.getLong(cursor.getColumnIndexOrThrow(Table.GROUP_ID));
+		playingTime.memberId = cursor.getLong(cursor.getColumnIndexOrThrow(Table.MEMBER_ID));
+		playingTime.startTime = cursor.getString(cursor.getColumnIndexOrThrow(Table.START_TIME));
+		playingTime.endTime = cursor.getString(cursor.getColumnIndexOrThrow(Table.END_TIME));
+		
+		return playingTime;
 	}
 	
 	public void startOrContinueGame(Game game, Group group, List<Member> mGroupPlayingMemberList, long time) {
@@ -145,9 +156,28 @@ public class PlayingTimeDb extends BaseDb {
 		}
 	}
 
-	public List<String> getGroupMemberPlayingTime(Group group, Member member) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<PlayingTime> getGroupMemberPlayingTime(Game game, Group group) {
+		List<PlayingTime> playingTimeList = new ArrayList<PlayingTime>();
+		
+        String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.GROUP_ID);
+        String[] selectionArgs = new String[] { String.valueOf(game.gId), String.valueOf(group.groupId) };
+        
+        Cursor cursor = null;
+        try {
+        	checkDb();
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, null );
+            while (cursor != null && cursor.moveToNext()) {
+            	PlayingTime playingTime = (PlayingTime)parseCursor(cursor);
+            	playingTimeList.add(playingTime);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return playingTimeList;
 	}
 
 }

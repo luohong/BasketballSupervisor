@@ -78,11 +78,11 @@ public class MemberDb extends BaseDb {
 		return member;
 	}
 
-	public List<Member> getGroupMembers(long gruopId) {
+	public List<Member> getGroupMembers(long groupId) {
 		List<Member> memberList = new ArrayList<Member>();
 		
         String selection = String.format(" %s = ? ", Table.GROUP_ID);
-        String[] selectionArgs = new String[] { String.valueOf(gruopId) };
+        String[] selectionArgs = new String[] { String.valueOf(groupId) };
         
         Cursor cursor = null;
         try {

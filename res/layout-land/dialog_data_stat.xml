@@ -8,33 +8,14 @@
     android:gravity="center"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/tv_group_a_name"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:background="@drawable/cm_03"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/tv_group_a_name"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="A队"
-            android:textColor="@color/black"
-            android:textSize="@dimen/dialog_group_name" />
-
-        <TextView
-            android:id="@+id/tv_group_b_name"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="B队"
-            android:textColor="@color/white"
-            android:textSize="@dimen/dialog_group_name" />
-    </LinearLayout>
+        android:gravity="center"
+        android:text="比赛数据统计列表"
+        android:textColor="@color/black"
+        android:textSize="@dimen/data_stat_title" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
