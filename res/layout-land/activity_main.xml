@@ -64,7 +64,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal" 
-            android:background="@drawable/basketball_allline">
+            android:background="@drawable/basketball_allline"
+            android:gravity="center_vertical">
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -73,14 +74,18 @@
                 android:scaleType="fitStart"
                 android:src="@drawable/basketball_left" 
 		        android:paddingBottom="15dp"
-		        android:paddingTop="15dp" />
+		        android:paddingTop="15dp" 
+            	android:gravity="center_vertical"
+            	android:layout_gravity="center_vertical"/>
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
                 android:src="@drawable/basketball_middle" 
-                android:scaleType="center"/>
+                android:scaleType="center"
+            	android:gravity="center_vertical"
+            	android:layout_gravity="center_vertical"/>
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -89,7 +94,9 @@
                 android:scaleType="fitEnd"
                 android:src="@drawable/basketball_right" 
 		        android:paddingBottom="15dp"
-		        android:paddingTop="15dp"/>
+		        android:paddingTop="15dp"
+            	android:gravity="center_vertical"
+            	android:layout_gravity="center_vertical"/>
         </LinearLayout>
 
         <GridView
