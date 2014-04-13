@@ -137,6 +137,8 @@ public class SelectPlayersDialog extends BaseDialog {
 			}
 		});
 		
+//		mTvTrainers.setVisibility(View.GONE);
+		
 	}
 	
 	protected void showConfirmSubstitudeDialog() {
