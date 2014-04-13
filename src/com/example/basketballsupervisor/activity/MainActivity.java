@@ -502,7 +502,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 //				showToastLong("无替补队员");
 //			}
 		} else {
-			showToastLong("不允许换人");
+			showToastLong("比赛尚未开始，不允许换人");
 		}
 	}
 
@@ -533,7 +533,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (allowPause) {
 			showPauseGameDialog();
 		} else {
-			showToastLong("不允许暂停比赛");
+			showToastLong("比赛尚未开始，不允许暂停比赛");
 		}
 	}
 
@@ -583,8 +583,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void updateGameRecord() {
 		// 更新比赛记录，显示统计信息表
+		boolean allowUpdate = running;
+		if (!allowUpdate) {
+			showToastLong("比赛尚未开始，不允许显示统计列表");
+			return;
+		}
 		
-		if (!isRequiredUpdateGameRecord) {
+		if (isRequiredUpdateGameRecord) {
 			final QueryBBGameRecordRequest request = new QueryBBGameRecordRequest(mGame.gId);
 			Config.asynPost(this, "正在更新比赛记录，请稍候...", request.getData(), new CallBack() {
 				
