@@ -7,6 +7,7 @@
     <dimen name="include_header_height">40dp</dimen>
     <dimen name="include_header_text_size">20sp</dimen>
     
+    <dimen name="edittext_width">480dp</dimen>
     <dimen name="edittext_height">40dp</dimen>
     
     <dimen name="text_input">16sp</dimen>

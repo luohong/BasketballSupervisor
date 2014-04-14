@@ -50,7 +50,7 @@
         android:text="收藏"
         android:textColor="@color/include_header_title"
         android:textSize="@dimen/include_header_text_size"
-        android:visibility="visible"
+        android:visibility="gone"
         android:layout_alignParentRight="true"
         android:drawablePadding="5dp" />
 
