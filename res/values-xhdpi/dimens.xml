@@ -24,8 +24,7 @@
     <dimen name="menu_time_height">82dp</dimen>
     <dimen name="operate_btn">60dp</dimen>
     
-    
-    <dimen name="dialog_group_name">18sp</dimen>
+    <dimen name="dialog_group_name">22sp</dimen>
     
     <dimen name="item_height">48dp</dimen>
     

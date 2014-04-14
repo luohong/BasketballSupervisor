@@ -152,11 +152,11 @@ public class SelectPlayersDialog extends BaseDialog {
 	    m.getDefaultDisplay().getMetrics(dm);    
 		
 	    int width = (int) (dm.widthPixels * 0.6);
-	    int height = (int) (dm.heightPixels * 0.8);
+//	    int height = (int) (dm.heightPixels * 0.8);
 
 		WindowManager.LayoutParams p = win.getAttributes();
 		p.width = width;
-		p.height = height;
+//		p.height = height;
 		
 	    win.setAttributes(p);
 	}
