@@ -12,13 +12,14 @@
     
     <dimen name="text_input">22sp</dimen>
     
-    <dimen name="group_name">20sp</dimen>
+    <dimen name="group_name">22sp</dimen>
     <dimen name="group_score">24sp</dimen>
     
-    <dimen name="game_half">14sp</dimen>
+    <dimen name="game_half">16sp</dimen>
     
     <dimen name="menu_width">70dp</dimen>
     <dimen name="menu_margin">60dp</dimen>
+    <dimen name="menu_time_margin">5dp</dimen>
     <dimen name="menu_time_width">144dp</dimen>
     <dimen name="menu_time_height">82dp</dimen>
     <dimen name="operate_btn">60dp</dimen>

@@ -275,7 +275,7 @@
         android:layout_marginRight="@dimen/activity_margin"
         android:layout_weight="0"
         android:background="@drawable/btn_topbanner"
-        android:gravity="center_horizontal"
+        android:gravity="center"
         android:orientation="vertical"
         android:paddingBottom="5dp"
         android:paddingTop="5dp" >
@@ -289,7 +289,8 @@
             android:textSize="@dimen/group_score"
             android:textColor="@color/white"
             android:textStyle="bold"
-            android:layout_marginBottom="5dp"/>
+            android:layout_marginBottom="5dp"
+            android:visibility="visible"/>
 
         <TextView
             android:id="@+id/tv_game_time"
@@ -306,7 +307,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
-            android:orientation="horizontal" >
+            android:orientation="horizontal" 
+            android:layout_marginTop="@dimen/menu_time_margin">
 
             <TextView
                 android:id="@+id/tv_game_first_half"
@@ -322,7 +324,7 @@
                 android:id="@+id/tv_game_second_half"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="@dimen/menu_time_margin"
                 android:layout_weight="0"
                 android:singleLine="true"
                 android:text="下半场"
