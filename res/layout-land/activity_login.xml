@@ -3,66 +3,76 @@
     android:id="@+id/ll_splash"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" 
-    android:background="@color/white" 
-    android:gravity="center_horizontal">
-    
-    <include 
-        layout="@layout/include_header"/>
-    
-     <EditText 
-         android:id="@+id/et_username"
-         android:layout_width="wrap_content"
-         android:layout_height="@dimen/edittext_height"
-         android:layout_marginLeft="10dp"
-         android:layout_marginRight="10dp"
-         android:layout_marginTop="10dp"
-         android:minWidth="@dimen/edittext_width"
-         android:background="@drawable/bg_input"
-         android:hint="请输入用户名"
-         android:textColorHint="@color/login_hint"
-         android:textColor="@color/login_input"
-         android:textSize="@dimen/text_input"
-         android:inputType="textEmailAddress"/>
-     
-     <EditText 
-         android:id="@+id/et_password"
-         android:layout_width="wrap_content"
-         android:layout_height="@dimen/edittext_height"
-         android:layout_marginLeft="10dp"
-         android:layout_marginRight="10dp"
-         android:layout_marginTop="10dp"
-         android:minWidth="@dimen/edittext_width"
-         android:background="@drawable/bg_input"
-         android:hint="请输入密码"
-         android:textColorHint="@color/login_hint"
-         android:textColor="@color/login_input"
-         android:textSize="@dimen/text_input"
-         android:password="true"/>
-     
-     <Button 
-         android:id="@+id/btn_commit"
-         android:layout_width="wrap_content"
-         android:layout_height="@dimen/edittext_height"
-         android:layout_marginLeft="10dp"
-         android:layout_marginRight="10dp"
-         android:layout_marginTop="10dp"
-         android:minWidth="@dimen/edittext_width"
-         android:textColor="@color/white"
-         android:text="登录"
-         android:textSize="18sp"
-         android:background="@color/login_btn"/>
-     
-     <TextView 
-         android:id="@+id/btn_forget_password"
-         android:layout_width="match_parent"
-         android:layout_height="@dimen/edittext_height"
-         android:layout_marginLeft="10dp"
-         android:layout_marginRight="10dp"
-         android:layout_marginTop="10dp"
-         android:gravity="center"
-         android:textColor="@color/login_forget_password"
-         android:text="找回密码"
-         android:visibility="gone"/>
+    android:background="@color/white"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/header_height"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:gravity="center"
+        android:text="标题栏"
+        android:textColor="@color/include_header_title"
+        android:textSize="@dimen/header_text_size"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/edittext_height"
+        android:layout_marginLeft="@dimen/activity_margin"
+        android:layout_marginRight="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:background="@drawable/bg_input"
+        android:hint="请输入用户名"
+        android:inputType="textEmailAddress"
+        android:minWidth="@dimen/edittext_width"
+        android:textColor="@color/login_input"
+        android:textColorHint="@color/login_hint"
+        android:textSize="@dimen/text_input" />
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/edittext_height"
+        android:layout_marginLeft="@dimen/activity_margin"
+        android:layout_marginRight="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:background="@drawable/bg_input"
+        android:hint="请输入密码"
+        android:minWidth="@dimen/edittext_width"
+        android:password="true"
+        android:textColor="@color/login_input"
+        android:textColorHint="@color/login_hint"
+        android:textSize="@dimen/text_input" />
+
+    <Button
+        android:id="@+id/btn_commit"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/edittext_height"
+        android:layout_marginLeft="@dimen/activity_margin"
+        android:layout_marginRight="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:background="@color/login_btn"
+        android:minWidth="@dimen/edittext_width"
+        android:text="登录"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <TextView
+        android:id="@+id/btn_forget_password"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/edittext_height"
+        android:layout_marginLeft="@dimen/activity_margin"
+        android:layout_marginRight="@dimen/activity_margin"
+        android:layout_marginTop="@dimen/activity_margin"
+        android:minWidth="@dimen/edittext_width"
+        android:gravity="center"
+        android:text="找回密码"
+        android:textColor="@color/login_forget_password"
+        android:visibility="gone" />
 
 </LinearLayout>

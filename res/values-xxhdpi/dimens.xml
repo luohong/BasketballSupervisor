@@ -1,0 +1,35 @@
+<resources>
+
+    <!--
+         Customize dimensions originally defined in res/values/dimens.xml (such as
+         screen margins) for sw600dp devices (e.g. 7" tablets) here.
+    -->
+    <dimen name="activity_margin">48dp</dimen>
+    <dimen name="header_height">64dp</dimen>
+    <dimen name="header_text_size">22sp</dimen>
+    
+    <dimen name="edittext_height">48dp</dimen>
+    
+    <dimen name="text_input">22sp</dimen>
+    
+    <dimen name="group_name">20sp</dimen>
+    <dimen name="group_score">24sp</dimen>
+    
+    <dimen name="game_half">14sp</dimen>
+    
+    <dimen name="menu_width">70dp</dimen>
+    <dimen name="menu_margin">60dp</dimen>
+    <dimen name="menu_time_width">144dp</dimen>
+    <dimen name="menu_time_height">82dp</dimen>
+    <dimen name="operate_btn">60dp</dimen>
+    
+    <dimen name="dialog_group_name">18sp</dimen>
+    
+    <dimen name="item_height">48dp</dimen>
+    
+    <dimen name="data_stat_width">120dp</dimen>
+    <dimen name="data_stat_title">20sp</dimen>
+    <dimen name="data_stat_column">16sp</dimen>
+    <dimen name="data_stat_content">16sp</dimen>
+
+</resources>

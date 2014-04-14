@@ -9,10 +9,10 @@
 
     <LinearLayout
         android:id="@+id/ll_menu_left"
-        android:layout_width="50dp"
+        android:layout_width="@dimen/menu_width"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="@dimen/menu_margin"
         android:background="@drawable/bgti"
         android:gravity="center_horizontal|top"
         android:orientation="vertical"
@@ -25,14 +25,14 @@
             android:id="@+id/iv_substitute_left"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             android:src="@drawable/btn_substitute" />
 
         <ImageView
             android:id="@+id/iv_pause_left"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             android:src="@drawable/btn_pause" 
             android:layout_marginTop="5dp"/>
 
@@ -40,7 +40,7 @@
             android:id="@+id/iv_info_left"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             android:src="@drawable/btn_info" 
             android:layout_marginTop="5dp"/>
     </LinearLayout>
@@ -48,7 +48,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="@dimen/menu_margin"
         android:layout_toLeftOf="@+id/ll_menu_right"
         android:layout_toRightOf="@+id/ll_menu_left"
         android:paddingTop="5dp">
@@ -114,10 +114,10 @@
 
     <LinearLayout
         android:id="@+id/ll_menu_right"
-        android:layout_width="50dp"
+        android:layout_width="@dimen/menu_width"
         android:layout_height="match_parent"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="@dimen/menu_margin"
         android:background="@drawable/bgti"
         android:gravity="center_horizontal|top"
         android:orientation="vertical"
@@ -130,14 +130,14 @@
             android:id="@+id/iv_substitute_right"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             android:src="@drawable/btn_substitute" />
 
         <ImageView
             android:id="@+id/iv_pause_right"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             android:src="@drawable/btn_pause" 
             android:layout_marginTop="5dp"/>
 
@@ -145,7 +145,7 @@
             android:id="@+id/iv_info_right"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             android:src="@drawable/btn_info" 
             android:layout_marginTop="5dp"/>
 
@@ -163,7 +163,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:scaleType="centerInside"
                 android:src="@drawable/earth" />
 
             <TextView
@@ -181,7 +180,7 @@
     <LinearLayout
         android:id="@+id/ll_game_info"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="@dimen/menu_width"
         android:layout_alignParentTop="true"
         android:background="@drawable/topbanner_hui"
         android:gravity="center_vertical"
@@ -212,8 +211,8 @@
                 android:id="@+id/tv_group_a_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="@dimen/activity_margin"
+                android:layout_marginRight="@dimen/activity_margin"
                 android:layout_weight="0"
                 android:gravity="center"
                 android:padding="5dp"
@@ -268,12 +267,12 @@
 
     <LinearLayout
         android:id="@+id/ll_game_info"
-        android:layout_width="120dp"
-        android:layout_height="62dp"
+        android:layout_width="@dimen/menu_time_width"
+        android:layout_height="@dimen/menu_time_height"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
+        android:layout_marginLeft="@dimen/activity_margin"
+        android:layout_marginRight="@dimen/activity_margin"
         android:layout_weight="0"
         android:background="@drawable/btn_topbanner"
         android:gravity="center_horizontal"

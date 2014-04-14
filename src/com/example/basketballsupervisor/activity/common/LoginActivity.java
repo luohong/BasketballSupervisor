@@ -23,7 +23,6 @@ import com.example.basketballsupervisor.util.SpUtil;
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
 	private TextView tvTitle;
-	private Button btnRegister;
 	private Button btnCommit;
 	private EditText etUsername;
 	private EditText etPassword;
@@ -42,7 +41,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	@Override
 	public void onFindViews() {
 		tvTitle = (TextView) findViewById(R.id.tv_title);
-		btnRegister = (Button) findViewById(R.id.btn_right);
 		etUsername = (EditText) findViewById(R.id.et_username);
 		etPassword = (EditText) findViewById(R.id.et_password);
 		btnCommit = (Button) findViewById(R.id.btn_commit);
@@ -52,10 +50,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	@Override
 	public void onInitViewData() {
 		tvTitle.setText("登录");
-//		btnRegister.setText("注册");
-		btnRegister.setVisibility(View.GONE);
-//		Drawable rightArrow = getResources().getDrawable(R.drawable.ic_right_arrow);
-//		btnRegister.setCompoundDrawablesWithIntrinsicBounds(null, null, rightArrow, null);
 	}
 
 	@Override
