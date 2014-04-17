@@ -25,7 +25,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.framework.core.widget.ConfirmDialog;
-import com.example.basketballsupervisor.IApplication;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.config.Config;
 import com.example.basketballsupervisor.config.Config.CallBack;
@@ -54,6 +53,8 @@ import com.example.basketballsupervisor.model.Record;
 import com.example.basketballsupervisor.model.RoleRecord;
 import com.example.basketballsupervisor.util.CountDown;
 import com.example.basketballsupervisor.util.CountDown.OnCountDownListener;
+import com.example.basketballsupervisor.util.HomeWatcher;
+import com.example.basketballsupervisor.util.HomeWatcher.OnHomePressedListener;
 import com.example.basketballsupervisor.widget.DataStatDialog;
 import com.example.basketballsupervisor.widget.RecordEventDialog;
 import com.example.basketballsupervisor.widget.SelectPlayersDialog;
@@ -103,6 +104,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private CountDown mCountDown;
 	
+	private HomeWatcher mHomeWatcher;
+	
 	private boolean running = false;
 	private boolean pausing = false;
 	
@@ -126,6 +129,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		int timeout = 4 * 10 * 60 * 1000;// 四节比赛，每节比赛10分钟
 		mCountDown = new CountDown(timeout, 1000);
 		mCountDown.setOnCountDownListener(this);
+		
+		mHomeWatcher = new HomeWatcher(this);  
+        mHomeWatcher.setOnHomePressedListener(new OnHomePressedListener() {  
+            @Override  
+            public void onHomePressed() {  
+            	moveAppToBack();
+            }  
+  
+            @Override  
+            public void onHomeLongPressed() {  
+            }  
+        });  
+        mHomeWatcher.startWatch();
 	}
 
 	@Override
@@ -1348,9 +1364,26 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 	
 	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+		moveAppToBack();
+	}
+	
+	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		IApplication.hasStart = false;
+//		IApplication.hasStart = false;
+	}
+
+	private void moveAppToBack() {
+		if (pausing) {// 暂停比赛状态下直接切换到后台运行
+			moveTaskToBack(false);
+		} else if (running) {// 正在比赛状态下，暂停比赛并切换到后台运行
+			doPauseGame();
+			moveTaskToBack(false);
+		} else {// 直接切换到后台运行
+			moveTaskToBack(false);
+		}
 	}
 
 }
