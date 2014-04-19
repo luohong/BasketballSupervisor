@@ -37,7 +37,7 @@
         <activity
         	android:name="com.example.basketballsupervisor.activity.MainActivity"
             android:screenOrientation="landscape" 
-            android:launchMode="singleTask">
+            android:launchMode="singleTop">
         </activity>
         <activity
         	android:name="com.example.basketballsupervisor.activity.common.LoginActivity"
