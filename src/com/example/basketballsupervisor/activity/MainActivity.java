@@ -1373,6 +1373,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	protected void onDestroy() {
 		super.onDestroy();
 //		IApplication.hasStart = false;
+		mHomeWatcher.stopWatch();
 	}
 
 	private void moveAppToBack() {
