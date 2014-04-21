@@ -54,7 +54,7 @@ public class SpUtil {
 	}
 
 	public void logout(){
-		
+		getSp().edit().clear().commit();
 	}
 	
 	public void setUser(User user) {

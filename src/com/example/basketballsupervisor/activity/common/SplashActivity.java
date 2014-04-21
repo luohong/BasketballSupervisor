@@ -26,7 +26,7 @@ public class SplashActivity extends BaseActivity {
 		if (!IApplication.hasStart) {
 			startSplash();
 		} else {
-			finish();
+			goToIntent();
 		}
 	}
 
@@ -70,18 +70,22 @@ public class SplashActivity extends BaseActivity {
 			public void onAnimationEnd(Animation animation) {
 				IApplication.hasStart = true;
 				
-				User user = SpUtil.getInstance(getActivity()).getUser();
-				Intent intent = null;
-				if (user != null && user.isLogin()) {
-					intent = new Intent(SplashActivity.this, MainActivity.class);
-				} else {
-					intent = new Intent(SplashActivity.this, LoginActivity.class);
-				}
-				startActivity(intent);
-				
-		        finish();
+				goToIntent();
 			}
 		});
 		return ani;
+	}
+
+	private void goToIntent() {
+		User user = SpUtil.getInstance(getActivity()).getUser();
+		Intent intent = null;
+		if (user != null && user.isLogin()) {
+			intent = new Intent(SplashActivity.this, MainActivity.class);
+		} else {
+			intent = new Intent(SplashActivity.this, LoginActivity.class);
+		}
+		startActivity(intent);
+		
+		finish();
 	}
 }

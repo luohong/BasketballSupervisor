@@ -25,6 +25,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.framework.core.widget.ConfirmDialog;
+import com.example.basketballsupervisor.IApplication;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.config.Config;
 import com.example.basketballsupervisor.config.Config.CallBack;
@@ -55,6 +56,7 @@ import com.example.basketballsupervisor.util.CountDown;
 import com.example.basketballsupervisor.util.CountDown.OnCountDownListener;
 import com.example.basketballsupervisor.util.HomeWatcher;
 import com.example.basketballsupervisor.util.HomeWatcher.OnHomePressedListener;
+import com.example.basketballsupervisor.util.SpUtil;
 import com.example.basketballsupervisor.widget.DataStatDialog;
 import com.example.basketballsupervisor.widget.RecordEventDialog;
 import com.example.basketballsupervisor.widget.SelectPlayersDialog;
@@ -96,6 +98,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private ImageView mIvSubstitueLeft, mIvSubstitueRight;
 	private ImageView mIvPauseLeft, mIvPauseRight;
 	private ImageView mIvInfoLeft, mIvInfoRight;
+	private ImageView mIvDataStatLeft, mIvDataStatRight;
+	private ImageView mIvNewGame;
+	private ImageView mIvLogout;
 	private LinearLayout mLlUpload;
 	
 	private GridView mGvCourt;
@@ -166,6 +171,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mIvInfoLeft = (ImageView) findViewById(R.id.iv_info_left);
 		mIvInfoRight = (ImageView) findViewById(R.id.iv_info_right);
 		
+		mIvDataStatLeft = (ImageView) findViewById(R.id.iv_stat_left);
+		mIvDataStatRight = (ImageView) findViewById(R.id.iv_stat_right);
+
+		mIvNewGame = (ImageView) findViewById(R.id.iv_new_game);
+		
+		mIvLogout = (ImageView) findViewById(R.id.iv_logout);
+		
 		mLlUpload = (LinearLayout) findViewById(R.id.ll_upload);
 		
 		mGvCourt = (GridView) findViewById(R.id.gv_court);
@@ -205,6 +217,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mCourtPositions = new ArrayList<Integer>(17 * 32);// 长32个格子，宽17个格子
 		for (int i = 0; i < 17 * 32; i++) {
 			mCourtPositions.add(null);
+		}
+		
+		RecordDb db = new RecordDb(this);
+		List<Record> recordList = db.getAll(mGame);
+		for (Record record : recordList) {
+			if (!TextUtils.isEmpty(record.coordinate)) {
+				String[] split = record.coordinate.split(",");
+				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+				mCourtPositions.set(position, 0);
+			}
 		}
 		
 		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
@@ -254,6 +276,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mIvInfoLeft.setOnClickListener(this);
 		mIvInfoRight.setOnClickListener(this);
 		
+		mIvDataStatLeft.setOnClickListener(this);
+		mIvDataStatRight.setOnClickListener(this);
+
+		mIvNewGame.setOnClickListener(this);
+		mIvLogout.setOnClickListener(this);
+		
 		mLlUpload.setOnClickListener(this);
 		
 		mGvCourt.setOnItemClickListener(this);
@@ -302,7 +330,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			onInitViewData();
 		}
 	}
-
+	
 	private void requestGameData() {
 		final QueryPlayInfoRequest request = new QueryPlayInfoRequest(1);
 		Config.asynPost(this, "正在获取球队数据...", request.getData(), new CallBack() {
@@ -423,7 +451,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			break;
 		case R.id.iv_info_left:
 		case R.id.iv_info_right:
+			
+			break;
+		case R.id.iv_stat_left:
+		case R.id.iv_stat_right:
 			updateGameRecord();
+			break;
+		case R.id.iv_new_game:
+			requestNewGameData();
+			break;
+		case R.id.iv_logout:
+			logout();
 			break;
 		case R.id.ll_upload:
 			uploadGameData();
@@ -1077,6 +1115,53 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			innovateDataStatContent.dataList = dataList;
 			list.add(innovateDataStatContent);
 		}
+	}
+	
+	private void requestNewGameData() {
+		// 请求新的比赛数据
+		if (running) {
+			showToastShort("比赛正在进行，不允许获取新的比赛数据");
+		} else {
+			requestGameData();
+		}
+	}
+
+	private void logout() {
+		// 退出登录
+		ConfirmDialog dialog = new ConfirmDialog(this, "是否退出登录，数据将被清除？", new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				doLogout();
+			}
+		});
+		dialog.show();
+	}
+
+	private void doLogout() {
+		// 清除数据
+		SpUtil.getInstance(this).logout();
+		
+		GameDb gameDb = new GameDb(this);
+		gameDb.clearAllData();
+		
+		GroupDb groupDb = new GroupDb(this);
+		groupDb.clearAllData();
+		
+		MemberDb memberDb = new MemberDb(this);
+		memberDb.clearAllData();
+		
+		RecordDb recordDb = new RecordDb(this);
+		recordDb.clearAllData();
+		
+		PlayingTimeDb playingTimeDb = new PlayingTimeDb(this);
+		playingTimeDb.clearAllData();
+		
+		GameTimeDb gameTimeDb = new GameTimeDb(this);
+		gameTimeDb.clearAllData();
+		
+		IApplication.hasStart = false;
+		finish();
 	}
 
 	private void uploadGameData() {
