@@ -32,17 +32,42 @@
             android:id="@+id/iv_pause_left"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
+            android:layout_marginTop="5dp"
             android:scaleType="fitXY"
-            android:src="@drawable/btn_pause" 
-            android:layout_marginTop="5dp"/>
+            android:src="@drawable/btn_pause" />
 
         <ImageView
             android:id="@+id/iv_info_left"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
+            android:layout_marginTop="5dp"
             android:scaleType="fitXY"
-            android:src="@drawable/btn_info" 
-            android:layout_marginTop="5dp"/>
+            android:src="@drawable/btn_info" />
+        
+        <ImageView
+            android:id="@+id/iv_stat_left"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/btn_data_stat" />
+        
+        <ImageView
+            android:id="@+id/iv_new_game"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/btn_new_game" />
+        
+        <ImageView
+            android:id="@+id/iv_logout"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/btn_close" />
+        
     </LinearLayout>
 
     <FrameLayout
@@ -51,65 +76,34 @@
         android:layout_marginTop="@dimen/menu_margin"
         android:layout_toLeftOf="@+id/ll_menu_right"
         android:layout_toRightOf="@+id/ll_menu_left"
-        android:paddingTop="5dp">
+        android:paddingTop="5dp" >
 
         <!-- android:layout_below="@+id/ll_game_info" -->
-        
-        <View 
+
+        <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-        	android:background="@drawable/bg_basketball_repeat"/>
+            android:background="@drawable/bg_basketball_repeat" />
 
-        <LinearLayout
+        <ImageView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal" 
-            android:background="@drawable/basketball_allline"
-            android:gravity="center_vertical">
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:scaleType="fitStart"
-                android:src="@drawable/basketball_left" 
-		        android:paddingBottom="15dp"
-		        android:paddingTop="15dp" 
-            	android:gravity="center_vertical"
-            	android:layout_gravity="center_vertical"/>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:src="@drawable/basketball_middle" 
-                android:scaleType="center"
-            	android:gravity="center_vertical"
-            	android:layout_gravity="center_vertical"/>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:scaleType="fitEnd"
-                android:src="@drawable/basketball_right" 
-		        android:paddingBottom="15dp"
-		        android:paddingTop="15dp"
-            	android:gravity="center_vertical"
-            	android:layout_gravity="center_vertical"/>
-        </LinearLayout>
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:scaleType="fitXY"
+            android:src="@drawable/basketball_line" />
 
         <GridView
             android:id="@+id/gv_court"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:numColumns="32" 
-            android:stretchMode="columnWidth"
             android:layout_gravity="center"
             android:gravity="center"
-            android:padding="5dp">
+            android:numColumns="32"
+            android:padding="5dp"
+            android:stretchMode="columnWidth" >
         </GridView>
-        
     </FrameLayout>
 
     <LinearLayout
@@ -137,26 +131,34 @@
             android:id="@+id/iv_pause_right"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
+            android:layout_marginTop="5dp"
             android:scaleType="fitXY"
-            android:src="@drawable/btn_pause" 
-            android:layout_marginTop="5dp"/>
+            android:src="@drawable/btn_pause" />
 
         <ImageView
             android:id="@+id/iv_info_right"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="@dimen/operate_btn"
+            android:layout_marginTop="5dp"
             android:scaleType="fitXY"
-            android:src="@drawable/btn_info" 
-            android:layout_marginTop="5dp"/>
+            android:src="@drawable/btn_info" />
+        
+        <ImageView
+            android:id="@+id/iv_stat_right"
+            android:layout_width="@dimen/operate_btn"
+            android:layout_height="@dimen/operate_btn"
+            android:layout_marginTop="5dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/btn_data_stat" />
 
         <LinearLayout
             android:id="@+id/ll_upload"
             android:layout_width="@dimen/operate_btn"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:background="@drawable/btn_upload"
             android:gravity="center"
-            android:orientation="vertical" 
-            android:layout_marginTop="5dp">
+            android:orientation="vertical" >
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -198,14 +200,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
+                android:drawableBottom="@drawable/st_07"
                 android:ellipsize="end"
                 android:gravity="center"
                 android:paddingLeft="10dp"
                 android:singleLine="true"
                 android:text="上海泰迪熊队"
                 android:textColor="@color/white"
-                android:textSize="@dimen/group_name" 
-                android:drawableBottom="@drawable/st_07"/>
+                android:textSize="@dimen/group_name" />
 
             <TextView
                 android:id="@+id/tv_group_a_score"
@@ -222,11 +224,11 @@
                 android:textSize="@dimen/group_score"
                 android:textStyle="bold" />
         </LinearLayout>
-        
+
         <View
-	        android:layout_width="120dp"
-	        android:layout_height="wrap_content" 
-	        android:layout_weight="0"/>
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -279,18 +281,18 @@
         android:orientation="vertical"
         android:paddingBottom="5dp"
         android:paddingTop="5dp" >
-        
-        <TextView 
+
+        <TextView
             android:id="@+id/tv_game_start"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="5dp"
             android:gravity="center"
             android:text="开始比赛"
-            android:textSize="@dimen/group_score"
             android:textColor="@color/white"
+            android:textSize="@dimen/group_score"
             android:textStyle="bold"
-            android:layout_marginBottom="5dp"
-            android:visibility="visible"/>
+            android:visibility="visible" />
 
         <TextView
             android:id="@+id/tv_game_time"
@@ -306,9 +308,9 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/menu_time_margin"
             android:gravity="center_vertical"
-            android:orientation="horizontal" 
-            android:layout_marginTop="@dimen/menu_time_margin">
+            android:orientation="horizontal" >
 
             <TextView
                 android:id="@+id/tv_game_first_half"

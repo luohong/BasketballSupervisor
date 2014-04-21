@@ -16,12 +16,12 @@
     
     <dimen name="game_half">12sp</dimen>
     
-    <dimen name="menu_width">50dp</dimen>
+    <dimen name="menu_width">54dp</dimen>
     <dimen name="menu_margin">40dp</dimen>
     <dimen name="menu_time_margin">2dp</dimen>
     <dimen name="menu_time_width">120dp</dimen>
     <dimen name="menu_time_height">62dp</dimen>
-    <dimen name="operate_btn">40dp</dimen>
+    <dimen name="operate_btn">44dp</dimen>
     
     <dimen name="dialog_group_name">14sp</dimen>
     
