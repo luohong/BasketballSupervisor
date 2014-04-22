@@ -108,7 +108,7 @@ public class ActionDb extends BaseDb {
 		sampleActions.add(new Action(10,0,"后场篮板",0,0));
 		sampleActions.add(new Action(11,0,"失误",0,0));
 		sampleActions.add(new Action(12,0,"封盖",0,0));
-		sampleActions.add(new Action(13,0,"犯规",0,0));
+		sampleActions.add(new Action(13,14,"犯规",0,0));
 		sampleActions.add(new Action(14,0,"被犯规",0,0));
 		sampleActions.add(new Action(15,-1,"创新",0,1));
 		sampleActions.add(new Action(16,-2,"超远3分",0,0));
@@ -122,6 +122,7 @@ public class ActionDb extends BaseDb {
 		sampleActions.add(new Action(24,-2,"2罚不中",0,0));
 		sampleActions.add(new Action(25,-2,"3罚不中",0,0));
 		sampleActions.add(new Action(26,-2,"被晃倒",0,0));
+		sampleActions.add(new Action(27,-10,"技术犯规",0,0));
 		
 		saveAll(sampleActions);
 	}

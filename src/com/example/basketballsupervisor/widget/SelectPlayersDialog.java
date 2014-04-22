@@ -197,6 +197,11 @@ public class SelectPlayersDialog extends BaseDialog {
 			dialog.show();
 		}
 	}
+	
+	public void fillGroupData(Group group) {
+		mTvGroupAName.setText(group.groupName);
+		mTvGroupBName.setText("");
+	}
 
 	public void fillGroupData(Group groupA, Group groupB) {
 		mTvGroupAName.setText(groupA.groupName);

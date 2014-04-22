@@ -12,7 +12,7 @@
         <ViewFlipper
             android:id="@+id/vf_events"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" 
+            android:layout_height="wrap_content" 
             android:background="@drawable/m_pop">
 
             <LinearLayout
@@ -38,6 +38,7 @@
                         android:textSize="@dimen/dialog_group_name" />
                     
                     <View 
+                        android:id="@+id/divider"
                         android:layout_width="1px"
 						android:layout_height="match_parent"
                         android:layout_margin="5dp"
@@ -61,6 +62,7 @@
                     android:orientation="horizontal" >
 
                     <TextView
+                        android:id="@+id/tv_group_a_title"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -71,6 +73,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_group_b_title"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -209,7 +212,8 @@
                         android:layout_width="1px"
 						android:layout_height="match_parent"
                         android:layout_margin="5dp"
-                        android:background="@color/white"/>
+                        android:background="@color/white"
+                        android:visibility="gone"/>
 
                     <TextView
                         android:id="@+id/tv_page4_group_b_name"

@@ -40,7 +40,10 @@ public class RecordEventDialog extends BaseDialog {
 	protected ViewFlipper vFlipper;
 	
 	private TextView mTvGroupAName, mTvGroupBName;
+	private TextView mTvGroupATitle, mTvGroupBTitle;
 	private ListView mLvPlaying, mLvBench;
+
+	private View mDivider;
 	
 	private PlayerAdapter mGroupAPlayingAdapter;
 	private PlayerAdapter mGroupBPlayingAdapter;
@@ -68,7 +71,7 @@ public class RecordEventDialog extends BaseDialog {
 	protected Action mNextAction;
 
 	private Game mGame;
-	private int mRole;
+	private  List<Integer> mRoles;
 	private long mGameTime;
 	private String mCoordinate;
 
@@ -97,6 +100,11 @@ public class RecordEventDialog extends BaseDialog {
 		mTvGroupAName = (TextView) findViewById(R.id.tv_group_a_name);
 		mTvGroupBName = (TextView) findViewById(R.id.tv_group_b_name);
 		
+		mTvGroupATitle = (TextView) findViewById(R.id.tv_group_a_title);
+		mTvGroupBTitle = (TextView) findViewById(R.id.tv_group_b_title);
+		
+		mDivider = findViewById(R.id.divider);
+		
 		mLvPlaying = (ListView) findViewById(R.id.lv_playing);
 		mLvBench = (ListView) findViewById(R.id.lv_bench);
 		
@@ -113,6 +121,7 @@ public class RecordEventDialog extends BaseDialog {
 		
 		mLvPage4Playing = (ListView) findViewById(R.id.lv_page4_playing);
 		mLvPage4Bench = (ListView) findViewById(R.id.lv_page4_bench);
+		mLvPage4Bench.setVisibility(View.GONE);
 		
 	}
 
@@ -131,7 +140,7 @@ public class RecordEventDialog extends BaseDialog {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if (mRole == 1 || mRole == 3) {// 记录A队数据或创新数据
+				if (mRoles.contains(1) || mRoles.contains(3)) {// 记录A队数据或创新数据
 					mSelectedGroupAPlayingPos = position;
 					mGroupAPlayingAdapter.notifyDataSetChanged();
 					
@@ -152,7 +161,7 @@ public class RecordEventDialog extends BaseDialog {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if (mRole == 2 || mRole == 3) {// 记录B队数据或创新数据
+				if (mRoles.contains(2) || mRoles.contains(3)) {// 记录B队数据或创新数据
 
 					mSelectedGroupBPlayingPos = position;
 					mGroupBPlayingAdapter.notifyDataSetChanged();
@@ -181,7 +190,7 @@ public class RecordEventDialog extends BaseDialog {
 					int position, long id) {
 				Action action = (Action) parent.getItemAtPosition(position);
 				if (action.nextActionId == 0) {
-					if (mRole == 3) {// 记录创新数据
+					if (!mRoles.contains(1) && !mRoles.contains(2)) {// 仅记录创新数据
 						Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
 					} else {
 						dismiss();
@@ -192,13 +201,13 @@ public class RecordEventDialog extends BaseDialog {
 					mNextAction = action;
 					
 					if (mNextAction.nextActionId == -1) {
-						if (mRole == 3) {// 记录创新数据
+						if (mRoles.contains(3)) {// 记录创新数据
 							showNewStat();
 						} else {
 							Toast.makeText(context, "您没有权限记录创新数据", Toast.LENGTH_SHORT).show();
 						}
 					} else if (mNextAction.nextActionId > 0) {
-						if (mRole == 3) {// 记录创新数据
+						if (!mRoles.contains(1) && !mRoles.contains(2)) {// 记录创新数据
 							Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
 						} else {
 							showNextStat();
@@ -212,8 +221,8 @@ public class RecordEventDialog extends BaseDialog {
 		mPage4GroupAPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_A);
 		mLvPage4Playing.setAdapter(mPage4GroupAPlayingAdapter);
 
-		mPage4GroupBPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_B);
-		mLvPage4Bench.setAdapter(mPage4GroupBPlayingAdapter);
+//		mPage4GroupBPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_B);
+//		mLvPage4Bench.setAdapter(mPage4GroupBPlayingAdapter);
 		
 		mLvPage4Playing.setOnItemClickListener(new OnItemClickListener() {
 
@@ -226,17 +235,17 @@ public class RecordEventDialog extends BaseDialog {
 				saveRecordEvent(mNextAction);
 			}
 		});
-		mLvPage4Bench.setOnItemClickListener(new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
-				dismiss();
-				
-				mSelectedMember = (Member) parent.getItemAtPosition(position);
-				saveRecordEvent(mNextAction);
-			}
-		});
+//		mLvPage4Bench.setOnItemClickListener(new OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> parent, View view,
+//					int position, long id) {
+//				dismiss();
+//				
+//				mSelectedMember = (Member) parent.getItemAtPosition(position);
+//				saveRecordEvent(mNextAction);
+//			}
+//		});
 	}
 	
 	@Override
@@ -263,13 +272,15 @@ public class RecordEventDialog extends BaseDialog {
 	private void saveRecordEvent(Action action, boolean toast) {
 		// 记录动作行为
 		RecordDb db = new RecordDb(getContext());
-		if (mRole == 1) {// 记录A队数据
+		if (mRoles.contains(1) && mSelectedGroup == mGroupA) {// 记录A队数据
 			mMainActivity.updateGroupAScore(action.score);
 			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime, mCoordinate);
-		} else if (mRole == 2) {// 记录B队数据
+		} 
+		if (mRoles.contains(2) && mSelectedGroup == mGroupB) {// 记录B队数据
 			mMainActivity.updateGroupBScore(action.score);
 			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime, mCoordinate);
-		} else if (mRole == 3) {// 记录创新数据
+		} 
+		if (mRoles.contains(3) && action.nextActionId == -2) {// 记录创新数据
 			db.saveRecord(mGame, mSelectedGroup, mSelectedMember, action, mGameTime, mCoordinate);
 		}
 		
@@ -298,11 +309,28 @@ public class RecordEventDialog extends BaseDialog {
 		
 		mTvPage4Title.setText(mNextAction.name + "球员选项");
 		
-		mTvPage4GroupAName.setText(mGroupA.groupName);
-		mTvPage4GroupBName.setText(mGroupB.groupName);
+		if (mNextAction.id != 14) {// 仅被犯规选择对方球员
+			if (mSelectedGroup == mGroupA && mRoles.contains(1)) {// 记录A队数据
+				mTvPage4GroupAName.setText(mGroupA.groupName);
+				mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+			} else if (mSelectedGroup == mGroupB && mRoles.contains(2)) {// 记录B队数据
+				mTvPage4GroupAName.setText(mGroupB.groupName);
+				mPage4GroupAPlayingAdapter.setData(mGroupBPlayingMembers);
+			}
+		} else {
+			if (mSelectedGroup == mGroupA && mRoles.contains(1)) {// 记录A队数据
+				mTvPage4GroupAName.setText(mGroupB.groupName);
+				mPage4GroupAPlayingAdapter.setData(mGroupBPlayingMembers);
+			} else if (mSelectedGroup == mGroupB && mRoles.contains(2)) {// 记录B队数据
+				mTvPage4GroupAName.setText(mGroupA.groupName);
+				mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+			}
+		}
+		mTvPage4GroupBName.setVisibility(View.GONE);
+//		mTvPage4GroupBName.setText(mGroupB.groupName);
 		
-		mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
-		mPage4GroupBPlayingAdapter.setData(mGroupBPlayingMembers);
+//		mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+//		mPage4GroupBPlayingAdapter.setData(mGroupBPlayingMembers);
 		
 		mSelectedGroupAPlayingPos = -1;
 		mSelectedGroupBPlayingPos = -1;
@@ -383,9 +411,9 @@ public class RecordEventDialog extends BaseDialog {
 		}
 	}
 	
-	public void fillGameData(Game game, int role, long time, String coordinate) {
+	public void fillGameData(Game game, List<Integer> roles, long time, String coordinate) {
 		mGame = game;
-		mRole = role;
+		mRoles = roles;
 		mGameTime = time;
 		mCoordinate = coordinate;
 	}
@@ -393,6 +421,36 @@ public class RecordEventDialog extends BaseDialog {
 	public void fillGroupData(Group groupA, Group groupB) {
 		mGroupA = groupA;
 		mGroupB = groupB;
+			
+		if (mRoles.contains(3)) {// 记录创新数据
+			mTvGroupAName.setVisibility(View.VISIBLE);
+			mTvGroupATitle.setVisibility(View.VISIBLE);
+			mDivider.setVisibility(View.VISIBLE);
+			mTvGroupBName.setVisibility(View.VISIBLE);
+			mTvGroupBTitle.setVisibility(View.VISIBLE);
+		} else {
+			if (mRoles.contains(1)) {// 记录A队数据
+				mTvGroupAName.setVisibility(View.VISIBLE);
+				mTvGroupATitle.setVisibility(View.VISIBLE);
+			} else {
+				mTvGroupAName.setVisibility(View.GONE);
+				mTvGroupATitle.setVisibility(View.GONE);
+			}
+			
+			if (mRoles.contains(2)) {// 记录B队数据
+				mTvGroupBName.setVisibility(View.VISIBLE);
+				mTvGroupBTitle.setVisibility(View.VISIBLE);
+			} else {
+				mTvGroupBName.setVisibility(View.GONE);
+				mTvGroupBTitle.setVisibility(View.GONE);
+			}
+			
+			if ((mRoles.contains(1) && mRoles.contains(2))) {
+				mDivider.setVisibility(View.VISIBLE);
+			} else {
+				mDivider.setVisibility(View.GONE);
+			}
+		}
 		
 		mTvGroupAName.setText(mGroupA.groupName);
 		mTvGroupBName.setText(mGroupB.groupName);
@@ -401,9 +459,27 @@ public class RecordEventDialog extends BaseDialog {
 	public void fillPlayersData(List<Member> groupAPlayingMembers, List<Member> groupBPlayingMembers) {
 		mGroupAPlayingMembers = groupAPlayingMembers;
 		mGroupBPlayingMembers = groupBPlayingMembers;
-		
-		mGroupAPlayingAdapter.setData(mGroupAPlayingMembers);
-		mGroupBPlayingAdapter.setData(mGroupBPlayingMembers);
+
+		if (mRoles.contains(3)) {// 记录创新数据
+			mLvPlaying.setVisibility(View.VISIBLE);
+			mLvBench.setVisibility(View.VISIBLE);
+			mGroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+			mGroupBPlayingAdapter.setData(mGroupBPlayingMembers);
+		} else {
+			if (mRoles.contains(1)) {// 记录A队数据
+				mLvPlaying.setVisibility(View.VISIBLE);
+				mGroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+			} else {
+				mLvPlaying.setVisibility(View.GONE);
+			}
+			
+			if (mRoles.contains(2)) {// 记录B队数据
+				mLvBench.setVisibility(View.VISIBLE);
+				mGroupBPlayingAdapter.setData(mGroupBPlayingMembers);
+			} else {
+				mLvBench.setVisibility(View.GONE);
+			}
+		}
 	}
 
 	protected void showPrevious() {
@@ -483,12 +559,14 @@ public class RecordEventDialog extends BaseDialog {
 			holder.ivPoint.setVisibility(View.VISIBLE);
 			holder.tvTitle.setText(member.name);
 			holder.tvNum.setText(member.number);
+			holder.tvTCount.setText("1");
 			
 			boolean selected = (mTeam == TEAM_A && mSelectedGroupAPlayingPos >= 0 && mSelectedGroupAPlayingPos == position) 
 				|| (mTeam == TEAM_B && mSelectedGroupBPlayingPos >= 0 && mSelectedGroupBPlayingPos == position); 
 			holder.ivPoint.setSelected(selected);
 			holder.tvTitle.setSelected(selected);
 			holder.tvNum.setSelected(selected);
+			holder.tvTCount.setSelected(selected);
 			
 			return convertView;
 		}
@@ -500,11 +578,13 @@ public class RecordEventDialog extends BaseDialog {
 		private ImageView ivPoint;
 		private TextView tvTitle;
 		private TextView tvNum;
+		private TextView tvTCount;
 
 		public ViewHolder(View convertView) {
 			ivPoint = (ImageView) convertView.findViewById(R.id.iv_point);
 			tvTitle = (TextView) convertView.findViewById(R.id.tv_title);
 			tvNum = (TextView) convertView.findViewById(R.id.tv_num);
+			tvTCount = (TextView) convertView.findViewById(R.id.tv_t_count);
 		}
 		
 	}
