@@ -464,8 +464,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			}
 			break;
 		case R.id.iv_info_left:
+			technicalFouls(CLICK_POS_LEFT);// 技术犯规
+			break;
 		case R.id.iv_info_right:
-			
+			technicalFouls(CLICK_POS_RIGHT);// 技术犯规
 			break;
 		case R.id.iv_stat_left:
 		case R.id.iv_stat_right:
@@ -479,6 +481,64 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			break;
 		case R.id.ll_upload:
 			uploadGameData();
+			break;
+		}
+	}
+
+	private void technicalFouls(int clickPos) {
+		// 技术犯规
+		// 判断当前比赛状态是否允许记录技术犯规
+		boolean allowSubstitute = running;// 记录创新数据的角色不允许记录技术犯规
+		if (!allowSubstitute) {
+			showToastShort("比赛尚未开始，不允许记录技术犯规");
+			return ;
+		} else if (!mRoles.contains(1) && !mRoles.contains(2)) {
+			showToastShort("创新数据记录角色不允许记录技术犯规");
+			return ;
+		}
+		
+		// 成员记录次数map
+		Map<Long, Integer> mMemberActionMap = new HashMap<Long, Integer>();
+		
+		RecordDb db = new RecordDb(this);
+		List<Record> recordList = db.getAll(mGame, 28);
+		for (Record record : recordList) {
+			Integer memberActionCount = mMemberActionMap.get(record.memberId);
+			if (memberActionCount == null) {
+				memberActionCount = 1;
+			} else {
+				memberActionCount ++;
+			}
+			mMemberActionMap.put(record.memberId, memberActionCount);
+		}
+		
+		// 左边场上球员playerInTheGame，右边整队球员groupMembers
+		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_TECHNICAL_FOULS);
+		dialog.show();
+		dialog.fillGameData(mGame, mRoles, mGameTime, null);
+		dialog.fillGroupData(mGroupA, mGroupB);
+		switch (clickPos) {
+		case CLICK_POS_LEFT:
+			if (mRoles.contains(1)) {// 记录A队数据
+				dialog.fillGroupData(mGroupA);
+				dialog.fillPlayersData(mGroupAMemberList, mMemberActionMap);
+			} else if (mRoles.contains(2)) {// 记录B队数据
+				dialog.fillGroupData(mGroupB);
+				dialog.fillPlayersData(mGroupBMemberList, mMemberActionMap);
+			} else if (mRoles.contains(3)) {// 记录创新数据
+				// 不处理
+			}
+			break;
+		case CLICK_POS_RIGHT:
+			if (mRoles.contains(2)) {// 记录B队数据
+				dialog.fillGroupData(mGroupB);
+				dialog.fillPlayersData(mGroupBMemberList, mMemberActionMap);
+			} else if (mRoles.contains(1)) {// 记录A队数据
+				dialog.fillGroupData(mGroupA);
+				dialog.fillPlayersData(mGroupAMemberList, mMemberActionMap);
+			} else if (mRoles.contains(3)) {// 记录创新数据
+				// 不处理
+			}
 			break;
 		}
 	}
@@ -573,10 +633,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 //			if (allowSubstitute) {
 				showSubstituteDialog(clickPos);
 //			} else {
-//				showToastLong("无替补队员");
+//				showToastShort("无替补队员");
 //			}
 		} else {
-			showToastLong("比赛尚未开始，不允许换人");
+			showToastShort("比赛尚未开始，不允许换人");
 		}
 	}
 
@@ -624,7 +684,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (allowPause) {
 			showPauseGameDialog();
 		} else {
-			showToastLong("比赛尚未开始，不允许暂停比赛");
+			showToastShort("比赛尚未开始，不允许暂停比赛");
 		}
 	}
 
@@ -674,7 +734,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 更新比赛记录，显示统计信息表
 		boolean allowUpdate = running;
 		if (!allowUpdate) {
-			showToastLong("比赛尚未开始，不允许显示统计列表");
+			showToastShort("比赛尚未开始，不允许显示统计列表");
 			return;
 		}
 		
@@ -1211,7 +1271,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (hasGameData) {
 			showConfirmUploadGameDataDialog();
 		} else {
-			showToastLong("无比赛数据");
+			showToastShort("无比赛数据");
 		}
 	}
 

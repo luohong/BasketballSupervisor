@@ -185,4 +185,28 @@ public class RecordDb extends BaseDb {
 		}
 	}
 
+	public List<Record> getAll(Game game, int actionId) {
+		List<Record> recordList = new ArrayList<Record>();
+        Cursor cursor = null;
+        try {
+        	checkDb();
+    		
+            String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.ACTION_ID);
+            String[] selectionArgs = new String[] { String.valueOf(game.gId), String.valueOf(actionId) };
+        	
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, null);
+            while (cursor != null && cursor.moveToNext()) {
+            	Record record = (Record)parseCursor(cursor);
+            	recordList.add(record);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return recordList;
+	}
+
 }

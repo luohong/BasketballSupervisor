@@ -2,6 +2,7 @@ package com.example.basketballsupervisor.widget;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.util.DisplayMetrics;
@@ -21,6 +22,9 @@ import android.widget.Toast;
 import com.android.framework.core.widget.BaseDialog;
 import com.android.framework.core.widget.ConfirmDialog;
 import com.example.basketballsupervisor.R;
+import com.example.basketballsupervisor.db.RecordDb;
+import com.example.basketballsupervisor.model.Action;
+import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
 
@@ -28,9 +32,10 @@ public class SelectPlayersDialog extends BaseDialog {
 	
 	public static final int MODE_SELECT_STARTS = 0;
 	public static final int MODE_SUBSTITUTE = 1;
-	public static final int MODE_RECORD_EVENT = 2;
+	public static final int MODE_TECHNICAL_FOULS = 2;
 	
 	private TextView mTvGroupAName, mTvGroupBName;
+	private TextView mTvGroupATitle, mTvGroupBTitle;
 	
 	private ListView mLvPlaying, mLvBench;
 	
@@ -50,6 +55,15 @@ public class SelectPlayersDialog extends BaseDialog {
 	
 	private int mSelectedPlayingPos = -1;
 	private int mSelectedBenchPos = -1;
+	
+	private Group mGroup;
+	private Game mGame;
+	private List<Integer> mRoles;
+	private long mGameTime;
+	private String mCoordinate;
+	private Group mGroupA;
+	private Group mGroupB;
+	private Map<Long, Integer> mMemberActionMap;
 
 	public SelectPlayersDialog(Context context, int mode) {
 		super(context);
@@ -66,6 +80,9 @@ public class SelectPlayersDialog extends BaseDialog {
 		
 		mTvGroupAName = (TextView) findViewById(R.id.tv_group_a_name);
 		mTvGroupBName = (TextView) findViewById(R.id.tv_group_b_name);
+		
+		mTvGroupATitle = (TextView) findViewById(R.id.tv_group_a_title);
+		mTvGroupBTitle = (TextView) findViewById(R.id.tv_group_b_title);
 		
 		mLvPlaying = (ListView) findViewById(R.id.lv_playing);
 		mLvBench = (ListView) findViewById(R.id.lv_bench);
@@ -106,6 +123,9 @@ public class SelectPlayersDialog extends BaseDialog {
 					
 					showConfirmSubstitudeDialog();
 					break;
+				case MODE_TECHNICAL_FOULS:
+					// 不处理
+					break;
 				}
 			}
 		});
@@ -136,12 +156,44 @@ public class SelectPlayersDialog extends BaseDialog {
 					
 					showConfirmSubstitudeDialog();
 					break;
+				case MODE_TECHNICAL_FOULS:
+					dismiss();
+					
+					mSelectedBenchPos = position;
+					saveTechnicalFoulsEvent();
+					break;
 				}
 			}
 		});
 		
 //		mTvTrainers.setVisibility(View.GONE);
 		
+	}
+	
+	private void saveTechnicalFoulsEvent() {
+		// 记录动作行为
+		Member member = mBenchMembers.get(mSelectedBenchPos);
+		
+		Integer count = mMemberActionMap.get(member.memberId);
+		if (count != null && count > 2) {
+			Toast.makeText(context, "累计技术犯规次数超过限制", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
+		Action action = new Action(28,-10,"技术犯规",0,0);
+		
+		RecordDb db = new RecordDb(getContext());
+		if (mRoles.contains(1) && mGroupA == mGroup) {// 记录A队数据
+			db.saveRecord(mGame, mGroup, member, action, mGameTime, mCoordinate);
+		} 
+		if (mRoles.contains(2) && mGroupB == mGroup) {// 记录B队数据
+			db.saveRecord(mGame, mGroup, member, action, mGameTime, mCoordinate);
+		} 
+		if (mRoles.contains(3)) {// 记录创新数据
+			// 不处理
+		}
+		
+		Toast.makeText(context, "记录成功", Toast.LENGTH_SHORT).show();
 	}
 	
 	@Override
@@ -199,13 +251,36 @@ public class SelectPlayersDialog extends BaseDialog {
 	}
 	
 	public void fillGroupData(Group group) {
+		mGroup = group;
+		
 		mTvGroupAName.setText(group.groupName);
 		mTvGroupBName.setText("");
 	}
 
 	public void fillGroupData(Group groupA, Group groupB) {
+		mGroupA = groupA;
+		mGroupB = groupB;
+		
 		mTvGroupAName.setText(groupA.groupName);
 		mTvGroupBName.setText(groupB.groupName);
+	}
+	
+	public void fillPlayersData(List<Member> allMembers, Map<Long, Integer> memberActionMap) {
+		mMemberActionMap = memberActionMap;
+
+		mTvGroupATitle.setVisibility(View.VISIBLE);
+		mTvGroupATitle.setText("球员  号码  技术犯规次数");
+		mTvGroupBTitle.setVisibility(View.GONE);
+		
+		mPlayingMembers = null;
+		mAllMembers = allMembers;
+		
+		mPlayingAdapter.setData(mPlayingMembers);
+		mLvPlaying.setVisibility(View.GONE);
+		
+		mBenchMembers = new ArrayList<Member>();
+		mBenchMembers.addAll(allMembers);
+		mAllAdapter.setData(mBenchMembers);
 	}
 	
 	public void fillPlayersData(List<Member> playingMembers, List<Member> allMembers) {
@@ -225,6 +300,13 @@ public class SelectPlayersDialog extends BaseDialog {
 			mBenchMembers.addAll(allMembers);
 		}
 		mAllAdapter.setData(mBenchMembers);
+	}
+	
+	public void fillGameData(Game game, List<Integer> roles, long time, String coordinate) {
+		mGame = game;
+		mRoles = roles;
+		mGameTime = time;
+		mCoordinate = coordinate;
 	}
 	
 	private class PlayerAdapter extends BaseAdapter {
@@ -284,6 +366,18 @@ public class SelectPlayersDialog extends BaseDialog {
 			holder.tvTitle.setText(member.name);
 			holder.tvNum.setText(member.number);
 			
+			Integer count = mMemberActionMap != null ? mMemberActionMap.get(member.memberId) : null;
+			if (count != null && count > 0) {
+				holder.tvTCount.setVisibility(View.VISIBLE);
+				if (count > 2) count = 2;
+				holder.tvTCount.setText(count.toString());
+			} else if (mMemberActionMap != null) {
+				holder.tvTCount.setText("0");
+				holder.tvTCount.setVisibility(View.INVISIBLE);
+			} else {
+				holder.tvTCount.setVisibility(View.GONE);
+			}
+			
 			switch (mMode) {
 			case MODE_SUBSTITUTE:
 				boolean selected = (mTeam == TEAM_A && mSelectedPlayingPos >= 0 && mSelectedPlayingPos == position) 
@@ -291,6 +385,7 @@ public class SelectPlayersDialog extends BaseDialog {
 				holder.ivPoint.setSelected(selected);
 				holder.tvTitle.setSelected(selected);
 				holder.tvNum.setSelected(selected);
+				holder.tvTCount.setSelected(selected);
 				break;
 			}
 			
@@ -304,11 +399,13 @@ public class SelectPlayersDialog extends BaseDialog {
 		private ImageView ivPoint;
 		private TextView tvTitle;
 		private TextView tvNum;
+		private TextView tvTCount;
 
 		public ViewHolder(View convertView) {
 			ivPoint = (ImageView) convertView.findViewById(R.id.iv_point);
 			tvTitle = (TextView) convertView.findViewById(R.id.tv_title);
 			tvNum = (TextView) convertView.findViewById(R.id.tv_num);
+			tvTCount = (TextView) convertView.findViewById(R.id.tv_t_count);
 		}
 		
 	}
