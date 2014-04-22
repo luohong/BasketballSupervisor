@@ -13,4 +13,6 @@ public class Game implements Serializable {
 								// null][记录权限列表：1：记录groupList中1队数据，2：groupList中2对数据,3：记录创新数据]
 	public String time;// [String][not null][比赛开始时间 yyyy-MM-dd hh:mm:ss]
 	public String location;// [String][not null][比赛地址]
+	public int section;// [int][not null][比赛小节数]
+	public int section_time;// [int][not null][每小节分钟数]
 }

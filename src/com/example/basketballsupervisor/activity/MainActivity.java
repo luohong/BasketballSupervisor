@@ -84,6 +84,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private long mGameTime = 0l;
 	private int mGroupAScore = 0;
 	private int mGroupBScore = 0;
+	private int mCurrentQuarter = 1;
+	private int mQuarterCount = 1;
+	private int mQuarterTime = 10;
 	
 	private Game mGame;
 	private Group mGroupA;
@@ -133,10 +136,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void onInit() {
 		mGroupAPlayingMemberList = new ArrayList<Member>();
 		mGroupBPlayingMemberList = new ArrayList<Member>();
-		
-		int timeout = 4 * 10 * 60 * 1000;// 四节比赛，每节比赛10分钟
-		mCountDown = new CountDown(timeout, 1000);
-		mCountDown.setOnCountDownListener(this);
 		
 		mHomeWatcher = new HomeWatcher(this);  
         mHomeWatcher.setOnHomePressedListener(new OnHomePressedListener() {  
@@ -190,11 +189,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void onInitViewData() {
 		onCountDownIntervalReach(0);
 
-		int drawable = R.drawable.st_07;
+		int drawable = R.drawable.st_07;		
 		
-		// 支持多种角色
-		if (mGame != null && mGame.role != null) {
-			mRoles = mGame.role;
+		if (mGame != null) {
+			// 支持多种角色
+			if (mGame.role != null) {
+				mRoles = mGame.role;
+			}
+			mQuarterCount = mGame.section;
+			mQuarterTime = mGame.section_time;
+			
+			int timeout = mQuarterCount * mQuarterTime * 60 * 1000;// 四节比赛，每节比赛10分钟
+			mCountDown = new CountDown(timeout, 1000);
+			mCountDown.setOnCountDownListener(this);
 		}
 		if (mRoles == null) {
 			mRoles = new ArrayList<Integer>(3);
@@ -226,23 +233,25 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		
 		// 填充网格
-		mCourtPositions = new ArrayList<Integer>(17 * 32);// 长32个格子，宽17个格子
-		for (int i = 0; i < 17 * 32; i++) {
-			mCourtPositions.add(null);
+		if (mCourtPositions == null) {
+			mCourtPositions = new ArrayList<Integer>(17 * 32);// 长32个格子，宽17个格子
+			for (int i = 0; i < 17 * 32; i++) {
+				mCourtPositions.add(null);
+			}
+		
+	//		RecordDb db = new RecordDb(this);
+	//		List<Record> recordList = db.getAll(mGame);
+	//		for (Record record : recordList) {
+	//			if (!TextUtils.isEmpty(record.coordinate)) {
+	//				String[] split = record.coordinate.split(",");
+	//				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+	//				mCourtPositions.set(position, 0);
+	//			}
+	//		}
+			
+			mCourtAdapter = new CourtAdapter(this, mCourtPositions);
+			mGvCourt.setAdapter(mCourtAdapter);
 		}
-		
-//		RecordDb db = new RecordDb(this);
-//		List<Record> recordList = db.getAll(mGame);
-//		for (Record record : recordList) {
-//			if (!TextUtils.isEmpty(record.coordinate)) {
-//				String[] split = record.coordinate.split(",");
-//				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-//				mCourtPositions.set(position, 0);
-//			}
-//		}
-		
-		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
-		mGvCourt.setAdapter(mCourtAdapter);
 	}
 
 	private String formGameTime(int count) {
@@ -1373,16 +1382,24 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void onCountDownIntervalReach(int last) {
 		mTvGameTime.setText(formGameTime(last));
 		
-		if (last > 0 && last <= 20 * 60 * 1000) {
-			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.game_progress));
-			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.white));
-		} else if (last > 20 * 60 * 1000) {
-			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.white));
-			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.game_progress));
-		} else {
-			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.white));
-			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.white));
+		int quarter = last / (mQuarterTime * 60 * 1000) + 1;
+		if (quarter == mCurrentQuarter + 1) {// 进入下一节，先暂停
+			doPauseGame();
 		}
+		mTvGameFirstHalf.setText("第" + mCurrentQuarter + "节");
+		
+		mTvGameFirstHalf.setVisibility(View.VISIBLE);
+		mTvGameSecondHalf.setVisibility(View.GONE);
+//		if (last > 0 && last <= 20 * 60 * 1000) {
+//			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.game_progress));
+//			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.white));
+//		} else if (last > 20 * 60 * 1000) {
+//			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.white));
+//			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.game_progress));
+//		} else {
+//			mTvGameFirstHalf.setTextColor(getResources().getColor(R.color.white));
+//			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.white));
+//		}
 	}
 
 	public void updateGroupAScore(int score) {

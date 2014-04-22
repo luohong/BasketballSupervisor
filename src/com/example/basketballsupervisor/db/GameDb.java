@@ -31,10 +31,12 @@ public class GameDb extends BaseDb {
 		public static final String ROLE = "role"; 
 		public static final String TIME = "time"; 
 		public static final String LOCATION = "location"; 
+		public static final String SECTION = "section"; 
+		public static final String SECTION_TIME = "section_time"; 
 
 		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
 
-		public static final String[] PROJECTION = { _ID, PLATFORM_ID, NAME, REMARK, /**GROUP_LIST,**/ ROLE, TIME, LOCATION };
+		public static final String[] PROJECTION = { _ID, PLATFORM_ID, NAME, REMARK, /**GROUP_LIST,**/ ROLE, TIME, LOCATION, SECTION, SECTION_TIME };
 	}
 	
 	public GameDb(Context context) {
@@ -57,6 +59,8 @@ public class GameDb extends BaseDb {
 //		sb.append(Table.GROUP_LIST).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.ROLE).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.TIME).append(COLUMN_TYPE.TEXT).append(COMMA);
+		sb.append(Table.SECTION).append(COLUMN_TYPE.INTEGER).append(COMMA);
+		sb.append(Table.SECTION_TIME).append(COLUMN_TYPE.INTEGER).append(COMMA);
 		sb.append(Table.LOCATION).append(COLUMN_TYPE.TEXT);
 		sb.append(BRACKET_RIGHT);
 
@@ -80,6 +84,8 @@ public class GameDb extends BaseDb {
 		game.role = roles;
 		game.time = cursor.getString(cursor.getColumnIndexOrThrow(Table.TIME));
 		game.location = cursor.getString(cursor.getColumnIndexOrThrow(Table.LOCATION));
+		game.section = cursor.getInt(cursor.getColumnIndexOrThrow(Table.SECTION));
+		game.section_time = cursor.getInt(cursor.getColumnIndexOrThrow(Table.SECTION_TIME));
 		
 		return game;
 	}
@@ -135,6 +141,8 @@ public class GameDb extends BaseDb {
 			values.put(Table.ROLE, json);
 			values.put(Table.TIME, game.time);
 			values.put(Table.LOCATION, game.location);
+			values.put(Table.SECTION, game.section);
+			values.put(Table.SECTION_TIME, game.section_time);
 			
 			db.insert(Table.TABLE_NAME, null, values);
 		}
