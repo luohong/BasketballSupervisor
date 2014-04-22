@@ -233,6 +233,7 @@
                     android:orientation="horizontal" >
 
                     <TextView
+                        android:id="@+id/tv_page4_group_a_title"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -243,6 +244,7 @@
                         android:textStyle="bold" />
 
                     <TextView
+                        android:id="@+id/tv_page4_group_b_title"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
@@ -262,7 +264,7 @@
 
                     <ListView
                         android:id="@+id/lv_page4_playing"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:divider="@color/black"
@@ -271,7 +273,7 @@
 
                     <ListView
                         android:id="@+id/lv_page4_bench"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
                         android:divider="@color/black"

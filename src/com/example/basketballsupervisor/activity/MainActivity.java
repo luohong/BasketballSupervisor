@@ -192,7 +192,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 		int drawable = R.drawable.st_07;
 		
-		// TODO 目前仅支持一种角色
+		// 支持多种角色
 		if (mGame != null && mGame.role != null) {
 			mRoles = mGame.role;
 		}
@@ -231,15 +231,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mCourtPositions.add(null);
 		}
 		
-		RecordDb db = new RecordDb(this);
-		List<Record> recordList = db.getAll(mGame);
-		for (Record record : recordList) {
-			if (!TextUtils.isEmpty(record.coordinate)) {
-				String[] split = record.coordinate.split(",");
-				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-				mCourtPositions.set(position, 0);
-			}
-		}
+//		RecordDb db = new RecordDb(this);
+//		List<Record> recordList = db.getAll(mGame);
+//		for (Record record : recordList) {
+//			if (!TextUtils.isEmpty(record.coordinate)) {
+//				String[] split = record.coordinate.split(",");
+//				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+//				mCourtPositions.set(position, 0);
+//			}
+//		}
 		
 		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
 		mGvCourt.setAdapter(mCourtAdapter);
@@ -1118,20 +1118,20 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			
 			Map<Integer, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
 			if (actionCountMap != null) {
-				dataList.add("0");// 一条龙 TODO 数据库未添加记录
-				dataList.add(actionCountMap.get(16) != null ? actionCountMap.get(16).toString() : "0");// 超远三分
-				dataList.add(actionCountMap.get(17) != null ? actionCountMap.get(17).toString() : "0");// 绝杀
-				dataList.add(actionCountMap.get(18) != null ? actionCountMap.get(18).toString() : "0");// 最后三秒得分
-				dataList.add(actionCountMap.get(19) != null ? actionCountMap.get(19).toString() : "0");// 晃倒
-				dataList.add(actionCountMap.get(20) != null ? actionCountMap.get(20).toString() : "0");// 2+1
-				dataList.add(actionCountMap.get(21) != null ? actionCountMap.get(21).toString() : "0");// 3+1
-				dataList.add(actionCountMap.get(22) != null ? actionCountMap.get(22).toString() : "0");// 扣篮
-				dataList.add(actionCountMap.get(23) != null ? actionCountMap.get(23).toString() : "0");// 快攻
-				dataList.add(actionCountMap.get(24) != null ? actionCountMap.get(24).toString() : "0");// 2罚不中
-				dataList.add(actionCountMap.get(25) != null ? actionCountMap.get(25).toString() : "0");// 三罚不中
-				dataList.add(actionCountMap.get(26) != null ? actionCountMap.get(26).toString() : "0");// 被晃倒
+				dataList.add(actionCountMap.get(16) != null ? actionCountMap.get(16).toString() : "0");// 一条龙 
+				dataList.add(actionCountMap.get(17) != null ? actionCountMap.get(17).toString() : "0");// 超远三分
+				dataList.add(actionCountMap.get(18) != null ? actionCountMap.get(18).toString() : "0");// 绝杀
+				dataList.add(actionCountMap.get(19) != null ? actionCountMap.get(19).toString() : "0");// 最后三秒得分
+				dataList.add(actionCountMap.get(20) != null ? actionCountMap.get(20).toString() : "0");// 晃倒
+				dataList.add(actionCountMap.get(21) != null ? actionCountMap.get(21).toString() : "0");// 2+1
+				dataList.add(actionCountMap.get(22) != null ? actionCountMap.get(22).toString() : "0");// 3+1
+				dataList.add(actionCountMap.get(23) != null ? actionCountMap.get(23).toString() : "0");// 扣篮
+				dataList.add(actionCountMap.get(24) != null ? actionCountMap.get(24).toString() : "0");// 快攻
+				dataList.add(actionCountMap.get(25) != null ? actionCountMap.get(25).toString() : "0");// 2罚不中
+				dataList.add(actionCountMap.get(26) != null ? actionCountMap.get(26).toString() : "0");// 三罚不中
+				dataList.add(actionCountMap.get(27) != null ? actionCountMap.get(27).toString() : "0");// 被晃倒
 			} else {
-				dataList.add("0");// 一条龙 TODO 数据库未添加记录
+				dataList.add("0");// 一条龙 
 				dataList.add("0");// 超远三分
 				dataList.add("0");// 绝杀
 				dataList.add("0");// 最后三秒得分

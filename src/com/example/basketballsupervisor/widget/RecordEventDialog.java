@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -63,6 +64,7 @@ public class RecordEventDialog extends BaseDialog {
 	
 	private TextView mTvPage4Title;
 	private TextView mTvPage4GroupAName, mTvPage4GroupBName;
+	private TextView mTvPage4GroupATitle, mTvPage4GroupBTitle;
 	private ListView mLvPage4Playing, mLvPage4Bench;
 	
 	private PlayerAdapter mPage4GroupAPlayingAdapter;
@@ -118,6 +120,9 @@ public class RecordEventDialog extends BaseDialog {
 		
 		mTvPage4GroupAName = (TextView) findViewById(R.id.tv_page4_group_a_name);
 		mTvPage4GroupBName = (TextView) findViewById(R.id.tv_page4_group_b_name);
+		
+		mTvPage4GroupATitle = (TextView) findViewById(R.id.tv_page4_group_a_title);
+		mTvPage4GroupBTitle = (TextView) findViewById(R.id.tv_page4_group_b_title);
 		
 		mLvPage4Playing = (ListView) findViewById(R.id.lv_page4_playing);
 		mLvPage4Bench = (ListView) findViewById(R.id.lv_page4_bench);
@@ -309,7 +314,7 @@ public class RecordEventDialog extends BaseDialog {
 		
 		mTvPage4Title.setText(mNextAction.name + "球员选项");
 		
-		if (mNextAction.id != 14) {// 仅被犯规选择对方球员
+		if (mNextAction.id != 13) {// 仅被犯规选择对方球员
 			if (mSelectedGroup == mGroupA && mRoles.contains(1)) {// 记录A队数据
 				mTvPage4GroupAName.setText(mGroupA.groupName);
 				mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
@@ -327,6 +332,7 @@ public class RecordEventDialog extends BaseDialog {
 			}
 		}
 		mTvPage4GroupBName.setVisibility(View.GONE);
+		mTvPage4GroupBTitle.setVisibility(View.GONE);
 //		mTvPage4GroupBName.setText(mGroupB.groupName);
 		
 //		mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
@@ -374,8 +380,7 @@ public class RecordEventDialog extends BaseDialog {
 			}
 		} else {
 			for (Action action : mActionList) {
-				if (action.nextActionId == mNextAction.nextActionId || 
-						(action.nextActionId < mNextAction.nextActionId && mNextAction.nextActionId == -1)) {
+				if (action.nextActionId < mNextAction.nextActionId && action.nextActionId > -10 && mNextAction.nextActionId == -1) {
 					stepActionList.add(action);
 				}
 			}
