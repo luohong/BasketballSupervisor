@@ -368,7 +368,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 							saveGameData(gameList);
 							initGameData(gameList);
 						} else {
-							showToastShort("球队数据获取不完整，请检查网络后重试");
+							showToastShort("没有最新的比赛数据");
 						}
 					} else {
 						onFail(response.error_remark);
@@ -554,6 +554,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void startGame() {
 		// 开始比赛
+		if (mGame == null || mGroupA == null || mGroupB == null) {
+			showToastShort("没有最新比赛的数据，不能进行比赛");
+			return ;
+		}
 		
 		// 选择首发球员
 		if (mRoles.contains(1) || mRoles.contains(2)) {// 记录A队或B队数据无需选择首发球员
