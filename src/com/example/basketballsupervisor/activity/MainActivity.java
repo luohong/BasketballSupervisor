@@ -587,46 +587,90 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void selectStartPlayers() {
 		// 选择首发球员
-		showToastShort("选择首发球员");
-		
-		SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SELECT_STARTS);
-		dialog.show();
-//		dialog.fillGroupData(mGroupA, mGroupB);
-		if (mRoles.size() == 1) {
+		if (mRoles.contains(1) && mRoles.contains(2)) {
+			showToastShort("选择" + mGroupA.groupName+ "首发球员");
+			
+			SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SELECT_STARTS);
+			dialog.show();
+//			dialog.fillGroupData(mGroupA, mGroupB);
+			dialog.fillGroupData(mGroupA);
+			dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
+			dialog.setOnCancelListener(new OnCancelListener() {
+				
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					showToastShort("选择" + mGroupB.groupName+ "首发球员");
+					
+					SelectPlayersDialog selectDialog = new SelectPlayersDialog(MainActivity.this, SelectPlayersDialog.MODE_SELECT_STARTS);
+					selectDialog.show();
+					selectDialog.fillGroupData(mGroupB);
+					selectDialog.fillPlayersData(mGroupBPlayingMemberList, mGroupBMemberList);
+					selectDialog.setOnCancelListener(new OnCancelListener() {
+						@Override
+						public void onCancel(DialogInterface dialog) {
+							showToastShort("比赛开始");
+							doStartGame();
+							
+							// 记录比赛开始时间
+							GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
+							gameTimeDb.startOrContinueGame(mGame, null, mGameTime);
+							
+							// 记录首发球员上场时间
+							PlayingTimeDb db = new PlayingTimeDb(getActivity());
+							if (mRoles.contains(1)) {// 记录A队数据
+								db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+							} 
+							if (mRoles.contains(2)) {// 记录B队数据
+								db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+							} 
+							if (mRoles.contains(3)) {// 记录创新数据
+								// 不处理
+							}
+						}
+					});
+				}
+			});
+		} else {
+			SelectPlayersDialog dialog = new SelectPlayersDialog(this, SelectPlayersDialog.MODE_SELECT_STARTS);
+			dialog.show();
+//			dialog.fillGroupData(mGroupA, mGroupB);
 			if (mRoles.contains(1)) {// 记录A队数据
+				showToastShort("选择" + mGroupA.groupName+ "首发球员");
 				dialog.fillGroupData(mGroupA);
 				dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupAMemberList);
 			} else if (mRoles.contains(2)) {// 记录B队数据
+				showToastShort("选择" + mGroupB.groupName+ "首发球员");
 				dialog.fillGroupData(mGroupB);
 				dialog.fillPlayersData(mGroupBPlayingMemberList, mGroupBMemberList);
 			} else if (mRoles.contains(3)) {// 记录创新数据
 				// 不处理
 			}
-		}
-		dialog.setOnCancelListener(new OnCancelListener() {
-			
-			@Override
-			public void onCancel(DialogInterface dialog) {
-				showToastShort("比赛开始");
-				doStartGame();
+			dialog.setOnCancelListener(new OnCancelListener() {
 				
-				// 记录比赛开始时间
-				GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
-				gameTimeDb.startOrContinueGame(mGame, null, mGameTime);
-				
-				// 记录首发球员上场时间
-				PlayingTimeDb db = new PlayingTimeDb(getActivity());
-				if (mRoles.contains(1)) {// 记录A队数据
-					db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
-				} 
-				if (mRoles.contains(2)) {// 记录B队数据
-					db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
-				} 
-				if (mRoles.contains(3)) {// 记录创新数据
-					// 不处理
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					showToastShort("比赛开始");
+					doStartGame();
+					
+					// 记录比赛开始时间
+					GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
+					gameTimeDb.startOrContinueGame(mGame, null, mGameTime);
+					
+					// 记录首发球员上场时间
+					PlayingTimeDb db = new PlayingTimeDb(getActivity());
+					if (mRoles.contains(1)) {// 记录A队数据
+						db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+					} 
+					if (mRoles.contains(2)) {// 记录B队数据
+						db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+					} 
+					if (mRoles.contains(3)) {// 记录创新数据
+						// 不处理
+					}
 				}
-			}
-		});
+			});
+		}
+		
 	}
 
 	private void substitute(int clickPos) {
