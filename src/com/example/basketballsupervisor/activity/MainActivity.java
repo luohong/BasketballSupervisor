@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -117,6 +118,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private HomeWatcher mHomeWatcher;
 	
+	private PowerManager.WakeLock mWakeLock;
+	
 	private boolean running = false;
 	private boolean pausing = false;
 	
@@ -128,6 +131,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		
+		running = SpUtil.getInstance(this).getSp().getBoolean("game_state_running", false);
+		pausing = SpUtil.getInstance(this).getSp().getBoolean("game_state_pausing", false);
 		
 		loadDataInBackground();
 	}
@@ -149,6 +155,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
             }  
         });  
         mHomeWatcher.startWatch();
+        
+        PowerManager mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag"); 
 	}
 
 	@Override
@@ -187,7 +196,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	@Override
 	public void onInitViewData() {
-		onCountDownIntervalReach(0);
+		int lastGameTime = SpUtil.getInstance(this).getSp().getInt("last_game_time", 0);
+		onCountDownIntervalReach(lastGameTime);
 
 		int drawable = R.drawable.st_07;		
 		
@@ -200,7 +210,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mQuarterTime = mGame.section_time;
 			
 			int timeout = mQuarterCount * mQuarterTime * 60 * 1000;// 四节比赛，每节比赛10分钟
-			mCountDown = new CountDown(timeout, 1000);
+			mCountDown = new CountDown(lastGameTime, timeout, 1000);
 			mCountDown.setOnCountDownListener(this);
 		}
 		if (mRoles == null) {
@@ -232,26 +242,36 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		
+		if (pausing) {
+			mIvPauseLeft.setImageResource(R.drawable.btn_continue);
+			mIvPauseRight.setImageResource(R.drawable.btn_continue);
+		} else {
+			mIvPauseLeft.setImageResource(R.drawable.btn_pause);
+			mIvPauseRight.setImageResource(R.drawable.btn_pause);
+		}
+		
 		// 填充网格
 		if (mCourtPositions == null) {
 			mCourtPositions = new ArrayList<Integer>(17 * 32);// 长32个格子，宽17个格子
 			for (int i = 0; i < 17 * 32; i++) {
 				mCourtPositions.add(null);
 			}
-		
-	//		RecordDb db = new RecordDb(this);
-	//		List<Record> recordList = db.getAll(mGame);
-	//		for (Record record : recordList) {
-	//			if (!TextUtils.isEmpty(record.coordinate)) {
-	//				String[] split = record.coordinate.split(",");
-	//				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-	//				mCourtPositions.set(position, 0);
-	//			}
-	//		}
-			
-			mCourtAdapter = new CourtAdapter(this, mCourtPositions);
-			mGvCourt.setAdapter(mCourtAdapter);
 		}
+		
+		if (running || pausing) {
+			RecordDb db = new RecordDb(this);
+			List<Record> recordList = db.getAll(mGame);
+			for (Record record : recordList) {
+				if (!TextUtils.isEmpty(record.coordinate)) {
+					String[] split = record.coordinate.split(",");
+					int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+					mCourtPositions.set(position, 0);
+				}
+			}
+		}
+			
+		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
+		mGvCourt.setAdapter(mCourtAdapter);
 	}
 
 	private String formGameTime(int count) {
@@ -349,6 +369,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			}
 			
 			onInitViewData();
+			doStartGameIfRunningOrPaused();
 		}
 	}
 	
@@ -410,6 +431,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 		
 		onInitViewData();
+		doStartGameIfRunningOrPaused();
 	}
 
 	private void saveGameData(List<Game> gameList) {
@@ -568,21 +590,34 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void doStartGame() {
-		running = true;
-		
-		mTvGameStart.setVisibility(View.GONE);
 		
 		mCountDown.start();// 计时开始
 		mGameTime = System.currentTimeMillis();
 		
-		RecordDb db = new RecordDb(this);
-		db.clearAllData();
+		mTvGameStart.setVisibility(View.GONE);
 		
-		PlayingTimeDb playingTimeDb = new PlayingTimeDb(this);
-		playingTimeDb.clearAllData();
+		if (!running && !pausing) {
+			running = true;
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
 		
-		GameTimeDb gameTimeDb = new GameTimeDb(this);
-		gameTimeDb.clearAllData();
+			RecordDb db = new RecordDb(this);
+			db.clearAllData();
+			
+			PlayingTimeDb playingTimeDb = new PlayingTimeDb(this);
+			playingTimeDb.clearAllData();
+			
+			GameTimeDb gameTimeDb = new GameTimeDb(this);
+			gameTimeDb.clearAllData();
+		}
+	}
+	
+	private void doStartGameIfRunningOrPaused() {
+		if (running) {
+			doStartGame();
+		} else if (pausing) {
+			doStartGame();
+			mCountDown.setPauseWork(true);
+		}
 	}
 
 	private void selectStartPlayers() {
@@ -760,7 +795,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 继续比赛
 		showToastShort("比赛继续");
 		
+		running = true;
 		pausing = false;
+		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+		
 		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
 		mIvPauseRight.setImageResource(R.drawable.btn_pause);
 		
@@ -1424,10 +1463,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void OnCountDownTimeout() {
 		// 比赛完成
 		showToastLong("比赛结束");
+		running = false;
+		pausing = false;
+		
+		mCountDown.reset();
+
+		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+		SpUtil.getInstance(this).getEdit().putInt("last_game_time", 0).commit();
 	}
 
 	@Override
 	public void onCountDownIntervalReach(int last) {
+		SpUtil.getInstance(this).getEdit().putInt("last_game_time", last).commit();
 		mTvGameTime.setText(formGameTime(last));
 		
 		int quarter = last / (mQuarterTime * 60 * 1000) + 1;
@@ -1524,7 +1572,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private void doPauseGame() {
 		showToastShort("比赛暂停");
 		
+		running = false;
 		pausing = true;
+		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
 		
 		mIvPauseLeft.setImageResource(R.drawable.btn_continue);
 		mIvPauseRight.setImageResource(R.drawable.btn_continue);
@@ -1617,8 +1668,20 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 	
 	@Override
+	protected void onResume() {
+		super.onResume();
+		mWakeLock.acquire();
+	}
+	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mWakeLock.release();
+	}
+	
+	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
+//		super.onBackPressed();
 		moveAppToBack();
 	}
 	
@@ -1627,6 +1690,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		super.onDestroy();
 //		IApplication.hasStart = false;
 		mHomeWatcher.stopWatch();
+		
+		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
 	}
 
 	private void moveAppToBack() {

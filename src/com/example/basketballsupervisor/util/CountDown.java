@@ -21,10 +21,10 @@ public class CountDown {
 	private boolean mPauseWork = false;
     private final Object mPauseWorkLock = new Object();
 
-	public CountDown(int timeout, int interval) {
+	public CountDown(int lastGameTime, int timeout, int interval) {
 		mTimeout = timeout;
 		mInterval = interval <= 0 ? 10 : interval;
-		mCount = 0;
+		mCount = lastGameTime / interval;
 		mHandler = new CountDownHandler(this);
 	}
 
@@ -34,9 +34,13 @@ public class CountDown {
 
 	public void start() {
 		mToQuit = false;
-		mCount = 0;
+//		mCount = 0;
 		mThread = new CountDownThread();
 		mThread.start();
+	}
+
+	public void reset() {
+		mCount = 0;
 	}
 
 	public void stop() {

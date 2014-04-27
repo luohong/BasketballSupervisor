@@ -136,7 +136,7 @@ public class SelectPlayersDialog extends BaseDialog {
 					int position, long id) {
 				switch (mMode) {
 				case MODE_SELECT_STARTS:
-					if (mPlayingMembers.size() <= 5) {
+					if (mPlayingMembers.size() < 5) {
 						Member member = mBenchMembers.remove(position);
 						mPlayingMembers.add(member);
 						
