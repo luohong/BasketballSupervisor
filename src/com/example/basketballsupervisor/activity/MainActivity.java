@@ -1474,7 +1474,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	@Override
-	public void OnCountDownTimeout() {
+	public void onCountDownTimeout() {
 		// 比赛完成
 		showToastLong("比赛结束");
 		running = false;
@@ -1495,7 +1495,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		int time = mQuarterTime * 60 * 1000;
 		if (last % time == 0) {
 			int quarter = last / (time) + 1;
-			if (quarter == mCurrentQuarter + 1) {// 进入下一节，先暂停
+			if (quarter == mQuarterCount) {
+				onCountDownTimeout();
+			} else if (quarter == mCurrentQuarter + 1) {// 进入下一节，先暂停
+				mCurrentQuarter = quarter;
 				doPauseGame();
 			}
 		}
