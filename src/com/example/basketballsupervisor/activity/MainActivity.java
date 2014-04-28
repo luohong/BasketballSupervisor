@@ -1032,25 +1032,25 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			int dichotomyHitCount = actionCountMap.containsKey(1) ? actionCountMap.get(1) : 0;// 2分球命中次数
 			int dichotomyMissCount = actionCountMap.containsKey(2) ? actionCountMap.get(2) : 0;// 2分球不中次数
 			int dichotomyShootCount = dichotomyHitCount + dichotomyMissCount;// 2分球出手次数
-			float dichotomyHitRate = (float) dichotomyHitCount / (float) dichotomyShootCount;// 2分球命中率 
+			float dichotomyHitRate = ((float) dichotomyHitCount / (float) dichotomyShootCount) * 100;// 2分球命中率 
 			int dichotomyScore = dichotomyHitCount * mActionMap.get(1).score;// 2分球总得分
 			
 			int trisectionHitCount = actionCountMap.containsKey(3) ? actionCountMap.get(3) : 0;// 3分球命中次数
 			int trisectionMissCount = actionCountMap.containsKey(4) ? actionCountMap.get(4) : 0;// 3分球不中次数
 			int trisectionShootCount = trisectionHitCount + trisectionMissCount;// 3分球出手次数
-			float trisectionHitRate = (float) trisectionHitCount / (float) trisectionShootCount;// 3分球命中率 
+			float trisectionHitRate = ((float) trisectionHitCount / (float) trisectionShootCount) * 100;// 3分球命中率 
 			int trisectionScore = trisectionHitCount * mActionMap.get(3).score;// 3分球总得分
 			
 			int penaltyHitCount = actionCountMap.containsKey(5) ? actionCountMap.get(5) : 0;// 罚球命中次数
 			int penaltyMissCount = actionCountMap.containsKey(6) ? actionCountMap.get(6) : 0;// 罚球命中次数
 			int penaltyShootCount = penaltyHitCount + penaltyMissCount;// 罚球出手次数
-			float penaltyHitRate = (float) penaltyHitCount / (float) penaltyShootCount;// 罚球命中率 
+			float penaltyHitRate = ((float) penaltyHitCount / (float) penaltyShootCount) * 100;// 罚球命中率 
 			int penaltyScore = penaltyHitCount * mActionMap.get(5).score;// 罚球总得分
 			
 			int totalScore = dichotomyScore + trisectionScore + penaltyScore;// 总得分
 			int totalHitCount = dichotomyHitCount + trisectionHitCount;// 总出手命中次数（不含罚球）
 			int totalShootCount = dichotomyShootCount + trisectionShootCount;// 总出手次数（不含罚球） 
-			float totalHitRate = (float) totalHitCount / (float) totalShootCount;// 总命中率（总命中率中不含罚球命中率）  
+			float totalHitRate = ((float) totalHitCount / (float) totalShootCount) * 100;// 总命中率（总命中率中不含罚球命中率）  
 			
 			int offensiveReboundCount = actionCountMap.containsKey(9) ? actionCountMap.get(9) : 0;// 前场篮板
 			int defensiveReboundCount = actionCountMap.containsKey(10) ? actionCountMap.get(10) : 0;// 后场篮板 
@@ -1065,16 +1065,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(String.valueOf(totalScore));// 总得分 
 			dataList.add(String.valueOf(totalHitCount));// 总出手命中次数（不含罚球）
 			dataList.add(String.valueOf(totalShootCount));// 总出手次数（不含罚球） 
-			dataList.add(String.valueOf(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
+			dataList.add(formatHitRatePercent(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
 			dataList.add(String.valueOf(dichotomyHitCount));// 2分球命中次数 
 			dataList.add(String.valueOf(dichotomyShootCount));// 2分球出手次数 
-			dataList.add(String.valueOf(dichotomyHitRate));// 2分球命中率 
+			dataList.add(formatHitRatePercent(dichotomyHitRate));// 2分球命中率 
 			dataList.add(String.valueOf(trisectionHitCount));// 3分球命中次数 
 			dataList.add(String.valueOf(trisectionShootCount));// 3分球出手次数 
-			dataList.add(String.valueOf(trisectionHitRate));// 3分球命中率 
+			dataList.add(formatHitRatePercent(trisectionHitRate));// 3分球命中率 
 			dataList.add(String.valueOf(penaltyHitCount));// 罚球命中次数 
 			dataList.add(String.valueOf(penaltyShootCount));// 罚球出手次数 
-			dataList.add(String.valueOf(penaltyHitRate));// 罚球命中率 
+			dataList.add(formatHitRatePercent(penaltyHitRate));// 罚球命中率 
 //			dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
 //			dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
 			dataList.add(String.valueOf(totalReboundCount));// 总篮板 
@@ -1089,16 +1089,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add("0");// 总得分 
 			dataList.add("0");// 总出手命中次数（不含罚球）
 			dataList.add("0");// 总出手次数（不含罚球） 
-			dataList.add("0");// 总命中率（总命中率中不含罚球命中率） 
+			dataList.add("0%");// 总命中率（总命中率中不含罚球命中率） 
 			dataList.add("0");// 2分球命中次数 
 			dataList.add("0");// 2分球出手次数 
-			dataList.add("0");// 2分球命中率 
+			dataList.add("0%");// 2分球命中率 
 			dataList.add("0");// 3分球命中次数 
 			dataList.add("0");// 3分球出手次数 
-			dataList.add("0");// 3分球命中率 
+			dataList.add("0%");// 3分球命中率 
 			dataList.add("0");// 罚球命中次数 
 			dataList.add("0");// 罚球出手次数 
-			dataList.add("0");// 罚球命中率 
+			dataList.add("0%");// 罚球命中率 
 //			dataList.add("0");// 前场篮板 
 //			dataList.add("0");// 后场篮板 
 			dataList.add("0");// 总篮板 
@@ -1155,25 +1155,25 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				int dichotomyHitCount = actionCountMap.containsKey(1) ? actionCountMap.get(1) : 0;// 2分球命中次数
 				int dichotomyMissCount = actionCountMap.containsKey(2) ? actionCountMap.get(2) : 0;// 2分球不中次数
 				int dichotomyShootCount = dichotomyHitCount + dichotomyMissCount;// 2分球出手次数
-				float dichotomyHitRate = (float) dichotomyHitCount / (float) dichotomyShootCount;// 2分球命中率 
+				float dichotomyHitRate = ((float) dichotomyHitCount / (float) dichotomyShootCount) * 100;// 2分球命中率 
 				int dichotomyScore = dichotomyHitCount * mActionMap.get(1).score;// 2分球总得分
 				
 				int trisectionHitCount = actionCountMap.containsKey(3) ? actionCountMap.get(3) : 0;// 3分球命中次数
 				int trisectionMissCount = actionCountMap.containsKey(4) ? actionCountMap.get(4) : 0;// 3分球不中次数
 				int trisectionShootCount = trisectionHitCount + trisectionMissCount;// 3分球出手次数
-				float trisectionHitRate = (float) trisectionHitCount / (float) trisectionShootCount;// 3分球命中率 
+				float trisectionHitRate = ((float) trisectionHitCount / (float) trisectionShootCount) * 100;// 3分球命中率 
 				int trisectionScore = trisectionHitCount * mActionMap.get(3).score;// 3分球总得分
 				
 				int penaltyHitCount = actionCountMap.containsKey(5) ? actionCountMap.get(5) : 0;// 罚球命中次数
 				int penaltyMissCount = actionCountMap.containsKey(6) ? actionCountMap.get(6) : 0;// 罚球命中次数
 				int penaltyShootCount = penaltyHitCount + penaltyMissCount;// 罚球出手次数
-				float penaltyHitRate = (float) penaltyHitCount / (float) penaltyShootCount;// 罚球命中率 
+				float penaltyHitRate = ((float) penaltyHitCount / (float) penaltyShootCount) * 100;// 罚球命中率 
 				int penaltyScore = penaltyHitCount * mActionMap.get(5).score;// 罚球总得分
 				
 				int totalScore = dichotomyScore + trisectionScore + penaltyScore;// 总得分
 				int totalHitCount = dichotomyHitCount + trisectionHitCount;// 总出手命中次数（不含罚球）
 				int totalShootCount = dichotomyShootCount + trisectionShootCount;// 总出手次数（不含罚球） 
-				float totalHitRate = (float) totalHitCount / (float) totalShootCount;// 总命中率（总命中率中不含罚球命中率）  
+				float totalHitRate = ((float) totalHitCount / (float) totalShootCount) * 100;// 总命中率（总命中率中不含罚球命中率）  
 				
 				int offensiveReboundCount = actionCountMap.containsKey(9) ? actionCountMap.get(9) : 0;// 前场篮板
 				int defensiveReboundCount = actionCountMap.containsKey(10) ? actionCountMap.get(10) : 0;// 后场篮板 
@@ -1188,16 +1188,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				dataList.add(String.valueOf(totalScore));// 总得分 
 				dataList.add(String.valueOf(totalHitCount));// 总出手命中次数（不含罚球）
 				dataList.add(String.valueOf(totalShootCount));// 总出手次数（不含罚球） 
-				dataList.add(String.valueOf(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
+				dataList.add(formatHitRatePercent(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
 				dataList.add(String.valueOf(dichotomyHitCount));// 2分球命中次数 
 				dataList.add(String.valueOf(dichotomyShootCount));// 2分球出手次数 
-				dataList.add(String.valueOf(dichotomyHitRate));// 2分球命中率 
+				dataList.add(formatHitRatePercent(dichotomyHitRate));// 2分球命中率 
 				dataList.add(String.valueOf(trisectionHitCount));// 3分球命中次数 
 				dataList.add(String.valueOf(trisectionShootCount));// 3分球出手次数 
-				dataList.add(String.valueOf(trisectionHitRate));// 3分球命中率 
+				dataList.add(formatHitRatePercent(trisectionHitRate));// 3分球命中率 
 				dataList.add(String.valueOf(penaltyHitCount));// 罚球命中次数 
 				dataList.add(String.valueOf(penaltyShootCount));// 罚球出手次数 
-				dataList.add(String.valueOf(penaltyHitRate));// 罚球命中率 
+				dataList.add(formatHitRatePercent(penaltyHitRate));// 罚球命中率 
 //				dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
 //				dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
 				dataList.add(String.valueOf(totalReboundCount));// 总篮板 
@@ -1211,16 +1211,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				dataList.add("0");// 总得分 
 				dataList.add("0");// 总出手命中次数（不含罚球）
 				dataList.add("0");// 总出手次数（不含罚球） 
-				dataList.add("0");// 总命中率（总命中率中不含罚球命中率） 
+				dataList.add("0%");// 总命中率（总命中率中不含罚球命中率） 
 				dataList.add("0");// 2分球命中次数 
 				dataList.add("0");// 2分球出手次数 
-				dataList.add("0");// 2分球命中率 
+				dataList.add("0%");// 2分球命中率 
 				dataList.add("0");// 3分球命中次数 
 				dataList.add("0");// 3分球出手次数 
-				dataList.add("0");// 3分球命中率 
+				dataList.add("0%");// 3分球命中率 
 				dataList.add("0");// 罚球命中次数 
 				dataList.add("0");// 罚球出手次数 
-				dataList.add("0");// 罚球命中率 
+				dataList.add("0%");// 罚球命中率 
 //				dataList.add("0");// 前场篮板 
 //				dataList.add("0");// 后场篮板 
 				dataList.add("0");// 总篮板 
@@ -1239,6 +1239,18 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			memberDataStatContent.dataList = dataList;
 			list.add(memberDataStatContent);
 		}
+	}
+	
+	private String formatHitRatePercent(float rate) {
+		String percent = Float.toString(rate);
+		if ("NaN".equals(percent)) {
+			percent = "0";
+		} else if (percent.startsWith("100.")) {
+			percent = "100";
+		} else if (percent.length() > 4) {
+			percent = percent.substring(0, 4);
+		}
+		return percent + "%";
 	}
 
 	private String formatPlayingTime(Long time) {
