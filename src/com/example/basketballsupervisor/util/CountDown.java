@@ -75,7 +75,7 @@ public class CountDown {
 				break;
 			case TAG_COUNT_DOWN_TIMEOUT:
 				if (countDown.mListener != null)
-					countDown.mListener.OnCountDownTimeout();
+					countDown.mListener.onCountDownTimeout();
 				break;
 			default:
 				break;
@@ -121,7 +121,7 @@ public class CountDown {
 	}
 
 	public interface OnCountDownListener {
-		void OnCountDownTimeout();
+		void onCountDownTimeout();
 
 		void onCountDownIntervalReach(int last);
 	}
