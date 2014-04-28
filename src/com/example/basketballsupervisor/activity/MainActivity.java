@@ -914,12 +914,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		Map<Long, Map<Integer, Integer>> mMemberActionMap = new HashMap<Long, Map<Integer, Integer>>();
 		
 		for (Record record : recordList) {
-			Map<Integer, Integer> groupActionCountMap = mGroupActionMap.get(record.groupId);
+			Long groupId = Long.valueOf(record.groupId);
+			
+			Map<Integer, Integer> groupActionCountMap = mGroupActionMap.get(groupId);
 			if (groupActionCountMap == null) {
 				groupActionCountMap = new HashMap<Integer, Integer>();
 			}
 			
-			Integer groupActionCount = groupActionCountMap.get(record.actionId);
+			Integer groupActionCount = groupActionCountMap.get((int)record.actionId);
 			if (groupActionCount == null) {
 				groupActionCount = 1;
 			} else {
@@ -927,7 +929,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			}
 			groupActionCountMap.put((int)record.actionId, groupActionCount);
 			
-			mGroupActionMap.put(record.groupId, groupActionCountMap);
+			mGroupActionMap.put(groupId, groupActionCountMap);
 			
 			
 			Map<Integer, Integer> memberActionCountMap = mMemberActionMap.get(record.memberId);
@@ -935,7 +937,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				memberActionCountMap = new HashMap<Integer, Integer>();
 			}
 			
-			Integer memberActionCount = memberActionCountMap.get(record.actionId);
+			Integer memberActionCount = memberActionCountMap.get((int)record.actionId);
 			if (memberActionCount == null) {
 				memberActionCount = 1;
 			} else {
