@@ -30,7 +30,7 @@
         
 		    <ListView
 		        android:id="@android:id/list"
-		        android:layout_width="3600dp"
+		        android:layout_width="1680dp"
 		        android:layout_height="match_parent"
 		        android:background="#FFB84D"
 		        android:cacheColorHint="@null"

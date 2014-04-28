@@ -70,13 +70,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private static String[] GROUP_DATA_STAT_COLUMNS = new String[] { "球队\\统计项",
 			"总得分", "总出手命中次数（不含罚球）", "总出手次数（不含罚球）", "总命中率（总命中率中不含罚球命中率）",
 			"2分球命中次数", "2分球出手次数", "2分球命中率", "3分球命中次数", "3分球出手次数", "3分球命中率",
-			"罚球命中次数", "罚球出手次数", "罚球命中率", "前场篮板", "后场篮板", "总篮板", "助攻", "抢断",
-			"封盖", "被犯规", "犯规", "失误" };
+			"罚球命中次数", "罚球出手次数", "罚球命中率", /**"前场篮板", "后场篮板", "总**/"篮板", "助攻", "抢断",
+			"封盖", /**"被犯规",**/ "犯规", "失误" };
 	private static String[] MEMBER_DATA_STAT_COLUMNS = new String[] { "球队",
 			"球员\\统计项", "总得分", "总出手命中次数（不含罚球）", "总出手次数（不含罚球）",
 			"总命中率（总命中率中不含罚球命中率）", "2分球命中次数", "2分球出手次数", "2分球命中率", "3分球命中次数",
-			"3分球出手次数", "3分球命中率", "罚球命中次数", "罚球出手次数", "罚球命中率", "前场篮板", "后场篮板",
-			"总篮板", "助攻", "抢断", "封盖", "被犯规", "犯规", "失误", "上场时间" };
+			"3分球出手次数", "3分球命中率", "罚球命中次数", "罚球出手次数", "罚球命中率", /**"前场篮板", "后场篮板",
+			"总**/"篮板", "助攻", "抢断", "封盖", /**"被犯规",**/ "犯规", "失误", "上场时间" };
 	private static String[] INNOVATE_DATA_STAT_COLUMNS = new String[] { "球队",
 			"球员\\统计项", "一条龙", "超远3分", "绝杀", "最后3秒得分", "晃倒", "2+1", "3+1", "扣篮",
 			"快攻", "2罚不中", "3罚不中", "被晃倒" };
@@ -519,8 +519,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private void technicalFouls(int clickPos) {
 		// 技术犯规
 		// 判断当前比赛状态是否允许记录技术犯规
-		boolean allowSubstitute = running;// 记录创新数据的角色不允许记录技术犯规
-		if (!allowSubstitute) {
+		boolean allow = running || pausing;// 记录创新数据的角色不允许记录技术犯规
+		if (!allow) {
 			showToastShort("比赛尚未开始，不允许记录技术犯规");
 			return ;
 		} else if (!mRoles.contains(1) && !mRoles.contains(2)) {
@@ -712,7 +712,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 换人
 		
 		// 判断当前比赛状态是否允许换人
-		boolean allowSubstitute = running && (mRoles.contains(1) || mRoles.contains(2));// 记录创新数据的角色不允许换人
+		boolean allowSubstitute = (running || pausing) && (mRoles.contains(1) || mRoles.contains(2));// 记录创新数据的角色不允许换人
 		if (allowSubstitute) {
 //			if (mRole == 1) {// 记录A队数据
 //				allowSubstitute = !(mGroupAPlayingMemberList.size() == mGroupAMemberList.size());
@@ -828,7 +828,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void updateGameRecord() {
 		// 更新比赛记录，显示统计信息表
-		boolean allowUpdate = running;
+		boolean allowUpdate = running || pausing;
 		if (!allowUpdate) {
 			showToastShort("比赛尚未开始，不允许显示统计列表");
 			return;
@@ -1056,7 +1056,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			int assistCount = actionCountMap.containsKey(8) ? actionCountMap.get(8) : 0;// 助攻 
 			int stealCount = actionCountMap.containsKey(7) ? actionCountMap.get(7) : 0;// 抢断 
 			int blockedShotsCount = actionCountMap.containsKey(12) ? actionCountMap.get(12) : 0;// 封盖 
-			int fouledCount = actionCountMap.containsKey(14) ? actionCountMap.get(14) : 0;// 被犯规 
+//			int fouledCount = actionCountMap.containsKey(14) ? actionCountMap.get(14) : 0;// 被犯规 
 			int foulCount = actionCountMap.containsKey(13) ? actionCountMap.get(13) : 0;// 犯规 
 			int missCount = actionCountMap.containsKey(11) ? actionCountMap.get(11) : 0;// 失误 
 			
@@ -1073,13 +1073,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(String.valueOf(penaltyHitCount));// 罚球命中次数 
 			dataList.add(String.valueOf(penaltyShootCount));// 罚球出手次数 
 			dataList.add(String.valueOf(penaltyHitRate));// 罚球命中率 
-			dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
-			dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
+//			dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
+//			dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
 			dataList.add(String.valueOf(totalReboundCount));// 总篮板 
 			dataList.add(String.valueOf(assistCount));// 助攻 
 			dataList.add(String.valueOf(stealCount));// 抢断 
 			dataList.add(String.valueOf(blockedShotsCount));// 封盖 
-			dataList.add(String.valueOf(fouledCount));// 被犯规 
+//			dataList.add(String.valueOf(fouledCount));// 被犯规 
 			dataList.add(String.valueOf(foulCount));// 犯规 
 			dataList.add(String.valueOf(missCount));// 失误 
 		} else {
@@ -1097,13 +1097,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add("0");// 罚球命中次数 
 			dataList.add("0");// 罚球出手次数 
 			dataList.add("0");// 罚球命中率 
-			dataList.add("0");// 前场篮板 
-			dataList.add("0");// 后场篮板 
+//			dataList.add("0");// 前场篮板 
+//			dataList.add("0");// 后场篮板 
 			dataList.add("0");// 总篮板 
 			dataList.add("0");// 助攻 
 			dataList.add("0");// 抢断 
 			dataList.add("0");// 封盖 
-			dataList.add("0");// 被犯规 
+//			dataList.add("0");// 被犯规 
 			dataList.add("0");// 犯规 
 			dataList.add("0");// 失误 
 		}
@@ -1179,7 +1179,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				int assistCount = actionCountMap.containsKey(8) ? actionCountMap.get(8) : 0;// 助攻 
 				int stealCount = actionCountMap.containsKey(7) ? actionCountMap.get(7) : 0;// 抢断 
 				int blockedShotsCount = actionCountMap.containsKey(12) ? actionCountMap.get(12) : 0;// 封盖 
-				int fouledCount = actionCountMap.containsKey(14) ? actionCountMap.get(14) : 0;// 被犯规 
+//				int fouledCount = actionCountMap.containsKey(14) ? actionCountMap.get(14) : 0;// 被犯规 
 				int foulCount = actionCountMap.containsKey(13) ? actionCountMap.get(13) : 0;// 犯规 
 				int missCount = actionCountMap.containsKey(11) ? actionCountMap.get(11) : 0;// 失误 
 				
@@ -1196,13 +1196,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				dataList.add(String.valueOf(penaltyHitCount));// 罚球命中次数 
 				dataList.add(String.valueOf(penaltyShootCount));// 罚球出手次数 
 				dataList.add(String.valueOf(penaltyHitRate));// 罚球命中率 
-				dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
-				dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
+//				dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
+//				dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
 				dataList.add(String.valueOf(totalReboundCount));// 总篮板 
 				dataList.add(String.valueOf(assistCount));// 助攻 
 				dataList.add(String.valueOf(stealCount));// 抢断 
 				dataList.add(String.valueOf(blockedShotsCount));// 封盖 
-				dataList.add(String.valueOf(fouledCount));// 被犯规 
+//				dataList.add(String.valueOf(fouledCount));// 被犯规 
 				dataList.add(String.valueOf(foulCount));// 犯规 
 				dataList.add(String.valueOf(missCount));// 失误 
 			} else {
@@ -1219,13 +1219,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				dataList.add("0");// 罚球命中次数 
 				dataList.add("0");// 罚球出手次数 
 				dataList.add("0");// 罚球命中率 
-				dataList.add("0");// 前场篮板 
-				dataList.add("0");// 后场篮板 
+//				dataList.add("0");// 前场篮板 
+//				dataList.add("0");// 后场篮板 
 				dataList.add("0");// 总篮板 
 				dataList.add("0");// 助攻 
 				dataList.add("0");// 抢断 
 				dataList.add("0");// 封盖 
-				dataList.add("0");// 被犯规 
+//				dataList.add("0");// 被犯规 
 				dataList.add("0");// 犯规 
 				dataList.add("0");// 失误 
 			}
@@ -1310,7 +1310,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private void requestNewGameData() {
 		// 请求新的比赛数据
-		if (running) {
+		if (running || pausing) {
 			showToastShort("比赛正在进行，不允许获取新的比赛数据");
 		} else {
 			requestGameData();
@@ -1478,9 +1478,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		SpUtil.getInstance(this).getEdit().putInt("last_game_time", last).commit();
 		mTvGameTime.setText(formGameTime(last));
 		
-		int quarter = last / (mQuarterTime * 60 * 1000) + 1;
-		if (quarter == mCurrentQuarter + 1) {// 进入下一节，先暂停
-			doPauseGame();
+		int time = mQuarterTime * 60 * 1000;
+		if (last % time == 0) {
+			int quarter = last / (time) + 1;
+			if (quarter == mCurrentQuarter + 1) {// 进入下一节，先暂停
+				doPauseGame();
+			}
 		}
 		mTvGameFirstHalf.setText("第" + mCurrentQuarter + "节");
 		
@@ -1580,7 +1583,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mIvPauseLeft.setImageResource(R.drawable.btn_continue);
 		mIvPauseRight.setImageResource(R.drawable.btn_continue);
 		
-		mCountDown.setPauseWork(true);
+		if (mCountDown != null) {
+			mCountDown.setPauseWork(true);
+		}
 		
 		mGameTime = System.currentTimeMillis();
 		
@@ -1588,15 +1593,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
 		
 		// 记录首发球员上场时间
-		PlayingTimeDb db = new PlayingTimeDb(getActivity());
+		PlayingTimeDb plaingTimeDb = new PlayingTimeDb(getActivity());
 		
 		if (mRoles.contains(1)) {// 记录A队数据
 			gameTimeDb.pauseOrEndGame(mGame, mGroupA, mGameTime);
-			db.pauseOrEndGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+			plaingTimeDb.pauseOrEndGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
 		} 
 		if (mRoles.contains(2)) {// 记录B队数据
 			gameTimeDb.pauseOrEndGame(mGame, mGroupB, mGameTime);
-			db.pauseOrEndGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+			plaingTimeDb.pauseOrEndGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
 		}
 		if (mRoles.contains(3)) {// 记录创新数据
 			// 无需处理
