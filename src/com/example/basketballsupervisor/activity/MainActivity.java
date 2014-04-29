@@ -1480,7 +1480,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		running = false;
 		pausing = false;
 		
-		mCountDown.reset();
+		if (mCountDown == null) {
+			mCountDown.reset();
+		}
 
 		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
 		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
@@ -1493,7 +1495,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGameTime.setText(formGameTime(last));
 		
 		int time = mQuarterTime * 60 * 1000;
-		if (last % time == 0) {
+		if (last > 0 && last % time == 0) {
 			int quarter = last / (time) + 1;
 			if (quarter == mQuarterCount) {
 				onCountDownTimeout();
