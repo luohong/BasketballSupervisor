@@ -239,6 +239,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		String groupBName = (mGroupB != null && !TextUtils.isEmpty(mGroupB.groupName)) ? mGroupB.groupName : "B队";
 		mTvGroupBName.setText(groupBName);
 		
+		if (running || pausing) {
+			mGroupAScore = SpUtil.getInstance(this).getSp().getInt("group_a_score", 0);
+			mGroupBScore = SpUtil.getInstance(this).getSp().getInt("group_b_score", 0);
+		}
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		
@@ -1526,11 +1530,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void updateGroupAScore(int score) {
 		mGroupAScore += score;
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
+		SpUtil.getInstance(this).getEdit().putInt("group_a_score", mGroupAScore).commit();
 	}
 
 	public void updateGroupBScore(int score) {
 		mGroupBScore += score;
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
+		SpUtil.getInstance(this).getEdit().putInt("group_b_score", mGroupBScore).commit();
 	}
 
 	public void setCurrentRecordCoordinate(Action action, String coordinate) {
@@ -1549,7 +1555,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (allowRecordEvent) {
 			showRecordEventDialog(position);
 		} else {
-			showToast("当前不允许记录球员事件");
+			showToast("仅比赛进行时，才允许记录球员事件");
 		}
 	}
 
