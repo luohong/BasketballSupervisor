@@ -380,7 +380,21 @@ public class SelectPlayersDialog extends BaseDialog {
 			
 			holder.ivPoint.setVisibility(View.VISIBLE);
 			holder.tvTitle.setText(member.name);
-			holder.tvNum.setText(member.number);
+			switch (member.isLeader) {
+			case 0://0:队员 
+			case 1://1:队长
+				holder.tvNum.setText(member.number);
+				break;
+			case 2://2:领队
+				holder.tvNum.setText("领队");
+				break;
+			case 3://3:教练
+				holder.tvNum.setText("教练");
+				break;
+			default:
+				holder.tvNum.setText(member.number);
+				break;
+			}
 			
 			Integer count = mMemberActionMap != null ? mMemberActionMap.get(member.memberId) : null;
 			if (count != null && count > 0) {
