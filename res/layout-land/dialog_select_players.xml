@@ -98,6 +98,7 @@
     </LinearLayout>
     
     <LinearLayout 
+        android:id="@+id/ll_trainers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -119,8 +120,8 @@
         <View 
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="4dp"
             android:background="@color/white"/>
         
         <TextView 
@@ -130,8 +131,7 @@
             android:gravity="center"
             android:textSize="@dimen/group_name"
             android:textColor="@color/white"
-            android:text="教练员1 教练员2 教练员3"
-            android:textStyle="bold"/>
+            android:text="教练员1 教练员2 教练员3"/>
         
     </LinearLayout>
 

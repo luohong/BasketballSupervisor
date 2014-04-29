@@ -961,6 +961,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		List<String> memberColumns = Arrays.asList(MEMBER_DATA_STAT_COLUMNS);
 		List<String> innovateColumns = Arrays.asList(INNOVATE_DATA_STAT_COLUMNS);
 		
+		List<Member> groupAMemberList = filterMember(mGroupAMemberList);
+		List<Member> groupBMemberList = filterMember(mGroupBMemberList);
+		
 		// 球队统计标题
 		DataStat groupDataStatTitle = new DataStat();
 		groupDataStatTitle.type = DataStatDialog.TYPE_TITLE;
@@ -994,8 +997,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		list.add(memberDataStatColumn);
 		
 		// 球员统计列值
-		addMemberDataStatContent(mMemberActionMap, list, mGroupAMemberList, mGroupA);// A队球员统计列值
-		addMemberDataStatContent(mMemberActionMap, list, mGroupBMemberList, mGroupB);// B队球员统计列值
+		addMemberDataStatContent(mMemberActionMap, list, groupAMemberList, mGroupA);// A队球员统计列值
+		addMemberDataStatContent(mMemberActionMap, list, groupBMemberList, mGroupB);// B队球员统计列值
 		
 		// 创新数据标题
 		DataStat innovateDataStatTitle = new DataStat();
@@ -1012,8 +1015,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		list.add(innovateDataStatColumn);
 		
 		// 创新数据列值
-		addInnovateDataStatContent(mMemberActionMap, list, mGroupAMemberList, mGroupA);// A队球员创新数据列值
-		addInnovateDataStatContent(mMemberActionMap, list, mGroupBMemberList, mGroupB);// B队球员创新数据列值
+		addInnovateDataStatContent(mMemberActionMap, list, groupAMemberList, mGroupA);// A队球员创新数据列值
+		addInnovateDataStatContent(mMemberActionMap, list, groupBMemberList, mGroupB);// B队球员创新数据列值
 		
 		return list;
 	}
@@ -1555,10 +1558,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		// TODO only for test
 		if (mGroupAPlayingMemberList.isEmpty()) {
-			mGroupAPlayingMemberList.addAll(mGroupAMemberList);
+			mGroupAPlayingMemberList = filterMember(mGroupAMemberList);
 		}
 		if (mGroupBPlayingMemberList.isEmpty()) {
-			mGroupBPlayingMemberList.addAll(mGroupBMemberList);
+			mGroupBPlayingMemberList = filterMember(mGroupBMemberList);
 		}
 		
 		mGameTime = System.currentTimeMillis();
@@ -1570,6 +1573,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		dialog.fillGameData(mGame, mRoles, mGameTime, coordinate);
 		dialog.fillGroupData(mGroupA, mGroupB);
 		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupBPlayingMemberList);
+	}
+
+	private List<Member> filterMember(List<Member> groupMemberList) {
+		List<Member> groupPlayingMemberList = new ArrayList<Member>();
+		for (Member member : groupMemberList) {
+			if (member.isLeader <= 1) {//3:教练,2:领队,1:队长,0:队员 
+				groupPlayingMemberList.add(member);
+			}
+		}
+		return groupPlayingMemberList;
 	}
 	
 	private String parseCoordinate(int position) {

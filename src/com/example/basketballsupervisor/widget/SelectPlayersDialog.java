@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,7 +39,8 @@ public class SelectPlayersDialog extends BaseDialog {
 	private TextView mTvGroupATitle, mTvGroupBTitle;
 	
 	private ListView mLvPlaying, mLvBench;
-	
+
+	private LinearLayout mLlTrainers;
 	private TextView mTvTrainers;
 
 	private PlayerAdapter mPlayingAdapter;
@@ -87,6 +89,7 @@ public class SelectPlayersDialog extends BaseDialog {
 		mLvPlaying = (ListView) findViewById(R.id.lv_playing);
 		mLvBench = (ListView) findViewById(R.id.lv_bench);
 		
+		mLlTrainers = (LinearLayout) findViewById(R.id.ll_trainers);
 		mTvTrainers = (TextView) findViewById(R.id.tv_trainers);
 
 	}
@@ -290,16 +293,29 @@ public class SelectPlayersDialog extends BaseDialog {
 		mPlayingAdapter.setData(mPlayingMembers);
 		
 		mBenchMembers = new ArrayList<Member>();
-		if (playingMembers != null && playingMembers.size() > 0) {
-			for (Member member : allMembers) {
-					if (!playingMembers.contains(member)) {
-						mBenchMembers.add(member);
-					}
-			}
-		} else {
-			mBenchMembers.addAll(allMembers);
+		List<Member> mTrainers = new ArrayList<Member>();
+		for (Member member : allMembers) {
+				if (!playingMembers.contains(member) && member.isLeader <= 1) {//3:教练,2:领队,1:队长,0:队员 
+					mBenchMembers.add(member);
+				} else if (member.isLeader > 2) {
+					mTrainers.add(member);
+				}
 		}
 		mAllAdapter.setData(mBenchMembers);
+		
+		if (mTrainers.size() > 0) {
+			mLlTrainers.setVisibility(View.VISIBLE);
+			mTvTrainers.setVisibility(View.VISIBLE);
+			
+			String trainers = "";
+			for (int i = 0; i < mTrainers.size(); i++) {
+				trainers += mTrainers.get(i).name + " ";
+			}
+			mTvTrainers.setText(trainers);
+		} else {
+			mLlTrainers.setVisibility(View.GONE);
+			mTvTrainers.setVisibility(View.GONE);
+		}
 	}
 	
 	public void fillGameData(Game game, List<Integer> roles, long time, String coordinate) {
