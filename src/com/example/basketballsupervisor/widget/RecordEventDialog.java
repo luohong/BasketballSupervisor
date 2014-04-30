@@ -85,7 +85,26 @@ public class RecordEventDialog extends BaseDialog {
 	public RecordEventDialog(Context context, List<Action> actionList) {
 		super(context);
 		mMainActivity = (MainActivity) context;
-		mActionList = actionList;
+		mActionList = filterAction(actionList);
+	}
+
+	private List<Action> filterAction(List<Action> actionList) {
+		List<Action> list = new ArrayList<Action>();
+		for (Action action : actionList) {
+			if (action.id != 14 && action.id != 9) {// 过滤被犯规，前场篮板
+				try {
+					Action a = (Action)action.clone();
+					if (action.id == 10) {
+						a.name = "篮板";
+						a.nextActionId = -11;
+					}
+					list.add(a);
+				} catch (CloneNotSupportedException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return list;
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package com.example.basketballsupervisor.model;
 
 import java.io.Serializable;
 
-public class Action implements Serializable {
+public class Action implements Serializable, Cloneable {
 	
 	public int id;
 	public int nextActionId;
@@ -21,6 +21,11 @@ public class Action implements Serializable {
 		this.name = name;
 		this.score = score;
 		this.cancelable = cancelable;
+	}
+	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
 	}
 	
 }

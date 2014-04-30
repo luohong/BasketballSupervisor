@@ -105,7 +105,7 @@ public class ActionDb extends BaseDb {
 		sampleActions.add(new Action(7,0,"抢断",0,0));
 		sampleActions.add(new Action(8,0,"助攻",0,0));
 		sampleActions.add(new Action(9,0,"前场篮板",0,0));
-		sampleActions.add(new Action(10,0,"后场篮板",0,0));
+		sampleActions.add(new Action(10,-11,"后场篮板",0,0));
 		sampleActions.add(new Action(11,0,"失误",0,0));
 		sampleActions.add(new Action(12,0,"封盖",0,0));
 		sampleActions.add(new Action(13,0,"犯规",0,0));
