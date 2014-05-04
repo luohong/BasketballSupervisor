@@ -443,14 +443,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		gameDb.saveAll(gameList);
 
 		GroupDb groupDb = new GroupDb(this);
+		groupDb.clearAllData();
+		
 		MemberDb memberDb = new MemberDb(this);
+		memberDb.clearAllData();
+		
 		for (Game game : gameList) {
 			if (game != null) {
 				List<Group> groupList = game.groupList;
 				if (groupList != null && groupList.size() > 0) {
 					groupDb.saveAll(groupList, game);
-					
-					memberDb.clearAllData();
 					for (Group group : groupList) {
 						if (group != null) {
 							List<Member> memberList = group.memberList;
