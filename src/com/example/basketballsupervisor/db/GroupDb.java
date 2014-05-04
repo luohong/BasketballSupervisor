@@ -98,7 +98,6 @@ public class GroupDb extends BaseDb {
 		beginTransaction();
 		try {
 			if (groupList != null && groupList.size() > 0) {
-				clearAllData();
 				for (Group group : groupList) {
 					insert(group, game);
 				}
