@@ -97,19 +97,19 @@ public class ActionDb extends BaseDb {
 		List<Action> sampleActions = new ArrayList<Action>();
 		
 		sampleActions.add(new Action(1,8,"2分命中",2,1));
-		sampleActions.add(new Action(2,10,"2分不中",0,1));
+		sampleActions.add(new Action(2,9,"2分不中",0,1));
 		sampleActions.add(new Action(3,8,"3分命中",3,1));
-		sampleActions.add(new Action(4,10,"3分不中",0,1));
+		sampleActions.add(new Action(4,9,"3分不中",0,1));
 		sampleActions.add(new Action(5,0,"罚球命中",1,0));
-		sampleActions.add(new Action(6,10,"罚球不中",0,1));
+		sampleActions.add(new Action(6,9,"罚球不中",0,1));
 		sampleActions.add(new Action(7,0,"抢断",0,0));
 		sampleActions.add(new Action(8,0,"助攻",0,0));
-		sampleActions.add(new Action(9,0,"前场篮板",0,0));
+		sampleActions.add(new Action(9,-11,"前场篮板",0,0));
 		sampleActions.add(new Action(10,-11,"后场篮板",0,0));
 		sampleActions.add(new Action(11,0,"失误",0,0));
 		sampleActions.add(new Action(12,0,"封盖",0,0));
-		sampleActions.add(new Action(13,0,"犯规",0,0));
-		sampleActions.add(new Action(14,13,"被犯规",0,0));
+		sampleActions.add(new Action(13,14,"犯规",0,0));
+		sampleActions.add(new Action(14,-12,"被犯规",0,0));
 		sampleActions.add(new Action(15,-1,"创新",0,1));
 		sampleActions.add(new Action(16,-2,"一条龙",0,0));
 		sampleActions.add(new Action(17,-2,"超远3分",0,0));

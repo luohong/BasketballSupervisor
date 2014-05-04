@@ -78,6 +78,7 @@ public class RecordEventDialog extends BaseDialog {
 
 	private Group mGroupA;
 	private Group mGroupB;
+	private Group mPreviousSelectedGroup;
 	private Group mSelectedGroup;
 
 	private boolean isSetRecordCoordinate;
@@ -91,17 +92,15 @@ public class RecordEventDialog extends BaseDialog {
 	private List<Action> filterAction(List<Action> actionList) {
 		List<Action> list = new ArrayList<Action>();
 		for (Action action : actionList) {
-			if (action.id != 14 && action.id != 9) {// 过滤被犯规，前场篮板
-				try {
-					Action a = (Action)action.clone();
-					if (action.id == 10) {
-						a.name = "篮板";
-						a.nextActionId = -11;
-					}
-					list.add(a);
-				} catch (CloneNotSupportedException e) {
-					e.printStackTrace();
+			try {
+				Action a = (Action)action.clone();
+				// 过滤被犯规，前场篮板
+				if (action.id == 9) {
+					a.name = "篮板";
 				}
+				list.add(a);
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
 			}
 		}
 		return list;
@@ -144,7 +143,6 @@ public class RecordEventDialog extends BaseDialog {
 		
 		mLvPage4Playing = (ListView) findViewById(R.id.lv_page4_playing);
 		mLvPage4Bench = (ListView) findViewById(R.id.lv_page4_bench);
-		mLvPage4Bench.setVisibility(View.GONE);
 		
 	}
 
@@ -244,8 +242,8 @@ public class RecordEventDialog extends BaseDialog {
 		mPage4GroupAPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_A);
 		mLvPage4Playing.setAdapter(mPage4GroupAPlayingAdapter);
 
-//		mPage4GroupBPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_B);
-//		mLvPage4Bench.setAdapter(mPage4GroupBPlayingAdapter);
+		mPage4GroupBPlayingAdapter = new PlayerAdapter(getContext(), PlayerAdapter.TEAM_B);
+		mLvPage4Bench.setAdapter(mPage4GroupBPlayingAdapter);
 		
 		mLvPage4Playing.setOnItemClickListener(new OnItemClickListener() {
 
@@ -253,22 +251,26 @@ public class RecordEventDialog extends BaseDialog {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				dismiss();
+				
+				mSelectedGroup = mGroupA;
 
 				mSelectedMember = (Member) parent.getItemAtPosition(position);
 				saveRecordEvent(mNextAction);
 			}
 		});
-//		mLvPage4Bench.setOnItemClickListener(new OnItemClickListener() {
-//
-//			@Override
-//			public void onItemClick(AdapterView<?> parent, View view,
-//					int position, long id) {
-//				dismiss();
-//				
-//				mSelectedMember = (Member) parent.getItemAtPosition(position);
-//				saveRecordEvent(mNextAction);
-//			}
-//		});
+		mLvPage4Bench.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+				dismiss();
+				
+				mSelectedGroup = mGroupB;
+				
+				mSelectedMember = (Member) parent.getItemAtPosition(position);
+				saveRecordEvent(mNextAction);
+			}
+		});
 	}
 	
 	@Override
@@ -294,18 +296,24 @@ public class RecordEventDialog extends BaseDialog {
 	
 	private void saveRecordEvent(Action action, boolean toast) {
 		// 记录动作行为
-		RecordDb db = new RecordDb(getContext());
-		if (mRoles.contains(1) && mSelectedGroup == mGroupA) {// 记录A队数据
-			mMainActivity.updateGroupAScore(action.score);
-			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime, mCoordinate);
-		} 
-		if (mRoles.contains(2) && mSelectedGroup == mGroupB) {// 记录B队数据
-			mMainActivity.updateGroupBScore(action.score);
-			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime, mCoordinate);
-		} 
-		if (mRoles.contains(3) && action.nextActionId == -2) {// 记录创新数据
-			db.saveRecord(mGame, mSelectedGroup, mSelectedMember, action, mGameTime, mCoordinate);
+		
+		if (mPreviousSelectedGroup != mSelectedGroup && action.nextActionId == 9) {
+			action.nextActionId = 10;// 所有投篮未中的后续篮板选项中应该是两队球员，如果选择的是投篮一方的球员，则记录前场篮板，如果选择的是防守一方的球员，则记录后场篮板。
 		}
+		
+		RecordDb db = new RecordDb(getContext());
+//		if (mRoles.contains(1) && mSelectedGroup == mGroupA) {// 记录A队数据
+//			mMainActivity.updateGroupAScore(action.score);
+//			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime, mCoordinate);
+//		} 
+//		if (mRoles.contains(2) && mSelectedGroup == mGroupB) {// 记录B队数据
+//			mMainActivity.updateGroupBScore(action.score);
+//			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime, mCoordinate);
+//		} 
+//		if (mRoles.contains(3) && action.nextActionId == -2) {// 记录创新数据
+//			db.saveRecord(mGame, mSelectedGroup, mSelectedMember, action, mGameTime, mCoordinate);
+//		}
+		db.saveRecord(mGame, mSelectedGroup, mSelectedMember, action, mGameTime, mCoordinate);
 		
 		if (toast) {
 			Toast.makeText(context, "记录成功", Toast.LENGTH_SHORT).show();
@@ -329,32 +337,57 @@ public class RecordEventDialog extends BaseDialog {
 			}
 		}
 		mNextAction = action;
+		mPreviousSelectedGroup = mSelectedGroup;
 		
 		mTvPage4Title.setText(mNextAction.name + "球员选项");
 		
-		if (mNextAction.id != 13) {// 仅被犯规选择对方球员
+		mTvPage4GroupAName.setText(mGroupA.groupName);
+		mTvPage4GroupBName.setText(mGroupB.groupName);
+		
+		mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+		mPage4GroupBPlayingAdapter.setData(mGroupBPlayingMembers);
+		
+		if (mNextAction.id != 14 && mNextAction.id != 9 && mNextAction.id != 10) {// 仅被犯规选择对方球员
 			if (mSelectedGroup == mGroupA && mRoles.contains(1)) {// 记录A队数据
-				mTvPage4GroupAName.setText(mGroupA.groupName);
-				mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+				mTvPage4GroupAName.setVisibility(View.VISIBLE);
+				mTvPage4GroupATitle.setVisibility(View.VISIBLE);
+				
+				mTvPage4GroupBName.setVisibility(View.GONE);
+				mTvPage4GroupBTitle.setVisibility(View.GONE);
+				
+				mLvPage4Playing.setVisibility(View.VISIBLE);
+				mLvPage4Bench.setVisibility(View.GONE);
 			} else if (mSelectedGroup == mGroupB && mRoles.contains(2)) {// 记录B队数据
-				mTvPage4GroupAName.setText(mGroupB.groupName);
-				mPage4GroupAPlayingAdapter.setData(mGroupBPlayingMembers);
+				mTvPage4GroupAName.setVisibility(View.GONE);
+				mTvPage4GroupATitle.setVisibility(View.GONE);
+				
+				mTvPage4GroupBName.setVisibility(View.VISIBLE);
+				mTvPage4GroupBTitle.setVisibility(View.VISIBLE);
+				
+				mLvPage4Playing.setVisibility(View.GONE);
+				mLvPage4Bench.setVisibility(View.VISIBLE);
 			}
 		} else {
-			if (mSelectedGroup == mGroupA && mRoles.contains(1)) {// 记录A队数据
-				mTvPage4GroupAName.setText(mGroupB.groupName);
-				mPage4GroupAPlayingAdapter.setData(mGroupBPlayingMembers);
-			} else if (mSelectedGroup == mGroupB && mRoles.contains(2)) {// 记录B队数据
-				mTvPage4GroupAName.setText(mGroupA.groupName);
-				mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
-			}
+			mTvPage4GroupBName.setVisibility(View.VISIBLE);
+			mTvPage4GroupBTitle.setVisibility(View.VISIBLE);
+			
+			mLvPage4Playing.setVisibility(View.VISIBLE);
+			mLvPage4Bench.setVisibility(View.VISIBLE);
+			
+			mTvPage4GroupAName.setText(mGroupA.groupName);
+			mTvPage4GroupBName.setText(mGroupB.groupName);
+			
+			mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+			mPage4GroupBPlayingAdapter.setData(mGroupBPlayingMembers);
+			
+//			if (mSelectedGroup == mGroupA && mRoles.contains(1)) {// 记录A队数据
+//				mTvPage4GroupAName.setText(mGroupB.groupName);
+//				mPage4GroupAPlayingAdapter.setData(mGroupBPlayingMembers);
+//			} else if (mSelectedGroup == mGroupB && mRoles.contains(2)) {// 记录B队数据
+//				mTvPage4GroupAName.setText(mGroupA.groupName);
+//				mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
+//			}
 		}
-		mTvPage4GroupBName.setVisibility(View.GONE);
-		mTvPage4GroupBTitle.setVisibility(View.GONE);
-//		mTvPage4GroupBName.setText(mGroupB.groupName);
-		
-//		mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
-//		mPage4GroupBPlayingAdapter.setData(mGroupBPlayingMembers);
 		
 		mSelectedGroupAPlayingPos = -1;
 		mSelectedGroupBPlayingPos = -1;

@@ -269,7 +269,7 @@
         android:textSize="@dimen/data_stat_column" >
     </TextView>
 
-    <!-- <TextView
+    <TextView
         android:id="@+id/tv_column23"
         android:layout_width="@dimen/data_stat_width"
         android:layout_height="wrap_content"
@@ -305,7 +305,7 @@
         android:textSize="@dimen/data_stat_column" >
     </TextView>
 
-    <TextView
+    <!-- <TextView
         android:id="@+id/tv_column26"
         android:layout_width="@dimen/data_stat_width"
         android:layout_height="wrap_content"

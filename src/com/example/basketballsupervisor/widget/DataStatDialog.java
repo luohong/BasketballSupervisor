@@ -117,7 +117,7 @@ public class DataStatDialog extends BaseDialog {
 				}
 
 				// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误 上场时间
-				for (int i = 0; i < 22; i++) {
+				for (int i = 0; i < 25; i++) {
 					((TextView) convertView.findViewById(R.id.tv_column1 + i)).setText(i < size ? dataList.get(i) : "");
 				}
 				break;
@@ -127,7 +127,7 @@ public class DataStatDialog extends BaseDialog {
 				}
 
 				// 一条龙，超远三分，绝杀，最后三秒得分，晃倒，2+1,3+1，扣篮，快攻，2罚不中，三罚不中，被晃倒
-				for (int i = 0; i < 22; i++) {
+				for (int i = 0; i < 25; i++) {
 					((TextView) convertView.findViewById(R.id.tv_column1 + i)).setText(i < size ? dataList.get(i) : "");
 				}
 				break;
