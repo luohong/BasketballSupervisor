@@ -1583,9 +1583,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private List<Member> filterMember(List<Member> groupMemberList) {
 		List<Member> groupPlayingMemberList = new ArrayList<Member>();
-		for (Member member : groupMemberList) {
-			if (member.isLeader <= 1) {//3:教练,2:领队,1:队长,0:队员 
-				groupPlayingMemberList.add(member);
+		if (groupMemberList != null) {
+			for (Member member : groupMemberList) {
+				if (member.isLeader <= 1) {//3:教练,2:领队,1:队长,0:队员 
+					groupPlayingMemberList.add(member);
+				}
 			}
 		}
 		return groupPlayingMemberList;
