@@ -298,7 +298,7 @@ public class RecordEventDialog extends BaseDialog {
 		// 记录动作行为
 		
 		if (mPreviousSelectedGroup != null && mPreviousSelectedGroup != mSelectedGroup && action.id == 9) {
-			action.nextActionId = 10;// 所有投篮未中的后续篮板选项中应该是两队球员，如果选择的是投篮一方的球员，则记录前场篮板，如果选择的是防守一方的球员，则记录后场篮板。
+			action.id = 10;// 所有投篮未中的后续篮板选项中应该是两队球员，如果选择的是投篮一方的球员，则记录前场篮板，如果选择的是防守一方的球员，则记录后场篮板。
 		}
 		
 		RecordDb db = new RecordDb(getContext());
