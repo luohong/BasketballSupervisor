@@ -1365,6 +1365,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		SpUtil.getInstance(this).logout();
 		SpUtil.getInstance(this).getEdit().clear().commit();
 		
+		if (mCountDown != null) {
+			mCountDown.stop();
+		}
+		
 		GameDb gameDb = new GameDb(this);
 		gameDb.clearAllData();
 		
