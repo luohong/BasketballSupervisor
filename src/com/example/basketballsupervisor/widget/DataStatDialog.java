@@ -149,7 +149,8 @@ public class DataStatDialog extends BaseDialog {
 				break;
 			}
 			
-			convertView.setSelected(selectedItem == position);
+			View view = convertView.findViewById(R.id.ll_column);
+			view.setSelected(selectedItem == position);
 
 			return convertView;
 		}

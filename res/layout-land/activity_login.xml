@@ -32,7 +32,8 @@
         android:minWidth="@dimen/edittext_width"
         android:textColor="@color/login_input"
         android:textColorHint="@color/login_hint"
-        android:textSize="@dimen/text_input" />
+        android:textSize="@dimen/text_input" 
+        android:gravity="center_vertical"/>
 
     <EditText
         android:id="@+id/et_password"
@@ -47,7 +48,8 @@
         android:password="true"
         android:textColor="@color/login_input"
         android:textColorHint="@color/login_hint"
-        android:textSize="@dimen/text_input" />
+        android:textSize="@dimen/text_input" 
+        android:gravity="center_vertical"/>
 
     <Button
         android:id="@+id/btn_commit"

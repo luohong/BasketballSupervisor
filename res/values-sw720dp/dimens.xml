@@ -8,7 +8,7 @@
     <dimen name="header_height">64dp</dimen>
     <dimen name="header_text_size">22sp</dimen>
     
-    <dimen name="edittext_height">48dp</dimen>
+    <dimen name="edittext_height">54dp</dimen>
     
     <dimen name="text_input">22sp</dimen>
     

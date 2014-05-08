@@ -36,7 +36,6 @@
 		        android:background="#A7A9A8"
 		        android:cacheColorHint="@null"
 		        android:dividerHeight="1.0dip"
-		        android:listSelector="@drawable/item_data_stat_selector"
 		        android:drawSelectorOnTop="false"
 		        android:fadingEdgeLength="0.0sp"
 		        android:fastScrollEnabled="true" />

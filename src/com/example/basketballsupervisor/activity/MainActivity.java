@@ -9,6 +9,7 @@ import java.util.Map;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
+import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.text.TextUtils;
@@ -127,20 +128,20 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private Map<Integer, Action> mActionMap;
 	private boolean isRequiredUpdateGameRecord = true;// 默认需要获取最新的比赛记录
 	private boolean isRequiredRecord = true;
+	private SpUtil mSpUtil;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		running = SpUtil.getInstance(this).getSp().getBoolean("game_state_running", false);
-		pausing = SpUtil.getInstance(this).getSp().getBoolean("game_state_pausing", false);
-		
 		loadDataInBackground();
 	}
 
 	@Override
 	public void onInit() {
+		mSpUtil = SpUtil.getInstance(this);
+		
 		mGroupAPlayingMemberList = new ArrayList<Member>();
 		mGroupBPlayingMemberList = new ArrayList<Member>();
 		
@@ -197,7 +198,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	@Override
 	public void onInitViewData() {
-		int lastGameTime = SpUtil.getInstance(this).getSp().getInt("last_game_time", 0);
+		int lastGameTime = mSpUtil.getSp().getInt("last_game_time", 0);
 		onCountDownIntervalReach(lastGameTime);
 
 		int drawable = R.drawable.st_07;		
@@ -241,8 +242,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGroupBName.setText(groupBName);
 		
 		if (running || pausing) {
-			mGroupAScore = SpUtil.getInstance(this).getSp().getInt("group_a_score", 0);
-			mGroupBScore = SpUtil.getInstance(this).getSp().getInt("group_b_score", 0);
+			mGroupAScore = mSpUtil.getSp().getInt("group_a_score", 0);
+			mGroupBScore = mSpUtil.getSp().getInt("group_b_score", 0);
 		}
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
@@ -373,8 +374,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				}
 			}
 			
+			// 恢复比赛现场
+			running = mSpUtil.getSp().getBoolean("game_state_running", false);
+			pausing = mSpUtil.getSp().getBoolean("game_state_pausing", false);
+			
 			onInitViewData();
-			doStartGameIfRunningOrPaused();
+			onRestoreGameState();
 		}
 	}
 	
@@ -436,7 +441,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 		
 		onInitViewData();
-		doStartGameIfRunningOrPaused();
 	}
 
 	private void saveGameData(List<Game> gameList) {
@@ -606,7 +610,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (!running && !pausing) {
 			running = true;
 			if (isRequiredRecord) {
-				SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+				mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
 			}
 		
 			RecordDb db = new RecordDb(this);
@@ -620,15 +624,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 	}
 	
-	private void doStartGameIfRunningOrPaused() {
-		if (running) {
-			doStartGame();
-		} else if (pausing) {
-			doStartGame();
-			mCountDown.setPauseWork(true);
-		}
-	}
-
 	private void selectStartPlayers() {
 		// 选择首发球员
 		if (mRoles.contains(1) && mRoles.contains(2)) {
@@ -652,24 +647,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 					selectDialog.setOnCancelListener(new OnCancelListener() {
 						@Override
 						public void onCancel(DialogInterface dialog) {
-							showToastShort("比赛开始");
-							doStartGame();
-							
-							// 记录比赛开始时间
-							GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
-							gameTimeDb.startOrContinueGame(mGame, null, mGameTime);
-							
-							// 记录首发球员上场时间
-							PlayingTimeDb db = new PlayingTimeDb(getActivity());
-							if (mRoles.contains(1)) {// 记录A队数据
-								db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
-							} 
-							if (mRoles.contains(2)) {// 记录B队数据
-								db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
-							} 
-							if (mRoles.contains(3)) {// 记录创新数据
-								// 不处理
-							}
+							onPostStartPlayers();
 						}
 					});
 				}
@@ -693,24 +671,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				
 				@Override
 				public void onCancel(DialogInterface dialog) {
-					showToastShort("比赛开始");
-					doStartGame();
-					
-					// 记录比赛开始时间
-					GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
-					gameTimeDb.startOrContinueGame(mGame, null, mGameTime);
-					
-					// 记录首发球员上场时间
-					PlayingTimeDb db = new PlayingTimeDb(getActivity());
-					if (mRoles.contains(1)) {// 记录A队数据
-						db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
-					} 
-					if (mRoles.contains(2)) {// 记录B队数据
-						db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
-					} 
-					if (mRoles.contains(3)) {// 记录创新数据
-						// 不处理
-					}
+					onPostStartPlayers();
 				}
 			});
 		}
@@ -776,6 +737,82 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			}
 			break;
 		}
+		dialog.setOnDismissListener(new OnDismissListener() {
+			
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				onSavePlayingPlayers();
+			}
+		});
+	}
+
+	protected void onSavePlayingPlayers() {
+		// 记录上场球员，在某种特殊条件下，因发生异常导致应用退出，用于重启应用恢复比赛现场
+		if (mRoles.contains(1) && mGroupAPlayingMemberList != null && mGroupAPlayingMemberList.size() > 0) {// 记录A队数据
+			StringBuffer memberIds = new StringBuffer();
+			for (Member member : mGroupAPlayingMemberList) {
+				memberIds.append(member.memberId).append(",");
+			}
+			if (memberIds.length() > 0) {
+				memberIds.deleteCharAt(memberIds.length() - 1);
+			}
+			mSpUtil.getEdit().putString("GroupAPlayingMemberList", memberIds.toString()).commit();
+		} 
+		if (mRoles.contains(2) && mGroupBPlayingMemberList != null && mGroupBPlayingMemberList.size() > 0) {// 记录B队数据
+			StringBuffer memberIds = new StringBuffer();
+			for (Member member : mGroupBPlayingMemberList) {
+				memberIds.append(member.memberId).append(",");
+			}
+			if (memberIds.length() > 0) {
+				memberIds.deleteCharAt(memberIds.length() - 1);
+			}
+			mSpUtil.getEdit().putString("GroupBPlayingMemberList", memberIds.toString()).commit();
+		} 
+		if (mRoles.contains(3)) {// 记录创新数据
+			// 不处理
+		}
+	}
+	
+	private void onRestoreGameState() {
+		
+		if (mRoles.contains(1)) {
+			String memberIds = mSpUtil.getSp().getString("GroupAPlayingMemberList", "");
+			String[] ids = memberIds.split(",");
+			if (mGroupAPlayingMemberList == null) {
+				mGroupAPlayingMemberList = new ArrayList<Member>();
+			}
+			if (mGroupAMemberList != null && ids.length > 0) {
+				for (Member member : mGroupAMemberList) {
+					int index = Arrays.binarySearch(ids, String.valueOf(member.memberId));
+					if (index >= 0) {
+						mGroupAPlayingMemberList.add(member);
+					}
+				}
+			}
+		}
+		
+		if (mRoles.contains(2)) {
+			String memberIds = mSpUtil.getSp().getString("GroupBPlayingMemberList", "");
+			String[] ids = memberIds.split(",");
+			if (mGroupBPlayingMemberList == null) {
+				mGroupBPlayingMemberList = new ArrayList<Member>();
+			}
+			if (mGroupBMemberList != null && ids.length > 0) {
+				for (Member member : mGroupBMemberList) {
+					int index = Arrays.binarySearch(ids, String.valueOf(member.memberId));
+					if (index >= 0) {
+						mGroupBPlayingMemberList.add(member);
+					}
+				}
+			}
+		}
+		
+		if (running) {
+			doStartGame();
+		} else if (pausing) {
+			doStartGame();
+			mCountDown.setPauseWork(true);
+		}
 	}
 
 	private void pauseGame() {
@@ -809,8 +846,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		pausing = false;
 		
 		if (isRequiredRecord) {
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+			mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
+			mSpUtil.getEdit().putBoolean("game_state_pausing", pausing).commit();
 		}
 		
 		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
@@ -1363,8 +1400,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 清除数据
 		isRequiredRecord = false;
 		
-		SpUtil.getInstance(this).logout();
-		SpUtil.getInstance(this).getEdit().clear().commit();
+		mSpUtil.logout();
+		mSpUtil.getEdit().clear().commit();
 		
 		if (mCountDown != null) {
 			mCountDown.stop();
@@ -1509,16 +1546,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 
 		if (isRequiredRecord ) {
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
-			SpUtil.getInstance(this).getEdit().putInt("last_game_time", 0).commit();
+			mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
+			mSpUtil.getEdit().putBoolean("game_state_pausing", pausing).commit();
+			mSpUtil.getEdit().putInt("last_game_time", 0).commit();
 		}
 	}
 
 	@Override
 	public void onCountDownIntervalReach(int last) {
 		if (isRequiredRecord) {
-			SpUtil.getInstance(this).getEdit().putInt("last_game_time", last).commit();
+			mSpUtil.getEdit().putInt("last_game_time", last).commit();
 		}
 		mTvGameTime.setText(formGameTime(last));
 		
@@ -1552,7 +1589,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mGroupAScore += score;
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
 		if (isRequiredRecord) {
-			SpUtil.getInstance(this).getEdit().putInt("group_a_score", mGroupAScore).commit();
+			mSpUtil.getEdit().putInt("group_a_score", mGroupAScore).commit();
 		}
 	}
 
@@ -1560,7 +1597,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mGroupBScore += score;
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		if (isRequiredRecord) {
-			SpUtil.getInstance(this).getEdit().putInt("group_b_score", mGroupBScore).commit();
+			mSpUtil.getEdit().putInt("group_b_score", mGroupBScore).commit();
 		}
 	}
 
@@ -1643,8 +1680,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		running = false;
 		pausing = true;
 		if (isRequiredRecord) {
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+			mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
+			mSpUtil.getEdit().putBoolean("game_state_pausing", pausing).commit();
 		}
 		
 		mIvPauseLeft.setImageResource(R.drawable.btn_continue);
@@ -1764,8 +1801,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mHomeWatcher.stopWatch();
 		
 		if (isRequiredRecord) {
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+			mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
+			mSpUtil.getEdit().putBoolean("game_state_pausing", pausing).commit();
 		}
 	}
 
@@ -1778,6 +1815,29 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		} else {// 直接切换到后台运行
 			moveTaskToBack(false);
 		}
+	}
+
+	private void onPostStartPlayers() {
+		showToastShort("比赛开始");
+		doStartGame();
+		
+		// 记录比赛开始时间
+		GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
+		gameTimeDb.startOrContinueGame(mGame, null, mGameTime);
+		
+		// 记录首发球员上场时间
+		PlayingTimeDb db = new PlayingTimeDb(getActivity());
+		if (mRoles.contains(1)) {// 记录A队数据
+			db.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+		} 
+		if (mRoles.contains(2)) {// 记录B队数据
+			db.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+		} 
+		if (mRoles.contains(3)) {// 记录创新数据
+			// 不处理
+		}
+		
+		onSavePlayingPlayers();// 记录上场球员，在某种特殊条件下，因发生异常导致应用退出，用于重启应用恢复比赛现场
 	}
 
 }
