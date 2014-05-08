@@ -9,7 +9,7 @@
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:orientation="horizontal" 
-	    android:listSelector="@drawable/item_data_stat_selector">
+	    android:background="@drawable/item_data_stat_selector">
 	
 	    <TextView
 	        android:id="@+id/tv_column1"
