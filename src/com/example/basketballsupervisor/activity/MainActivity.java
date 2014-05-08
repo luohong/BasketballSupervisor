@@ -126,6 +126,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private List<Action> mActionList;
 	private Map<Integer, Action> mActionMap;
 	private boolean isRequiredUpdateGameRecord = true;// 默认需要获取最新的比赛记录
+	private boolean isRequiredRecord = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -604,7 +605,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		if (!running && !pausing) {
 			running = true;
-			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+			if (isRequiredRecord) {
+				SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+			}
 		
 			RecordDb db = new RecordDb(this);
 			db.clearAllData();
@@ -803,8 +806,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		running = true;
 		pausing = false;
-		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
-		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+		
+		if (isRequiredRecord) {
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+		}
 		
 		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
 		mIvPauseRight.setImageResource(R.drawable.btn_pause);
@@ -1354,7 +1360,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void doLogout() {
 		// 清除数据
+		isRequiredRecord = false;
+		
 		SpUtil.getInstance(this).logout();
+		SpUtil.getInstance(this).getEdit().clear().commit();
 		
 		GameDb gameDb = new GameDb(this);
 		gameDb.clearAllData();
@@ -1493,14 +1502,18 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mCountDown.reset();
 		}
 
-		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
-		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
-		SpUtil.getInstance(this).getEdit().putInt("last_game_time", 0).commit();
+		if (isRequiredRecord ) {
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+			SpUtil.getInstance(this).getEdit().putInt("last_game_time", 0).commit();
+		}
 	}
 
 	@Override
 	public void onCountDownIntervalReach(int last) {
-		SpUtil.getInstance(this).getEdit().putInt("last_game_time", last).commit();
+		if (isRequiredRecord) {
+			SpUtil.getInstance(this).getEdit().putInt("last_game_time", last).commit();
+		}
 		mTvGameTime.setText(formGameTime(last));
 		
 		int time = mQuarterTime * 60 * 1000;
@@ -1532,13 +1545,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void updateGroupAScore(int score) {
 		mGroupAScore += score;
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
-		SpUtil.getInstance(this).getEdit().putInt("group_a_score", mGroupAScore).commit();
+		if (isRequiredRecord) {
+			SpUtil.getInstance(this).getEdit().putInt("group_a_score", mGroupAScore).commit();
+		}
 	}
 
 	public void updateGroupBScore(int score) {
 		mGroupBScore += score;
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
-		SpUtil.getInstance(this).getEdit().putInt("group_b_score", mGroupBScore).commit();
+		if (isRequiredRecord) {
+			SpUtil.getInstance(this).getEdit().putInt("group_b_score", mGroupBScore).commit();
+		}
 	}
 
 	public void setCurrentRecordCoordinate(Action action, String coordinate) {
@@ -1619,8 +1636,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		running = false;
 		pausing = true;
-		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
-		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+		if (isRequiredRecord) {
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+		}
 		
 		mIvPauseLeft.setImageResource(R.drawable.btn_continue);
 		mIvPauseRight.setImageResource(R.drawable.btn_continue);
@@ -1738,8 +1757,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 //		IApplication.hasStart = false;
 		mHomeWatcher.stopWatch();
 		
-		SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
-		SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+		if (isRequiredRecord) {
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_running", running).commit();
+			SpUtil.getInstance(this).getEdit().putBoolean("game_state_pausing", pausing).commit();
+		}
 	}
 
 	private void moveAppToBack() {
