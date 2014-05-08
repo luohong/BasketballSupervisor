@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,6 +27,8 @@ public class DataStatDialog extends BaseDialog {
 
 	private ListView mListView;
 	private List<DataStat> list;
+	private int selectedItem = -1;
+	private DataStatAdapter mAdapter;
 
 	public DataStatDialog(Context context, List<DataStat> list) {
 		super(context);
@@ -39,12 +43,24 @@ public class DataStatDialog extends BaseDialog {
 	@Override
 	protected void onFindViews() {
 		mListView = (ListView) findViewById(android.R.id.list);
-		mListView.setAdapter(new DataStatAdapter(getContext()));
+		mAdapter = new DataStatAdapter(getContext());
+		mListView.setAdapter(mAdapter);
 	}
 
 	@Override
 	protected void onInitViewData() {
+		mListView.setOnItemClickListener(new OnItemClickListener() {
 
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				if (selectedItem == position) {
+					selectedItem = -1;
+				} else {
+					selectedItem = position;
+				}
+				mAdapter.notifyDataSetChanged();
+			}
+		});
 	}
 	
 	@Override
@@ -132,6 +148,8 @@ public class DataStatDialog extends BaseDialog {
 				}
 				break;
 			}
+			
+			convertView.setSelected(selectedItem == position);
 
 			return convertView;
 		}

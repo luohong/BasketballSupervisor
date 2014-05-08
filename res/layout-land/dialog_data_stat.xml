@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="10dp"
-    android:background="@drawable/tan_bg03"
+    android:background="@color/bg_dialog"
     android:gravity="center"
     android:orientation="vertical" >
 
@@ -15,7 +15,8 @@
         android:gravity="center"
         android:text="比赛数据统计列表"
         android:textColor="@color/black"
-        android:textSize="@dimen/data_stat_title" />
+        android:textSize="@dimen/data_stat_title"
+    	android:background="@color/bg_dialog_title" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -32,9 +33,10 @@
 		        android:id="@android:id/list"
 		        android:layout_width="3000dp"
 		        android:layout_height="match_parent"
-		        android:background="#FFB84D"
+		        android:background="#A7A9A8"
 		        android:cacheColorHint="@null"
 		        android:dividerHeight="1.0dip"
+		        android:listSelector="@drawable/item_data_stat_selector"
 		        android:drawSelectorOnTop="false"
 		        android:fadingEdgeLength="0.0sp"
 		        android:fastScrollEnabled="true" />

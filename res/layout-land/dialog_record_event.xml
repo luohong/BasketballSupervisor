@@ -2,287 +2,282 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/bg_dialog"
     android:orientation="vertical" >
 
-    <ScrollView
+    <ViewFlipper
+        android:id="@+id/vf_events"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="wrap_content" >
 
-        <ViewFlipper
-            android:id="@+id/vf_events"
+        <LinearLayout
+            android:id="@+id/ll_page1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" 
-            android:background="@drawable/m_pop">
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
 
             <LinearLayout
-                android:id="@+id/ll_page1"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+        		android:background="@color/bg_dialog_title" >
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        android:id="@+id/tv_group_a_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="A队"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/dialog_group_name" />
-                    
-                    <View 
-                        android:id="@+id/divider"
-                        android:layout_width="1px"
-						android:layout_height="match_parent"
-                        android:layout_margin="5dp"
-                        android:background="@color/white"/>
-
-                    <TextView
-                        android:id="@+id/tv_group_b_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="B队"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/dialog_group_name" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        android:id="@+id/tv_group_a_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="场上球员  号码"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/group_name"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tv_group_b_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="场上球员  号码"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/group_name"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <TextView
+                    android:id="@+id/tv_group_a_name"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:orientation="horizontal" >
-
-                    <ListView
-                        android:id="@+id/lv_playing"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:divider="@color/black"
-                        android:dividerHeight="1px"
-                        android:gravity="center" />
-
-                    <ListView
-                        android:id="@+id/lv_bench"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:divider="@color/black"
-                        android:dividerHeight="1px"
-                        android:gravity="center" />
-                </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_page2"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                
-                <TextView
-                    android:id="@+id/tv_page2_title"
-                    android:layout_width="match_parent"
-                 	android:layout_height="30dp"
-                 	android:gravity="center_vertical"
-                    android:text="11 姚明 技术统计"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/dialog_group_name"
-                    android:singleLine="true" 
-                    android:paddingLeft="10dp"/>
-                    
-                <GridView 
-                    android:id="@+id/gv_page2_event"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:numColumns="3"
-                    android:stretchMode="columnWidth"
+                    android:layout_weight="1"
                     android:gravity="center"
-                    android:layout_gravity="center"
-                    android:horizontalSpacing="2dp"
-                    android:verticalSpacing="2dp"
-                    android:padding="2dp"
-                    android:background="@color/white"/>
-                
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/ll_page3"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                
-                <TextView
-                    android:id="@+id/tv_page3_title"
-                    android:layout_width="match_parent"
-                 	android:layout_height="30dp"
-                 	android:gravity="center_vertical"
-                    android:text="11 姚明 技术统计"
+                    android:text="A队"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/dialog_group_name"
-                    android:singleLine="true" 
-                    android:paddingLeft="10dp"/>
-                    
-                <GridView 
-                    android:id="@+id/gv_page3_event"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:numColumns="3"
-                    android:stretchMode="columnWidth"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:horizontalSpacing="2dp"
-                    android:verticalSpacing="2dp"
-                    android:padding="2dp"
-                    android:background="@color/white"/>
-                
-            </LinearLayout>
-            
-            <LinearLayout
-                android:id="@+id/ll_page4"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-                
-                <TextView
-                    android:id="@+id/tv_page4_title"
-                    android:layout_width="match_parent"
-                 	android:layout_height="30dp"
-                 	android:gravity="center_vertical"
-                    android:text="助攻"
-                    android:textColor="@color/white"
-                    android:textSize="@dimen/dialog_group_name"
-                    android:singleLine="true" 
-                    android:paddingLeft="10dp"/>
+                    android:textSize="@dimen/dialog_group_name" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="30dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        android:id="@+id/tv_page4_group_a_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="A队"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/dialog_group_name" />
-                    
-                    <View 
-                        android:layout_width="1px"
-						android:layout_height="match_parent"
-                        android:layout_margin="5dp"
-                        android:background="@color/white"
-                        android:visibility="gone"/>
-
-                    <TextView
-                        android:id="@+id/tv_page4_group_b_name"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="B队"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/dialog_group_name" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="40dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal" >
-
-                    <TextView
-                        android:id="@+id/tv_page4_group_a_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="场上球员  号码"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/group_name"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/tv_page4_group_b_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="场上球员  号码"
-                        android:textColor="@color/white"
-                        android:textSize="@dimen/group_name"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="1px"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:orientation="horizontal" >
+                    android:layout_margin="5dp"
+                    android:background="@color/white" />
 
-                    <ListView
-                        android:id="@+id/lv_page4_playing"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:divider="@color/black"
-                        android:dividerHeight="1px"
-                        android:gravity="center" />
-
-                    <ListView
-                        android:id="@+id/lv_page4_bench"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:divider="@color/black"
-                        android:dividerHeight="1px"
-                        android:gravity="center" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/tv_group_b_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="B队"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dialog_group_name" />
             </LinearLayout>
-            
-        </ViewFlipper>
-    </ScrollView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/tv_group_a_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="场上球员  号码"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/group_name"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_group_b_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="场上球员  号码"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/group_name"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal" >
+
+                <ListView
+                    android:id="@+id/lv_playing"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:divider="@color/black"
+                    android:dividerHeight="1px"
+                    android:gravity="center" />
+
+                <ListView
+                    android:id="@+id/lv_bench"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:divider="@color/black"
+                    android:dividerHeight="1px"
+                    android:gravity="center" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_page2"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_page2_title"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:singleLine="true"
+                android:text="11 姚明 技术统计"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_group_name"
+        		android:background="@color/bg_dialog_title" />
+
+            <GridView
+                android:id="@+id/gv_page2_event"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/white"
+                android:gravity="center"
+                android:horizontalSpacing="2dp"
+                android:numColumns="3"
+                android:padding="2dp"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="2dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_page3"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_page3_title"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:singleLine="true"
+                android:text="11 姚明 技术统计"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_group_name"
+        		android:background="@color/bg_dialog_title" />
+
+            <GridView
+                android:id="@+id/gv_page3_event"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:background="@color/white"
+                android:gravity="center"
+                android:horizontalSpacing="2dp"
+                android:numColumns="3"
+                android:padding="2dp"
+                android:stretchMode="columnWidth"
+                android:verticalSpacing="2dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_page4"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/tv_page4_title"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="10dp"
+                android:singleLine="true"
+                android:text="助攻"
+                android:textColor="@color/white"
+                android:textSize="@dimen/dialog_group_name"
+        		android:background="@color/bg_dialog_title" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/tv_page4_group_a_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="A队"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dialog_group_name" />
+
+                <View
+                    android:layout_width="1px"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:background="@color/white"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tv_page4_group_b_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="B队"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/dialog_group_name" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <TextView
+                    android:id="@+id/tv_page4_group_a_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="场上球员  号码"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/group_name"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_page4_group_b_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="场上球员  号码"
+                    android:textColor="@color/white"
+                    android:textSize="@dimen/group_name"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:orientation="horizontal" >
+
+                <ListView
+                    android:id="@+id/lv_page4_playing"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:divider="@color/black"
+                    android:dividerHeight="1px"
+                    android:gravity="center" />
+
+                <ListView
+                    android:id="@+id/lv_page4_bench"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:divider="@color/black"
+                    android:dividerHeight="1px"
+                    android:gravity="center" />
+            </LinearLayout>
+        </LinearLayout>
+    </ViewFlipper>
 
 </LinearLayout>
