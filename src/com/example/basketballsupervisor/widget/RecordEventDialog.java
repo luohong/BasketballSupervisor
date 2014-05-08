@@ -302,14 +302,14 @@ public class RecordEventDialog extends BaseDialog {
 		}
 		
 		RecordDb db = new RecordDb(getContext());
-//		if (mRoles.contains(1) && mSelectedGroup == mGroupA) {// 记录A队数据
-//			mMainActivity.updateGroupAScore(action.score);
+		if (mRoles.contains(1) && mSelectedGroup == mGroupA) {// 记录A队数据
+			mMainActivity.updateGroupAScore(action.score);
 //			db.saveRecord(mGame, mGroupA, mSelectedMember, action, mGameTime, mCoordinate);
-//		} 
-//		if (mRoles.contains(2) && mSelectedGroup == mGroupB) {// 记录B队数据
-//			mMainActivity.updateGroupBScore(action.score);
+		} 
+		if (mRoles.contains(2) && mSelectedGroup == mGroupB) {// 记录B队数据
+			mMainActivity.updateGroupBScore(action.score);
 //			db.saveRecord(mGame, mGroupB, mSelectedMember, action, mGameTime, mCoordinate);
-//		} 
+		} 
 //		if (mRoles.contains(3) && action.nextActionId == -2) {// 记录创新数据
 //			db.saveRecord(mGame, mSelectedGroup, mSelectedMember, action, mGameTime, mCoordinate);
 //		}
