@@ -347,7 +347,7 @@ public class RecordEventDialog extends BaseDialog {
 		mPage4GroupAPlayingAdapter.setData(mGroupAPlayingMembers);
 		mPage4GroupBPlayingAdapter.setData(mGroupBPlayingMembers);
 		
-		if (mNextAction.id != 14 && mNextAction.id != 9 && mNextAction.id != 10) {// 仅被犯规选择对方球员
+		if (mNextAction.id != 14 && mNextAction.id != 9 && mNextAction.id != 10) {// 非前场篮板，后场篮板，被犯规选择本队球员
 			if (mSelectedGroup == mGroupA && mRoles.contains(1)) {// 记录A队数据
 				mTvPage4GroupAName.setVisibility(View.VISIBLE);
 				mTvPage4GroupATitle.setVisibility(View.VISIBLE);
@@ -367,7 +367,27 @@ public class RecordEventDialog extends BaseDialog {
 				mLvPage4Playing.setVisibility(View.GONE);
 				mLvPage4Bench.setVisibility(View.VISIBLE);
 			}
-		} else {
+		} else if (mNextAction.id == 14) {// 仅被犯规选择对方球员
+			if (mSelectedGroup == mGroupA && mRoles.contains(1)) {// 记录A队数据
+				mTvPage4GroupAName.setVisibility(View.GONE);
+				mTvPage4GroupATitle.setVisibility(View.GONE);
+				
+				mTvPage4GroupBName.setVisibility(View.VISIBLE);
+				mTvPage4GroupBTitle.setVisibility(View.VISIBLE);
+				
+				mLvPage4Playing.setVisibility(View.GONE);
+				mLvPage4Bench.setVisibility(View.VISIBLE);
+			} else if (mSelectedGroup == mGroupB && mRoles.contains(2)) {// 记录B队数据
+				mTvPage4GroupAName.setVisibility(View.VISIBLE);
+				mTvPage4GroupATitle.setVisibility(View.VISIBLE);
+				
+				mTvPage4GroupBName.setVisibility(View.GONE);
+				mTvPage4GroupBTitle.setVisibility(View.GONE);
+				
+				mLvPage4Playing.setVisibility(View.VISIBLE);
+				mLvPage4Bench.setVisibility(View.GONE);
+			}
+		} else {// 仅前场篮板，后场篮板选择双方球员
 			mTvPage4GroupBName.setVisibility(View.VISIBLE);
 			mTvPage4GroupBTitle.setVisibility(View.VISIBLE);
 			
