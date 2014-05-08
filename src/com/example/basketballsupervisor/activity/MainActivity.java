@@ -721,7 +721,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 换人
 		
 		// 判断当前比赛状态是否允许换人
-		boolean allowSubstitute = (running || pausing) && (mRoles.contains(1) || mRoles.contains(2));// 记录创新数据的角色不允许换人
+		boolean allowSubstitute = (running || pausing);// 记录创新数据的角色不允许换人
 		if (allowSubstitute) {
 //			if (mRole == 1) {// 记录A队数据
 //				allowSubstitute = !(mGroupAPlayingMemberList.size() == mGroupAMemberList.size());
@@ -731,11 +731,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 //				// 不处理
 //			}
 //			
-//			if (allowSubstitute) {
+			allowSubstitute = (mRoles.contains(1) || mRoles.contains(2));
+			if (allowSubstitute) {
 				showSubstituteDialog(clickPos);
-//			} else {
-//				showToastShort("无替补队员");
-//			}
+			} else {
+				showToastShort("记录创新数据员没有权限换人");
+			}
 		} else {
 			showToastShort("比赛尚未开始，不允许换人");
 		}
@@ -1388,7 +1389,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		gameTimeDb.clearAllData();
 		
 		IApplication.hasStart = false;
-		finish();
+//		finish();
+		System.exit(0);
 	}
 
 	private void uploadGameData() {
