@@ -3,6 +3,8 @@
     <color name="include_header_title">#555555</color>
     <color name="include_header_btn">#555555</color>
     
+    <color name="light_gray">#e8e8e8</color>
+    
     <color name="login_btn">#f77f6c</color>
     <color name="login_forget_password">#888888</color>
     <color name="login_input">#999999</color>

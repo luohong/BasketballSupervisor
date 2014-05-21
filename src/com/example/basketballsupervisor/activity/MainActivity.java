@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -25,6 +26,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.framework.core.widget.ConfirmDialog;
 import com.example.basketballsupervisor.IApplication;
@@ -60,10 +62,11 @@ import com.example.basketballsupervisor.util.HomeWatcher;
 import com.example.basketballsupervisor.util.HomeWatcher.OnHomePressedListener;
 import com.example.basketballsupervisor.util.SpUtil;
 import com.example.basketballsupervisor.widget.DataStatDialog;
+import com.example.basketballsupervisor.widget.QuickAction;
 import com.example.basketballsupervisor.widget.RecordEventDialog;
 import com.example.basketballsupervisor.widget.SelectPlayersDialog;
 
-public class MainActivity extends BaseActivity implements OnClickListener, OnCountDownListener, OnItemClickListener {
+public class MainActivity extends BaseActivity implements OnClickListener, OnCountDownListener, OnItemClickListener, OnLongClickListener {
 	
 	private static final int CLICK_POS_LEFT = 0;
 	private static final int CLICK_POS_RIGHT = 1;
@@ -86,9 +89,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private long mGameTime = 0l;
 	private int mGroupAScore = 0;
 	private int mGroupBScore = 0;
+	
 	private int mCurrentQuarter = 1;
 	private int mQuarterCount = 1;
 	private int mQuarterTime = 10;
+	private List<Integer> mQuarterTimeList = new ArrayList<Integer>();
 	
 	private Game mGame;
 	private Group mGroupA;
@@ -129,6 +134,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private boolean isRequiredUpdateGameRecord = true;// 默认需要获取最新的比赛记录
 	private boolean isRequiredRecord = true;
 	private SpUtil mSpUtil;
+	private int mRunningTime = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -198,11 +204,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	@Override
 	public void onInitViewData() {
-		int lastGameTime = mSpUtil.getSp().getInt("last_game_time", 0);
-		onCountDownIntervalReach(lastGameTime);
-
 		int drawable = R.drawable.st_07;		
-		
+
+		int lastGameTime = mSpUtil.getSp().getInt("last_game_time", 0);
 		if (mGame != null) {
 			// 支持多种角色
 			if (mGame.role != null) {
@@ -211,10 +215,26 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mQuarterCount = mGame.section;
 			mQuarterTime = mGame.section_time;
 			
+			String times = SpUtil.getInstance(this).getSp().getString("quarterTimeList", "");
+			if (!TextUtils.isEmpty(times)) {
+				String[] time = times.split(",");
+				for (int i = 0; i < time.length; i++) {
+					int t = Integer.parseInt(time[i]);
+					mQuarterTimeList.add(t);
+				}
+			} else {
+				for (int i = 0; i < mQuarterCount; i++) {
+					mQuarterTimeList.add(mQuarterTime);
+				}
+			}
+			
 			int timeout = mQuarterCount * mQuarterTime * 60 * 1000;// 四节比赛，每节比赛10分钟
 			mCountDown = new CountDown(lastGameTime, timeout, 1000);
 			mCountDown.setOnCountDownListener(this);
 		}
+		
+		onCountDownIntervalReach(lastGameTime);
+		
 		if (mRoles == null) {
 			mRoles = new ArrayList<Integer>(3);
 		}
@@ -313,6 +333,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void onBindListener() {
 		mTvGameStart.setOnClickListener(this);
 		mTvGameTime.setOnClickListener(this);
+		
+		mTvGameTime.setOnLongClickListener(this);
+		
+		mTvGroupAScore.setOnLongClickListener(this);
+		mTvGroupBScore.setOnLongClickListener(this);
 		
 		mIvSubstitueLeft.setOnClickListener(this);
 		mIvSubstitueRight.setOnClickListener(this);
@@ -1554,18 +1579,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	@Override
 	public void onCountDownIntervalReach(int last) {
+		mRunningTime  = last;
 		if (isRequiredRecord) {
 			mSpUtil.getEdit().putInt("last_game_time", last).commit();
 		}
 		mTvGameTime.setText(formGameTime(last));
-		
-		int time = mQuarterTime * 60 * 1000;
-		if (last > 0 && last % time == 0) {
-			int quarter = last / (time) + 1;
-			if (quarter == mQuarterCount) {
+
+		mCurrentQuarter = getQuarter();
+		if (isQuarterTime()) {
+			if (isGameOver()) {
 				onCountDownTimeout();
-			} else if (quarter == mCurrentQuarter + 1) {// 进入下一节，先暂停
-				mCurrentQuarter = quarter;
+			} else {// 进入下一节，先暂停
 				doPauseGame();
 			}
 		}
@@ -1586,7 +1610,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	public void updateGroupAScore(int score) {
-		mGroupAScore += score;
+		if (mGroupAScore + score >= 0) {
+			mGroupAScore += score;
+		}
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
 		if (isRequiredRecord) {
 			mSpUtil.getEdit().putInt("group_a_score", mGroupAScore).commit();
@@ -1594,7 +1620,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	public void updateGroupBScore(int score) {
-		mGroupBScore += score;
+		if (mGroupBScore + score >= 0) {
+			mGroupBScore += score;
+		}
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		if (isRequiredRecord) {
 			mSpUtil.getEdit().putInt("group_b_score", mGroupBScore).commit();
@@ -1608,6 +1636,169 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		mCourtPositions.set(position, action.type);
 		mCourtAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public boolean onLongClick(View v) {
+		switch (v.getId()) {
+		case R.id.tv_group_a_score:
+		case R.id.tv_group_b_score:
+			showModifyGameScoreWindow(v);
+			break;
+		case R.id.tv_game_time:
+			showModifyGameTimeWindow(v);
+			break;
+		}
+		return false;
+	}
+
+	private void showModifyGameScoreWindow(final View view) {
+		final QuickAction window = new QuickAction(view);
+		
+		View addTimeView = getLayoutInflater().inflate(R.layout.popup_item, null);
+		TextView addTimeText = (TextView) addTimeView.findViewById(R.id.item);
+		addTimeText.setText("加一分");
+		addTimeText.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// 加一分
+				switch (view.getId()) {
+				case R.id.tv_group_a_score:
+					updateGroupAScore(1);
+					break;
+				case R.id.tv_group_b_score:
+					updateGroupBScore(1);
+					break;
+				}
+			}
+		});
+		window.addItem(addTimeView);
+
+		View overTimeView = getLayoutInflater().inflate(R.layout.popup_item, null);
+		TextView overTimeText = (TextView) overTimeView.findViewById(R.id.item);
+		overTimeText.setText("减一分");
+		overTimeText.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				// 减一分
+				switch (view.getId()) {
+				case R.id.tv_group_a_score:
+					updateGroupAScore(-1);
+					break;
+				case R.id.tv_group_b_score:
+					updateGroupBScore(-1);
+					break;
+				}
+			}
+		});
+		window.addItem(overTimeView);
+		
+		window.show();
+	}
+
+	private void showModifyGameTimeWindow(View v) {
+		final QuickAction window = new QuickAction(v);
+		
+		final boolean enabled = isQuarterTime();
+		
+		View addTimeView = getLayoutInflater().inflate(R.layout.popup_item, null);
+		TextView addTimeText = (TextView) addTimeView.findViewById(R.id.item);
+		addTimeText.setText("补足时间");
+		addTimeText.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				window.dismiss();
+				// 补足时间
+				
+				if (!enabled) {// 允许补足时间
+					mQuarterTimeList.set(mCurrentQuarter - 1, mQuarterTimeList.get(mCurrentQuarter - 1) + 1);
+					
+					restartCountDown();
+					
+					Toast.makeText(MainActivity.this, "补时成功", Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
+		addTimeText.setEnabled(!enabled);
+		window.addItem(addTimeView);
+		if (enabled) {
+			window.onItemSelected(addTimeText);
+		}
+
+		boolean overTimeEnabled = isGameOver();
+		
+		View overTimeView = getLayoutInflater().inflate(R.layout.popup_item, null);
+		TextView overTimeText = (TextView) overTimeView.findViewById(R.id.item);
+		overTimeText.setText("加时赛");
+		overTimeText.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				window.dismiss();
+				// 加时赛
+				mQuarterTimeList.set(mCurrentQuarter - 1, mQuarterTimeList.get(mCurrentQuarter - 1) + 5);
+				
+				restartCountDown();
+				
+				Toast.makeText(MainActivity.this, "进入加时赛", Toast.LENGTH_SHORT).show();
+			}
+		});
+		window.addItem(overTimeView);
+		overTimeText.setEnabled(overTimeEnabled);
+		if (!overTimeEnabled) {
+			window.onItemSelected(overTimeText);
+		}
+		
+		window.show();
+	}
+	
+	protected void restartCountDown() {		
+		int timeout = 0;
+
+		StringBuffer times = new StringBuffer();		
+		for (Integer time : mQuarterTimeList) {
+			timeout = timeout + time;
+			times.append(time).append(",");
+		}
+		timeout = timeout * 60 * 1000;// 计算比赛时间
+		
+		if (times.length() > 0) {
+			times.deleteCharAt(times.length() - 1);
+		}
+		SpUtil.getInstance(this).getEdit().putString("quarterTimeList", times.toString()).commit();
+		
+		mCountDown = new CountDown(mRunningTime, timeout, 1000);
+		mCountDown.start();// 计时开始
+	}
+
+	private boolean isQuarterTime() {
+		boolean isQuartTime = false;
+		for (Integer time : mQuarterTimeList) {
+			if (mRunningTime == time * 60 * 1000) {
+				isQuartTime = true;
+				break;
+			}
+		}
+		return isQuartTime;
+	}
+	
+	private boolean isGameOver() {
+		int total = 0;
+		for (Integer time : mQuarterTimeList) {
+			total = total + time;
+		}
+		return mRunningTime == (total * 60 * 1000);
+	}
+	
+	private int getQuarter() {
+		int total = 0;
+		for (int i = 0; i < mQuarterTimeList.size(); i++) {
+			int time = mQuarterTimeList.get(i) * 60 * 1000;
+			total = total + time;
+			if (mRunningTime <= total) {
+				return i + 1;
+			}
+		}
+		return 1;
 	}
 
 	@Override
@@ -1674,7 +1865,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 	}
 	
-	private void doPauseGame() {
+	public void doPauseGame() {
 		showToastShort("比赛暂停");
 		
 		running = false;

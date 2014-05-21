@@ -2,6 +2,7 @@
 
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_margin">16dp</dimen>
+    <dimen name="activity_margin_min">4dp</dimen>
     
     <dimen name="header_height">40dp</dimen>
     <dimen name="header_text_size">20sp</dimen>
@@ -13,6 +14,7 @@
     
     <dimen name="group_name">18sp</dimen>
     <dimen name="group_score">22sp</dimen>
+    <dimen name="group_score_operator">28sp</dimen>
     
     <dimen name="game_half">12sp</dimen>
     
