@@ -324,6 +324,10 @@ public class RecordEventDialog extends BaseDialog {
 			isSetRecordCoordinate = true;
 			mMainActivity.setCurrentRecordCoordinate(action, mCoordinate);
 		}
+		
+		if (action.id == 13) {// 犯规行为产生，即停表
+			mMainActivity.doPauseGame();
+		}
 	}
 
 	protected void showNextStat() {
