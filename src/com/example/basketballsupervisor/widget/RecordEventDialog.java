@@ -83,6 +83,8 @@ public class RecordEventDialog extends BaseDialog {
 
 	private boolean isSetRecordCoordinate;
 
+	private List<Action> step2ActionList;
+
 	public RecordEventDialog(Context context, List<Action> actionList) {
 		super(context);
 		mMainActivity = (MainActivity) context;
@@ -171,7 +173,12 @@ public class RecordEventDialog extends BaseDialog {
 					String title = mSelectedMember.number + " " + mSelectedMember.name + " 技术统计";
 					mTvPage2Title.setText(title);
 					
-					showNext();
+					if (step2ActionList.size() == 1) {// 仅一个选项时直接跳到第三步
+						showNext();
+						doAction(mActionList.get(0));
+					} else {
+						showNext();
+					}
 				} else {
 					Toast.makeText(context, "您没有权限记录" + mGroupA.groupName + "的技术数据", Toast.LENGTH_SHORT).show();
 				}
@@ -193,7 +200,12 @@ public class RecordEventDialog extends BaseDialog {
 					String title = mSelectedMember.number + " " + mSelectedMember.name + " 技术统计";
 					mTvPage2Title.setText(title);
 					
-					showNext();
+					if (step2ActionList.size() == 1) {// 仅一个选项时直接跳到第三步
+						showNext();
+						doAction(mActionList.get(0));
+					} else {
+						showNext();
+					}
 				} else {
 					Toast.makeText(context, "您没有权限记录" + mGroupB.groupName + "的技术数据", Toast.LENGTH_SHORT).show();
 				}
@@ -201,7 +213,7 @@ public class RecordEventDialog extends BaseDialog {
 		});
 		
 		// page2
-		List<Action> step2ActionList = filterActionListByStep(2);
+		step2ActionList = filterActionListByStep(2);
 		EventAdapter adapter = new EventAdapter(getContext(), 2, step2ActionList);
 		mGvPage2Event.setAdapter(adapter);
 		mGvPage2Event.setOnItemClickListener(new OnItemClickListener() {
@@ -210,31 +222,7 @@ public class RecordEventDialog extends BaseDialog {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				Action action = (Action) parent.getItemAtPosition(position);
-				if (action.nextActionId == 0) {
-					if (!mRoles.contains(1) && !mRoles.contains(2)) {// 仅记录创新数据
-						Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
-					} else {
-						dismiss();
-						
-						saveRecordEvent(action);
-					}
-				} else {
-					mNextAction = action;
-					
-					if (mNextAction.nextActionId == -1) {
-						if (mRoles.contains(3)) {// 记录创新数据
-							showNewStat();
-						} else {
-							Toast.makeText(context, "您没有权限记录创新数据", Toast.LENGTH_SHORT).show();
-						}
-					} else if (mNextAction.nextActionId > 0) {
-						if (!mRoles.contains(1) && !mRoles.contains(2)) {// 记录创新数据
-							Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
-						} else {
-							showNextStat();
-						}
-					}
-				}
+				doAction(action);
 			}
 		});
 		
@@ -585,6 +573,34 @@ public class RecordEventDialog extends BaseDialog {
 		}
 	}
 	
+	private void doAction(Action action) {
+		if (action.nextActionId == 0) {
+			if (!mRoles.contains(1) && !mRoles.contains(2)) {// 仅记录创新数据
+				Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
+			} else {
+				dismiss();
+				
+				saveRecordEvent(action);
+			}
+		} else {
+			mNextAction = action;
+			
+			if (mNextAction.nextActionId == -1) {
+				if (mRoles.contains(3)) {// 记录创新数据
+					showNewStat();
+				} else {
+					Toast.makeText(context, "您没有权限记录创新数据", Toast.LENGTH_SHORT).show();
+				}
+			} else if (mNextAction.nextActionId > 0) {
+				if (!mRoles.contains(1) && !mRoles.contains(2)) {// 记录创新数据
+					Toast.makeText(context, "您没有权限记录技术数据", Toast.LENGTH_SHORT).show();
+				} else {
+					showNextStat();
+				}
+			}
+		}
+	}
+
 	private class PlayerAdapter extends BaseAdapter {
 		
 		public static final int TEAM_A = 0;

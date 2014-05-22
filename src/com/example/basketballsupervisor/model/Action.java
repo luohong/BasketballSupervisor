@@ -27,5 +27,13 @@ public class Action implements Serializable, Cloneable {
 	public Object clone() throws CloneNotSupportedException {
 		return super.clone();
 	}
+
+	public static Action newFoulAction() {
+		return new Action(13,14,"犯规",0,0);
+	}
+
+	public static Action newFouledAction() {
+		return new Action(14,-12,"被犯规",0,0);
+	}
 	
 }

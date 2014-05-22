@@ -3,6 +3,7 @@ package com.example.basketballsupervisor.activity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -531,10 +532,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			}
 			break;
 		case R.id.iv_info_left:
-			technicalFouls(CLICK_POS_LEFT);// 技术犯规
+			showFoulDialog(CLICK_POS_LEFT);// 犯规
 			break;
 		case R.id.iv_info_right:
-			technicalFouls(CLICK_POS_RIGHT);// 技术犯规
+			showFoulDialog(CLICK_POS_RIGHT);// 犯规
 			break;
 		case R.id.iv_stat_left:
 		case R.id.iv_stat_right:
@@ -552,7 +553,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 	}
 
-	private void technicalFouls(int clickPos) {
+	private void showFoulDialog(final int clickPos) {
 		// 技术犯规
 		// 判断当前比赛状态是否允许记录技术犯规
 		boolean allow = running || pausing;// 记录创新数据的角色不允许记录技术犯规
@@ -563,6 +564,46 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			showToastShort("创新数据记录角色不允许记录技术犯规");
 			return ;
 		}
+		
+		ConfirmDialog dialog = new ConfirmDialog(this, "犯规球员选项", true, "技术犯规", "犯规", new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				commonFouls(clickPos);
+			}
+		}, new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				technicalFouls(clickPos);
+			}
+		});
+		dialog.show();
+	}
+	
+	protected void commonFouls(int clickPos) {
+		if (mGroupAPlayingMemberList.isEmpty()) {
+			mGroupAPlayingMemberList = filterMember(mGroupAMemberList);
+		}
+		if (mGroupBPlayingMemberList.isEmpty()) {
+			mGroupBPlayingMemberList = filterMember(mGroupBMemberList);
+		}
+		
+		mGameTime = System.currentTimeMillis();
+		
+		List<Action> actionList = new ArrayList<Action>();
+		actionList.add(Action.newFoulAction());
+		actionList.add(Action.newFouledAction());
+		
+		RecordEventDialog dialog = new RecordEventDialog(this, actionList);
+		dialog.show();
+		dialog.fillGameData(mGame, mRoles, mGameTime, "");
+		dialog.fillGroupData(mGroupA, mGroupB);
+		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupBPlayingMemberList);
+	}
+
+	private void technicalFouls(int clickPos) {
+		// 技术犯规
 		
 		// 成员记录次数map
 		Map<Long, Integer> mMemberActionMap = new HashMap<Long, Integer>();
@@ -1632,10 +1673,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void setCurrentRecordCoordinate(Action action, String coordinate) {
 		String[] split = coordinate.split(",");
 		
-		int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-		
-		mCourtPositions.set(position, action.type);
-		mCourtAdapter.notifyDataSetChanged();
+		if (split.length > 1) {
+			int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+			
+			mCourtPositions.set(position, action.type);
+			mCourtAdapter.notifyDataSetChanged();
+		}
 	}
 
 	@Override
@@ -1826,8 +1869,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mGameTime = System.currentTimeMillis();
 		
 		String coordinate = parseCoordinate(position);
+		
+		List<Action> actionList = new ArrayList<Action>();
+		for (Action action : mActionList) {
+			if (action.id != 13 && action.id != 14) {
+				actionList.add(action);
+			}
+		}
 
-		RecordEventDialog dialog = new RecordEventDialog(this, mActionList);
+		RecordEventDialog dialog = new RecordEventDialog(this, actionList);
 		dialog.show();
 		dialog.fillGameData(mGame, mRoles, mGameTime, coordinate);
 		dialog.fillGroupData(mGroupA, mGroupB);
