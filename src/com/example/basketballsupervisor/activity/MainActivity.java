@@ -3,7 +3,6 @@ package com.example.basketballsupervisor.activity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +13,7 @@ import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -71,6 +71,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private static final int CLICK_POS_LEFT = 0;
 	private static final int CLICK_POS_RIGHT = 1;
+	private static final String TAG = MainActivity.class.getSimpleName();
 	
 	private static String[] GROUP_DATA_STAT_COLUMNS = new String[] { "球队\\统计项",
 			"总得分", "总出手命中次数（不含罚球）", "总出手次数（不含罚球）", "总命中率（总命中率中不含罚球命中率）",
@@ -822,7 +823,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			if (memberIds.length() > 0) {
 				memberIds.deleteCharAt(memberIds.length() - 1);
 			}
-			mSpUtil.getEdit().putString("GroupAPlayingMemberList", memberIds.toString()).commit();
+			String memberIdsStr = memberIds.toString();
+			Log.d(TAG, "onSavePlayingPlayers()... GroupA memberIds:" + memberIdsStr);
+			mSpUtil.getEdit().putString("GroupAPlayingMemberList", memberIdsStr).commit();
 		} 
 		if (mRoles.contains(2) && mGroupBPlayingMemberList != null && mGroupBPlayingMemberList.size() > 0) {// 记录B队数据
 			StringBuffer memberIds = new StringBuffer();
@@ -832,7 +835,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			if (memberIds.length() > 0) {
 				memberIds.deleteCharAt(memberIds.length() - 1);
 			}
-			mSpUtil.getEdit().putString("GroupBPlayingMemberList", memberIds.toString()).commit();
+			String memberIdsStr = memberIds.toString();
+			Log.d(TAG, "onSavePlayingPlayers()... GroupB memberIds:" + memberIdsStr);
+			mSpUtil.getEdit().putString("GroupBPlayingMemberList", memberIdsStr).commit();
 		} 
 		if (mRoles.contains(3)) {// 记录创新数据
 			// 不处理
@@ -843,11 +848,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		if (mRoles.contains(1)) {
 			String memberIds = mSpUtil.getSp().getString("GroupAPlayingMemberList", "");
+			Log.d(TAG, "onRestoreGameState()... GroupA memberIds:" + memberIds);
+			
 			String[] ids = memberIds.split(",");
 			if (mGroupAPlayingMemberList == null) {
 				mGroupAPlayingMemberList = new ArrayList<Member>();
 			}
 			if (mGroupAMemberList != null && ids.length > 0) {
+				Arrays.sort(ids);
 				for (Member member : mGroupAMemberList) {
 					int index = Arrays.binarySearch(ids, String.valueOf(member.memberId));
 					if (index >= 0) {
@@ -859,11 +867,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		if (mRoles.contains(2)) {
 			String memberIds = mSpUtil.getSp().getString("GroupBPlayingMemberList", "");
+			Log.d(TAG, "onRestoreGameState()... GroupB memberIds:" + memberIds);
+			
 			String[] ids = memberIds.split(",");
 			if (mGroupBPlayingMemberList == null) {
 				mGroupBPlayingMemberList = new ArrayList<Member>();
 			}
 			if (mGroupBMemberList != null && ids.length > 0) {
+				Arrays.sort(ids);
 				for (Member member : mGroupBMemberList) {
 					int index = Arrays.binarySearch(ids, String.valueOf(member.memberId));
 					if (index >= 0) {
