@@ -1596,7 +1596,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		RoleRecord roleRecord = new RoleRecord();
 		roleRecord.game_id = mGame.gId;
 		roleRecord.group_id = group.groupId;
-		roleRecord.recordType = role;
+		roleRecord.recordType = role != 3 ? 1 : 2;
 		
 		List<BBGameRecord> gameRecords = new ArrayList<BBGameRecord>();
 		roleRecord.bb_game_record = gameRecords;
