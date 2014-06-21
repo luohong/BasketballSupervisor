@@ -1542,12 +1542,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			records.add(groupARecord);
 		} 
 		if (mRoles.contains(2)) {// 记录B队数据
-			RoleRecord groupBRecord = getRoleRecord(mGroupB, 2);
+			RoleRecord groupBRecord = getRoleRecord(mGroupB, 1);
 			records.add(groupBRecord);
 		} 
 		if (mRoles.contains(3)) {// 记录创新数据
 			if (!mRoles.contains(1)) {
-				RoleRecord groupARecord = getRoleRecord(mGroupA, 1);
+				RoleRecord groupARecord = getRoleRecord(mGroupA, 2);
 				records.add(groupARecord);
 			}
 			if (!mRoles.contains(2)) {
@@ -1592,11 +1592,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	 * @param group 队伍
 	 * @return
 	 */
-	private RoleRecord getRoleRecord(Group group, int role) {
+	private RoleRecord getRoleRecord(Group group, int recordType) {
 		RoleRecord roleRecord = new RoleRecord();
 		roleRecord.game_id = mGame.gId;
 		roleRecord.group_id = group.groupId;
-		roleRecord.recordType = role != 3 ? 1 : 2;
+		roleRecord.recordType = recordType;
 		
 		List<BBGameRecord> gameRecords = new ArrayList<BBGameRecord>();
 		roleRecord.bb_game_record = gameRecords;
