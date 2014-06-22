@@ -570,19 +570,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			
 			@Override
 			public void onClick(View arg0) {
-				technicalFoul(clickPos);
+				commonFouls(clickPos);
 			}
 		}, new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				commonFoul(clickPos);
+				technicalFouls(clickPos);
 			}
 		});
 		dialog.show();
 	}
 	
-	protected void technicalFoul(int clickPos) {
+	protected void commonFouls(int clickPos) {
 		if (mGroupAPlayingMemberList.isEmpty()) {
 			mGroupAPlayingMemberList = filterMember(mGroupAMemberList);
 		}
@@ -603,7 +603,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupBPlayingMemberList);
 	}
 
-	private void commonFoul(int clickPos) {
+	private void technicalFouls(int clickPos) {
 		// 技术犯规
 		
 		// 成员记录次数map
