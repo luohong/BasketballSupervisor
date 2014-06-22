@@ -4,6 +4,11 @@ import java.io.Serializable;
 
 public class Record implements Serializable {
 	
+	public interface FromType {
+		public static final int LOCAL = 0;
+		public static final int SERVER = 1;
+	}
+	
 	public long id;
 	public long gameId;
 	public long groupId;
@@ -13,6 +18,7 @@ public class Record implements Serializable {
 	public String showTime;
 	public String createTime;
 	public String coordinate;
+	public int fromType = FromType.LOCAL;// 0: local, 1:server
 
 	public Record() {
 	}
@@ -26,6 +32,7 @@ public class Record implements Serializable {
 		showTime = gameRecord.action_time;
 		createTime = gameRecord.action_time;
 		coordinate = gameRecord.coordinate;
+		fromType = FromType.SERVER;
 	}
 	
 }

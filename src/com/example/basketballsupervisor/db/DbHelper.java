@@ -9,7 +9,7 @@ public class DbHelper extends SQLiteOpenHelper {
 	
 	private static final String DB_NAME = "basketballsupervisor";
 
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 
 	private static DbHelper mDbHelper;
 	

@@ -36,10 +36,11 @@ public class RecordDb extends BaseDb {
 		public static final String SHOW_TIME = "show_time"; 
 		public static final String CREATE_TIME = "create_time"; 
 		public static final String COORDINATE = "coordinate"; 
+		public static final String FROM_TYPE = "from_type"; 
 
 		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
 
-		public static final String[] PROJECTION = { _ID, GAME_ID, GROUP_ID, MEMBER_ID, ACTION_ID, SHOW_TIME, CREATE_TIME, COORDINATE };
+		public static final String[] PROJECTION = { _ID, GAME_ID, GROUP_ID, MEMBER_ID, ACTION_ID, SHOW_TIME, CREATE_TIME, COORDINATE, FROM_TYPE };
 	}
 	
 	public RecordDb(Context context) {
@@ -62,7 +63,8 @@ public class RecordDb extends BaseDb {
 		sb.append(Table.ACTION_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.SHOW_TIME).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.CREATE_TIME).append(COLUMN_TYPE.TEXT).append(COMMA);
-		sb.append(Table.COORDINATE).append(COLUMN_TYPE.TEXT);
+		sb.append(Table.COORDINATE).append(COLUMN_TYPE.TEXT).append(COMMA);
+		sb.append(Table.FROM_TYPE).append(COLUMN_TYPE.INTEGER);
 		sb.append(BRACKET_RIGHT);
 
 		return sb.toString();
@@ -84,6 +86,7 @@ public class RecordDb extends BaseDb {
 		record.showTime = cursor.getString(cursor.getColumnIndexOrThrow(Table.SHOW_TIME));
 		record.createTime = cursor.getString(cursor.getColumnIndexOrThrow(Table.CREATE_TIME));
 		record.coordinate = cursor.getString(cursor.getColumnIndexOrThrow(Table.COORDINATE));
+		record.fromType = cursor.getInt(cursor.getColumnIndexOrThrow(Table.FROM_TYPE));
 		
 		return record;
 	}
@@ -118,8 +121,8 @@ public class RecordDb extends BaseDb {
         try {
         	checkDb();
     		
-            String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.GROUP_ID);
-            String[] selectionArgs = new String[] { String.valueOf(game.gId), String.valueOf(group.groupId) };
+            String selection = String.format(" %s = ? and %s = ? and %s = ? ", Table.GAME_ID, Table.GROUP_ID, Table.FROM_TYPE);
+            String[] selectionArgs = new String[] { String.valueOf(game.gId), String.valueOf(group.groupId), String.valueOf(Record.FromType.LOCAL) };
         	
             cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, null);
             while (cursor != null && cursor.moveToNext()) {
@@ -146,6 +149,7 @@ public class RecordDb extends BaseDb {
 			record.showTime = String.valueOf(time);
 			record.createTime = String.valueOf(System.currentTimeMillis());
 			record.coordinate = coordinate;
+			record.fromType = Record.FromType.LOCAL;
 
 			insert(record);
 		}
@@ -163,6 +167,7 @@ public class RecordDb extends BaseDb {
 			values.put(Table.CREATE_TIME, record.createTime);
 			values.put(Table.SHOW_TIME, record.showTime);
 			values.put(Table.COORDINATE, record.coordinate);
+			values.put(Table.FROM_TYPE, record.fromType);
 			
 			long result = db.insert(Table.TABLE_NAME, null, values);
 			Log.d(TAG, "insert result : " + result + ", actionId: " + record.actionId);

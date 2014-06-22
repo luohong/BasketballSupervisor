@@ -559,7 +559,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 判断当前比赛状态是否允许记录技术犯规
 		boolean allow = running || pausing;// 记录创新数据的角色不允许记录技术犯规
 		if (!allow) {
-			showToastShort("比赛尚未开始，不允许记录技术犯规");
+			showToastShort("比赛尚未开始，不允许记录犯规");
 			return ;
 		} else if (!mRoles.contains(1) && !mRoles.contains(2)) {
 			showToastShort("创新数据记录角色不允许记录技术犯规");
@@ -570,19 +570,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			
 			@Override
 			public void onClick(View arg0) {
-				commonFouls(clickPos);
+				technicalFoul(clickPos);
 			}
 		}, new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				technicalFouls(clickPos);
+				commonFoul(clickPos);
 			}
 		});
 		dialog.show();
 	}
 	
-	protected void commonFouls(int clickPos) {
+	protected void technicalFoul(int clickPos) {
 		if (mGroupAPlayingMemberList.isEmpty()) {
 			mGroupAPlayingMemberList = filterMember(mGroupAMemberList);
 		}
@@ -603,7 +603,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		dialog.fillPlayersData(mGroupAPlayingMemberList, mGroupBPlayingMemberList);
 	}
 
-	private void technicalFouls(int clickPos) {
+	private void commonFoul(int clickPos) {
 		// 技术犯规
 		
 		// 成员记录次数map
@@ -1537,23 +1537,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private void reportGameData() {
 		List<RoleRecord> records = new ArrayList<RoleRecord>();
 		
-		if (mRoles.contains(1)) {// 记录A队数据
-			RoleRecord groupARecord = getRoleRecord(mGroupA, 1);
-			records.add(groupARecord);
-		} 
-		if (mRoles.contains(2)) {// 记录B队数据
-			RoleRecord groupBRecord = getRoleRecord(mGroupB, 1);
-			records.add(groupBRecord);
-		} 
+		// 记录A队数据
+		RoleRecord groupARecord = getRoleRecord(mGroupA, 1);
+		records.add(groupARecord);
+			
+		// 记录B队数据
+		RoleRecord groupBRecord = getRoleRecord(mGroupB, 1);
+		records.add(groupBRecord);
+		
 		if (mRoles.contains(3)) {// 记录创新数据
-			if (!mRoles.contains(1)) {
-				RoleRecord groupARecord = getRoleRecord(mGroupA, 2);
-				records.add(groupARecord);
-			}
-			if (!mRoles.contains(2)) {
-				RoleRecord groupBRecord = getRoleRecord(mGroupB, 2);
-				records.add(groupBRecord);
-			}
+			RoleRecord groupANewRecord = getRoleRecord(mGroupA, 2);
+			records.add(groupANewRecord);
+			RoleRecord groupBNewRecord = getRoleRecord(mGroupB, 2);
+			records.add(groupBNewRecord);
 		}
 		
 		final ReportGameRecordRequest request = new ReportGameRecordRequest(records);
