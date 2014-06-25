@@ -12,6 +12,9 @@
     
     <dimen name="text_input">16sp</dimen>
     
+    <dimen name="game_title">18sp</dimen>
+    <dimen name="game_remark">16sp</dimen>
+    
     <dimen name="group_name">18sp</dimen>
     <dimen name="group_score">22sp</dimen>
     <dimen name="group_score_operator">28sp</dimen>

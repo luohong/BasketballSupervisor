@@ -63,6 +63,7 @@ import com.example.basketballsupervisor.util.HomeWatcher;
 import com.example.basketballsupervisor.util.HomeWatcher.OnHomePressedListener;
 import com.example.basketballsupervisor.util.SpUtil;
 import com.example.basketballsupervisor.widget.DataStatDialog;
+import com.example.basketballsupervisor.widget.GameListDialog;
 import com.example.basketballsupervisor.widget.QuickAction;
 import com.example.basketballsupervisor.widget.RecordEventDialog;
 import com.example.basketballsupervisor.widget.SelectPlayersDialog;
@@ -137,6 +138,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private boolean isRequiredRecord = true;
 	private SpUtil mSpUtil;
 	private int mRunningTime = 0;
+	private long mSelectedGameId = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -376,41 +378,71 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		GameDb gameDb = new GameDb(this);
 		List<Game> gameList = gameDb.getAll();
 		if (gameList != null && gameList.size() > 0) {
-			mGame = gameList.get(0);
-			
-			if (mGame != null) {
-				GroupDb groupDb = new GroupDb(this);
-				List<Group> groupList = groupDb.getGameGroups(mGame.gId);
-				
-				mGame.groupList = groupList;
-				
-				if (groupList != null && groupList.size() >= 2) {
-					MemberDb memberDb = new MemberDb(this);
-					
-					mGroupA = groupList.get(0);
-					if (mGroupA != null) {
-						mGroupAMemberList = memberDb.getGroupMembers(mGroupA.groupId);						
-						mGroupA.memberList = mGroupAMemberList;
-					}
-					
-					mGroupB = groupList.get(1);
-					if (mGroupB != null) {
-						mGroupBMemberList = memberDb.getGroupMembers(mGroupB.groupId);		
-						mGroupB.memberList = mGroupBMemberList;
+			Game selectedGame = null;
+			mSelectedGameId = mSpUtil.getSp().getLong("selected_game_id", -1);
+			if (mSelectedGameId > -1) {
+				for (Game game : gameList) {
+					if (game.gId == mSelectedGameId) {
+						selectedGame = game;
+						break;
 					}
 				}
 			}
 			
-			// 恢复比赛现场
-			running = mSpUtil.getSp().getBoolean("game_state_running", false);
-			pausing = mSpUtil.getSp().getBoolean("game_state_pausing", false);
-			
-			onInitViewData();
-			onRestoreGameState();
+			if (selectedGame != null) {
+				mGame = selectedGame;
+				
+				onGameItemClick(mGame);
+			} else {
+				showGameListDialog(gameList);
+			}
 		}
+	}
+
+	private void showGameListDialog(List<Game> gameList) {
+		GameListDialog dialog = new GameListDialog(this, gameList);
+		dialog.show();
+	}
+
+	public void onGameItemClick(Game game) {
+		mGame = game;
+		if (mGame != null) {
+			mSpUtil.getEdit().putLong("selected_game_id", mGame.gId).commit();
+			
+			GroupDb groupDb = new GroupDb(this);
+			List<Group> groupList = groupDb.getGameGroups(mGame.gId);
+			
+			mGame.groupList = groupList;
+			
+			if (groupList != null && groupList.size() >= 2) {
+				MemberDb memberDb = new MemberDb(this);
+				
+				mGroupA = groupList.get(0);
+				if (mGroupA != null) {
+					mGroupAMemberList = memberDb.getGroupMembers(mGroupA.groupId);						
+					mGroupA.memberList = mGroupAMemberList;
+				}
+				
+				mGroupB = groupList.get(1);
+				if (mGroupB != null) {
+					mGroupBMemberList = memberDb.getGroupMembers(mGroupB.groupId);		
+					mGroupB.memberList = mGroupBMemberList;
+				}
+			}
+		}
+		
+		// 恢复比赛现场
+		running = mSpUtil.getSp().getBoolean("game_state_running", false);
+		pausing = mSpUtil.getSp().getBoolean("game_state_pausing", false);
+		
+		onInitViewData();
+		onRestoreGameState();
 	}
 	
 	private void requestGameData() {
+		mSpUtil.getEdit().putLong("selected_game_id", -1).commit();
+		mSelectedGameId = -1;
+		
 		final QueryPlayInfoRequest request = new QueryPlayInfoRequest(1);
 		Config.asynPost(this, "正在获取球队数据...", request.getData(), new CallBack() {
 			
@@ -424,7 +456,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 							showToastShort("球队数据获取成功");
 							
 							saveGameData(gameList);
-							initGameData(gameList);
+//							initGameData(gameList);
+							showGameListDialog(gameList);
 						} else {
 							showToastShort("没有最新的比赛数据");
 						}
