@@ -206,6 +206,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
 		mGvCourt.setAdapter(mCourtAdapter);
+		
+		mActionMap = new HashMap<Integer, Action>();
 	}
 
 	@Override
@@ -425,17 +427,39 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mIvPauseRight.setImageResource(R.drawable.btn_pause);
 		}
 		
+		refreshCourtRecord();
+	}
+
+	private List<Record> refreshCourtRecord() {
+		int groupAScore = 0;
+		int groupBScore = 0;
+		mGroupAScore = mGroupBScore = 0;
+		
 		RecordDb db = new RecordDb(this);
 		List<Record> recordList = db.getAll(mGame);
 		for (Record record : recordList) {
+			// 记录坐标
 			if (!TextUtils.isEmpty(record.coordinate)) {
 				String[] split = record.coordinate.split(",");
 				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
 				mCourtPositions.set(position, 0);
 			}
-		}
 			
+			// 记录得分
+			if (mGroupA.groupId == record.groupId) {
+				groupAScore += mActionMap.get(record.actionId).score;
+			} else if (mGroupB.groupId == record.groupId) {
+				groupBScore += mActionMap.get(record.actionId).score;
+			}
+		}
+		// 更新坐标
 		mCourtAdapter.notifyDataSetChanged();
+
+		// 更新记录得分
+		updateGroupAScore(groupAScore);
+		updateGroupAScore(groupBScore);
+		
+		return recordList;
 	}
 
 	private void saveGameData(List<Game> gameList) {
@@ -475,6 +499,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 		
 		mActionList = db.getAll();
+		for (Action action : mActionList) {
+			mActionMap.put(action.id, action);
+		}
 	}
 
 	@Override
@@ -984,18 +1011,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void showStatPanel() {
-		// 显示统计信息画板
-		RecordDb db = new RecordDb(this);
-		List<Record> recordList = db.getAll(mGame);
-		for (Record record : recordList) {
-			if (!TextUtils.isEmpty(record.coordinate)) {
-				String[] split = record.coordinate.split(",");
-				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-				mCourtPositions.set(position, 0);
-			}
-		}
-		mCourtAdapter.notifyDataSetChanged();
-		
+		List<Record> recordList = refreshCourtRecord();
 		List<DataStat> list = initDataStat(recordList);
 		
 		DataStatDialog dialog = new DataStatDialog(this, list);
@@ -1041,13 +1057,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			memberActionCountMap.put((int)record.actionId, memberActionCount);
 			
 			mMemberActionMap.put(record.memberId, memberActionCountMap);
-		}
-		
-		if (mActionMap == null) {
-			mActionMap = new HashMap<Integer, Action>();
-		}
-		for (Action action : mActionList) {
-			mActionMap.put(action.id, action);
 		}
 		
 		List<DataStat> list = new ArrayList<DataStat>();
