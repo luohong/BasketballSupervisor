@@ -313,9 +313,9 @@ public class RecordEventDialog extends BaseDialog {
 			mMainActivity.setCurrentRecordCoordinate(action, mCoordinate);
 		}
 		
-		if (action.id == 13) {// 犯规行为产生，即停表
-			mMainActivity.doPauseGame();
-		}
+//		if (action.id == 13) {// 犯规行为产生，即停表
+//			mMainActivity.doPauseGame();
+//		}
 	}
 
 	protected void showNextStat() {
