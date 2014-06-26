@@ -1,8 +1,6 @@
 package com.example.basketballsupervisor.widget;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import android.content.Context;
 import android.text.TextUtils;
@@ -15,21 +13,13 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.framework.core.widget.BaseDialog;
-import com.android.framework.core.widget.ConfirmDialog;
 import com.example.basketballsupervisor.R;
 import com.example.basketballsupervisor.activity.MainActivity;
-import com.example.basketballsupervisor.db.RecordDb;
-import com.example.basketballsupervisor.model.Action;
 import com.example.basketballsupervisor.model.Game;
-import com.example.basketballsupervisor.model.Group;
-import com.example.basketballsupervisor.model.Member;
 
 public class GameListDialog extends BaseDialog {
 	
@@ -84,12 +74,12 @@ public class GameListDialog extends BaseDialog {
 		DisplayMetrics  dm = new DisplayMetrics();    
 	    m.getDefaultDisplay().getMetrics(dm);    
 		
-	    int width = (int) (dm.widthPixels * 0.6);
-//	    int height = (int) (dm.heightPixels * 0.8);
+	    int width = (int) (dm.widthPixels * 0.8);
+	    int height = (int) (dm.heightPixels * 0.8);
 
 		WindowManager.LayoutParams p = win.getAttributes();
 		p.width = width;
-//		p.height = height;
+		p.height = height;
 		
 	    win.setAttributes(p);
 	}

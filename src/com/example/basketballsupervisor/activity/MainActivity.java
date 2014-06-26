@@ -57,8 +57,10 @@ import com.example.basketballsupervisor.model.Member;
 import com.example.basketballsupervisor.model.PlayingTime;
 import com.example.basketballsupervisor.model.Record;
 import com.example.basketballsupervisor.model.RoleRecord;
+import com.example.basketballsupervisor.util.Constants;
 import com.example.basketballsupervisor.util.CountDown;
 import com.example.basketballsupervisor.util.CountDown.OnCountDownListener;
+import com.example.basketballsupervisor.util.GameUtils;
 import com.example.basketballsupervisor.util.HomeWatcher;
 import com.example.basketballsupervisor.util.HomeWatcher.OnHomePressedListener;
 import com.example.basketballsupervisor.util.SpUtil;
@@ -73,20 +75,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private static final int CLICK_POS_LEFT = 0;
 	private static final int CLICK_POS_RIGHT = 1;
 	private static final String TAG = MainActivity.class.getSimpleName();
-	
-	private static String[] GROUP_DATA_STAT_COLUMNS = new String[] { "球队\\统计项",
-			"总得分", "总出手命中次数（不含罚球）", "总出手次数（不含罚球）", "总命中率（总命中率中不含罚球命中率）",
-			"2分球命中次数", "2分球出手次数", "2分球命中率", "3分球命中次数", "3分球出手次数", "3分球命中率",
-			"罚球命中次数", "罚球出手次数", "罚球命中率", "前场篮板", "后场篮板", "总篮板", "助攻", "抢断",
-			"封盖", "被犯规", "犯规", "失误" };
-	private static String[] MEMBER_DATA_STAT_COLUMNS = new String[] { "球队",
-			"球员\\统计项", "总得分", "总出手命中次数（不含罚球）", "总出手次数（不含罚球）",
-			"总命中率（总命中率中不含罚球命中率）", "2分球命中次数", "2分球出手次数", "2分球命中率", "3分球命中次数",
-			"3分球出手次数", "3分球命中率", "罚球命中次数", "罚球出手次数", "罚球命中率", "前场篮板", "后场篮板",
-			"总篮板", "助攻", "抢断", "封盖", "被犯规", "犯规", "失误", "上场时间" };
-	private static String[] INNOVATE_DATA_STAT_COLUMNS = new String[] { "球队",
-			"球员\\统计项", "一条龙", "超远3分", "绝杀", "最后3秒得分", "晃倒", "2+1", "3+1", "扣篮",
-			"快攻", "2罚不中", "3罚不中", "被晃倒" };
 
 	private List<Integer> mRoles = new ArrayList<Integer>(3);
 	private long mGameTime = 0l;
@@ -145,7 +133,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-		loadDataInBackground();
+		loadData();
 	}
 
 	@Override
@@ -208,129 +196,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	@Override
 	public void onInitViewData() {
-		int drawable = R.drawable.st_07;		
-
-		int lastGameTime = mSpUtil.getSp().getInt("last_game_time", 0);
-		if (mGame != null) {
-			// 支持多种角色
-			if (mGame.role != null) {
-				mRoles = mGame.role;
-			}
-			mQuarterCount = mGame.section;
-			mQuarterTime = mGame.section_time;
-			
-			String times = SpUtil.getInstance(this).getSp().getString("quarterTimeList", "");
-			if (!TextUtils.isEmpty(times)) {
-				String[] time = times.split(",");
-				for (int i = 0; i < time.length; i++) {
-					int t = Integer.parseInt(time[i]);
-					mQuarterTimeList.add(t);
-				}
-			} else {
-				for (int i = 0; i < mQuarterCount; i++) {
-					mQuarterTimeList.add(mQuarterTime);
-				}
-			}
-			
-			int timeout = mQuarterCount * mQuarterTime * 60 * 1000;// 四节比赛，每节比赛10分钟
-			mCountDown = new CountDown(lastGameTime, timeout, 1000);
-			mCountDown.setOnCountDownListener(this);
-		}
-		
-		onCountDownIntervalReach(lastGameTime);
-		
-		if (mRoles == null) {
-			mRoles = new ArrayList<Integer>(3);
-		}
-		if (mRoles.isEmpty()) {
-			mRoles.add(1);// 默认记录A队数据
-		}
-		
-		if (mRoles.contains(1)) {// 记录A队数据
-			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
-			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-		} 
-		if (mRoles.contains(2)) {// 记录B队数据
-			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
-		} 
-		if (mRoles.contains(3) && !mRoles.contains(1) && !mRoles.contains(2)) {// 记录创新数据
-			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
-		}
-		
-		String groupAName = (mGroupA != null && !TextUtils.isEmpty(mGroupA.groupName)) ? mGroupA.groupName : "A队";
-		mTvGroupAName.setText(groupAName);
-		
-		String groupBName = (mGroupB != null && !TextUtils.isEmpty(mGroupB.groupName)) ? mGroupB.groupName : "B队";
-		mTvGroupBName.setText(groupBName);
-		
-		if (running || pausing) {
-			mGroupAScore = mSpUtil.getSp().getInt("group_a_score", 0);
-			mGroupBScore = mSpUtil.getSp().getInt("group_b_score", 0);
-		}
-		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
-		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
-		
-		if (pausing) {
-			mIvPauseLeft.setImageResource(R.drawable.btn_continue);
-			mIvPauseRight.setImageResource(R.drawable.btn_continue);
-		} else {
-			mIvPauseLeft.setImageResource(R.drawable.btn_pause);
-			mIvPauseRight.setImageResource(R.drawable.btn_pause);
-		}
+		mRoles = new ArrayList<Integer>();
 		
 		// 填充网格
-		if (mCourtPositions == null) {
-			mCourtPositions = new ArrayList<Integer>(17 * 32);// 长32个格子，宽17个格子
-			for (int i = 0; i < 17 * 32; i++) {
-				mCourtPositions.add(null);
-			}
+		mCourtPositions = new ArrayList<Integer>(17 * 32);// 长32个格子，宽17个格子
+		for (int i = 0; i < 17 * 32; i++) {
+			mCourtPositions.add(null);
 		}
 		
-		if (running || pausing) {
-			RecordDb db = new RecordDb(this);
-			List<Record> recordList = db.getAll(mGame);
-			for (Record record : recordList) {
-				if (!TextUtils.isEmpty(record.coordinate)) {
-					String[] split = record.coordinate.split(",");
-					int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-					mCourtPositions.set(position, 0);
-				}
-			}
-		}
-			
 		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
 		mGvCourt.setAdapter(mCourtAdapter);
-	}
-
-	private String formGameTime(int count) {
-		StringBuffer gameTime = new StringBuffer();
-		
-		int time = count / 1000;
-		
-		int minutes = time / 60;
-		if (minutes < 10) {
-			gameTime.append("0");
-		}
-		gameTime.append(minutes);
-
-		gameTime.append(":");
-		
-		int second = time % 60;
-		if (second < 10) {
-			gameTime.append("0");
-		}
-		gameTime.append(second);
-		
-		gameTime.append(" | ");
-		int milisecends = (count % 1000) / 100;
-		if (milisecends < 10) {
-			gameTime.append("0");
-		}
-		gameTime.append(milisecends);
-		
-		return gameTime.toString();
 	}
 
 	@Override
@@ -363,7 +238,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mGvCourt.setOnItemClickListener(this);
 	}
 
-	private void loadDataInBackground() {
+	private void loadData() {
 		GameDb gameDb = new GameDb(this);
 		if (gameDb.isHasData()) {
 			loadLocalData();
@@ -429,20 +304,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 					mGroupB.memberList = mGroupBMemberList;
 				}
 			}
+			
+			// 恢复比赛现场
+			running = mSpUtil.getSp().getBoolean("game_state_running", false);
+			pausing = mSpUtil.getSp().getBoolean("game_state_pausing", false);
+			
+			onInitGameData();
+			onRestoreGameState();
 		}
-		
-		// 恢复比赛现场
-		running = mSpUtil.getSp().getBoolean("game_state_running", false);
-		pausing = mSpUtil.getSp().getBoolean("game_state_pausing", false);
-		
-		onInitViewData();
-		onRestoreGameState();
 	}
 	
-	private void requestGameData() {
-		mSpUtil.getEdit().putLong("selected_game_id", -1).commit();
-		mSelectedGameId = -1;
-		
+	private void requestGameData() {		
 		final QueryPlayInfoRequest request = new QueryPlayInfoRequest(1);
 		Config.asynPost(this, "正在获取球队数据...", request.getData(), new CallBack() {
 			
@@ -454,9 +326,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 						List<Game> gameList = response.gameList;
 						if (gameList != null && gameList.size() > 0) {
 							showToastShort("球队数据获取成功");
+
+							mSpUtil.getEdit().putLong("selected_game_id", -1).commit();
+							mSelectedGameId = -1;
 							
 							saveGameData(gameList);
-//							initGameData(gameList);
 							showGameListDialog(gameList);
 						} else {
 							showToastShort("没有最新的比赛数据");
@@ -483,24 +357,85 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		});
 	}
 
-	private void initGameData(List<Game> gameList) {
-		mGame = gameList.get(0);
-		if (mGame != null) {
-			List<Group> groupList = mGame.groupList;
-			if (groupList != null && groupList.size() >= 2) {
-				mGroupA = groupList.get(0);
-				if (mGroupA != null) {
-					mGroupAMemberList = mGroupA.memberList;
-				}
-				
-				mGroupB = groupList.get(1);
-				if (mGroupB != null) {
-					mGroupBMemberList = mGroupB.memberList;
-				}
+	private void onInitGameData() {
+		int drawable = R.drawable.st_07;		
+
+		int lastGameTime = mSpUtil.getSp().getInt("last_game_time", 0);
+		// 支持多种角色
+		if (mGame.role != null) {
+			mRoles = mGame.role;
+		}
+		mQuarterCount = mGame.section;
+		mQuarterTime = mGame.section_time;
+		
+		String times = SpUtil.getInstance(this).getSp().getString("quarterTimeList", "");
+		if (!TextUtils.isEmpty(times)) {
+			String[] time = times.split(",");
+			for (int i = 0; i < time.length; i++) {
+				int t = Integer.parseInt(time[i]);
+				mQuarterTimeList.add(t);
+			}
+		} else {
+			for (int i = 0; i < mQuarterCount; i++) {
+				mQuarterTimeList.add(mQuarterTime);
 			}
 		}
 		
-		onInitViewData();
+		int timeout = mQuarterCount * mQuarterTime * 60 * 1000;// 四节比赛，每节比赛10分钟
+		mCountDown = new CountDown(lastGameTime, timeout, 1000);
+		mCountDown.setOnCountDownListener(this);
+		
+		onCountDownIntervalReach(lastGameTime);
+		
+		if (mRoles.isEmpty()) {
+			mRoles.add(1);// 默认记录A队数据
+		}
+		
+		if (mRoles.contains(1)) {// 记录A队数据
+			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
+			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+		} 
+		if (mRoles.contains(2)) {// 记录B队数据
+			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
+		} 
+		if (mRoles.contains(3) && !mRoles.contains(1) && !mRoles.contains(2)) {// 记录创新数据
+			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+		}
+		
+		String groupAName = (mGroupA != null && !TextUtils.isEmpty(mGroupA.groupName)) ? mGroupA.groupName : "A队";
+		mTvGroupAName.setText(groupAName);
+		
+		String groupBName = (mGroupB != null && !TextUtils.isEmpty(mGroupB.groupName)) ? mGroupB.groupName : "B队";
+		mTvGroupBName.setText(groupBName);
+		
+//		if (running || pausing) {
+//			mGroupAScore = mSpUtil.getSp().getInt("group_a_score", 0);
+//			mGroupBScore = mSpUtil.getSp().getInt("group_b_score", 0);
+//		}
+		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
+		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
+		
+		if (pausing) {
+			mIvPauseLeft.setImageResource(R.drawable.btn_continue);
+			mIvPauseRight.setImageResource(R.drawable.btn_continue);
+		} else {
+			mIvPauseLeft.setImageResource(R.drawable.btn_pause);
+			mIvPauseRight.setImageResource(R.drawable.btn_pause);
+		}
+		
+		RecordDb db = new RecordDb(this);
+		List<Record> recordList = db.getAll(mGame);
+		for (Record record : recordList) {
+			if (!TextUtils.isEmpty(record.coordinate)) {
+				String[] split = record.coordinate.split(",");
+				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+				mCourtPositions.set(position, 0);
+			}
+		}
+			
+		mCourtAdapter.notifyDataSetChanged();
 	}
 
 	private void saveGameData(List<Game> gameList) {
@@ -1117,9 +1052,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		List<DataStat> list = new ArrayList<DataStat>();
 		
-		List<String> groupColumns = Arrays.asList(GROUP_DATA_STAT_COLUMNS);
-		List<String> memberColumns = Arrays.asList(MEMBER_DATA_STAT_COLUMNS);
-		List<String> innovateColumns = Arrays.asList(INNOVATE_DATA_STAT_COLUMNS);
+		List<String> groupColumns = Arrays.asList(Constants.GROUP_DATA_STAT_COLUMNS);
+		List<String> memberColumns = Arrays.asList(Constants.MEMBER_DATA_STAT_COLUMNS);
+		List<String> innovateColumns = Arrays.asList(Constants.INNOVATE_DATA_STAT_COLUMNS);
 		
 		List<Member> groupAMemberList = filterMember(mGroupAMemberList);
 		List<Member> groupBMemberList = filterMember(mGroupBMemberList);
@@ -1228,16 +1163,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(String.valueOf(totalScore));// 总得分 
 			dataList.add(String.valueOf(totalHitCount));// 总出手命中次数（不含罚球）
 			dataList.add(String.valueOf(totalShootCount));// 总出手次数（不含罚球） 
-			dataList.add(formatHitRatePercent(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
+			dataList.add(GameUtils.formatHitRatePercent(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
 			dataList.add(String.valueOf(dichotomyHitCount));// 2分球命中次数 
 			dataList.add(String.valueOf(dichotomyShootCount));// 2分球出手次数 
-			dataList.add(formatHitRatePercent(dichotomyHitRate));// 2分球命中率 
+			dataList.add(GameUtils.formatHitRatePercent(dichotomyHitRate));// 2分球命中率 
 			dataList.add(String.valueOf(trisectionHitCount));// 3分球命中次数 
 			dataList.add(String.valueOf(trisectionShootCount));// 3分球出手次数 
-			dataList.add(formatHitRatePercent(trisectionHitRate));// 3分球命中率 
+			dataList.add(GameUtils.formatHitRatePercent(trisectionHitRate));// 3分球命中率 
 			dataList.add(String.valueOf(penaltyHitCount));// 罚球命中次数 
 			dataList.add(String.valueOf(penaltyShootCount));// 罚球出手次数 
-			dataList.add(formatHitRatePercent(penaltyHitRate));// 罚球命中率 
+			dataList.add(GameUtils.formatHitRatePercent(penaltyHitRate));// 罚球命中率 
 			dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
 			dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
 			dataList.add(String.valueOf(totalReboundCount));// 总篮板 
@@ -1309,7 +1244,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			dataList.add(group.groupName);
 			dataList.add(member.name);
 			
-			String playingTime = formatPlayingTime(playingTimeMap.get(member.memberId));// 上场时间
+			String playingTime = GameUtils.formatPlayingTime(playingTimeMap.get(member.memberId));// 上场时间
 			
 			// 总得分 总出手命中次数（不含罚球） 总出手次数（不含罚球） 总命中率（总命中率中不含罚球命中率） 2分球命中次数 2分球出手次数 2分球命中率 3分球命中次数 3分球出手次数 3分球命中率 罚球命中次数 罚球出手次数 罚球命中率 前场篮板 后场篮板 总篮板 助攻 抢断 封盖 被犯规 犯规 失误 上场时间
 			Map<Integer, Integer> actionCountMap = mMemberActionMap.get(member.memberId);
@@ -1351,16 +1286,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				dataList.add(String.valueOf(totalScore));// 总得分 
 				dataList.add(String.valueOf(totalHitCount));// 总出手命中次数（不含罚球）
 				dataList.add(String.valueOf(totalShootCount));// 总出手次数（不含罚球） 
-				dataList.add(formatHitRatePercent(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
+				dataList.add(GameUtils.formatHitRatePercent(totalHitRate));// 总命中率（总命中率中不含罚球命中率） 
 				dataList.add(String.valueOf(dichotomyHitCount));// 2分球命中次数 
 				dataList.add(String.valueOf(dichotomyShootCount));// 2分球出手次数 
-				dataList.add(formatHitRatePercent(dichotomyHitRate));// 2分球命中率 
+				dataList.add(GameUtils.formatHitRatePercent(dichotomyHitRate));// 2分球命中率 
 				dataList.add(String.valueOf(trisectionHitCount));// 3分球命中次数 
 				dataList.add(String.valueOf(trisectionShootCount));// 3分球出手次数 
-				dataList.add(formatHitRatePercent(trisectionHitRate));// 3分球命中率 
+				dataList.add(GameUtils.formatHitRatePercent(trisectionHitRate));// 3分球命中率 
 				dataList.add(String.valueOf(penaltyHitCount));// 罚球命中次数 
 				dataList.add(String.valueOf(penaltyShootCount));// 罚球出手次数 
-				dataList.add(formatHitRatePercent(penaltyHitRate));// 罚球命中率 
+				dataList.add(GameUtils.formatHitRatePercent(penaltyHitRate));// 罚球命中率 
 				dataList.add(String.valueOf(offensiveReboundCount));// 前场篮板 
 				dataList.add(String.valueOf(defensiveReboundCount));// 后场篮板 
 				dataList.add(String.valueOf(totalReboundCount));// 总篮板 
@@ -1402,42 +1337,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			memberDataStatContent.dataList = dataList;
 			list.add(memberDataStatContent);
 		}
-	}
-	
-	private String formatHitRatePercent(float rate) {
-		String percent = Float.toString(rate);
-		if ("NaN".equals(percent)) {
-			percent = "0";
-		} else if (percent.startsWith("100.")) {
-			percent = "100";
-		} else if (percent.length() > 4) {
-			percent = percent.substring(0, 4);
-		}
-		return percent + "%";
-	}
-
-	private String formatPlayingTime(Long time) {
-		StringBuffer playingTime = new StringBuffer();
-		if (time != null) {
-			time = time / 1000;
-			
-			long minutes = time / 60;
-			if (minutes < 10) {
-				playingTime.append("0");
-			}
-			playingTime.append(minutes);
-
-			playingTime.append(":");
-			
-			long second = time % 60;
-			if (second < 10) {
-				playingTime.append("0");
-			}
-			playingTime.append(second);
-		} else {
-			playingTime.append("00:00");
-		}
-		return playingTime.toString();
 	}
 
 	private void addInnovateDataStatContent(
@@ -1487,11 +1386,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private void requestNewGameData() {
 		// 请求新的比赛数据
-		if (running || pausing) {
-			showToastShort("比赛正在进行，不允许获取新的比赛数据");
-		} else {
+//		if (running || pausing) {
+//			showToastShort("比赛正在进行，不允许获取新的比赛数据");
+//		} else {
 			requestGameData();
-		}
+//		}
 	}
 
 	private void logout() {
@@ -1664,7 +1563,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (isRequiredRecord) {
 			mSpUtil.getEdit().putInt("last_game_time", last).commit();
 		}
-		mTvGameTime.setText(formGameTime(last));
+		mTvGameTime.setText(GameUtils.formGameTime(last));
 
 		mCurrentQuarter = getQuarter();
 		if (isQuarterTime()) {
