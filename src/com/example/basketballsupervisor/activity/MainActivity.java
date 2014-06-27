@@ -1588,7 +1588,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		pausing = false;
 		
 		if (mCountDown != null) {
-			mCountDown.reset();
+//			mCountDown.reset();
+			mCountDown.stop();
 		}
 
 		if (isRequiredRecord ) {
@@ -1736,6 +1737,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				
 				if (!enabled) {// 允许补足时间
 					mQuarterTimeList.set(mCurrentQuarter - 1, mQuarterTimeList.get(mCurrentQuarter - 1) + 1);
+					running = true;
+					pausing = false;
+					mSpUtil.setGameStateRunning(running);
+					mSpUtil.setGameStatePausing(pausing);
 					
 					restartCountDown();
 					
@@ -1760,6 +1765,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				window.dismiss();
 				// 加时赛
 				mQuarterTimeList.set(mCurrentQuarter - 1, mQuarterTimeList.get(mCurrentQuarter - 1) + 5);
+				running = true;
+				mSpUtil.setGameStateRunning(running);
+				
+				mGame.status = 0;// 更新比赛状态，比赛继续
+				mGameDb.update(mGame);
 				
 				restartCountDown();
 				
@@ -1809,7 +1819,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		for (Integer time : mQuarterTimeList) {
 			total = total + time;
 		}
-		return mRunningTime == (total * 60 * 1000);
+		return mRunningTime >= (total * 60 * 1000);
 	}
 	
 	private int getQuarter() {

@@ -184,7 +184,7 @@ public class GameDb extends BaseDb {
 			ContentValues values = new ContentValues();
 			values.put(Table.STATUS, game.status);
 			
-			String whereClause = String.format(" %s = ? ", Table._ID);
+			String whereClause = String.format(" %s = ? ", Table.GAME_ID);
 			String[] whereArgs = new String[] { String.valueOf(game.gId) };
 			
 			db.update(Table.TABLE_NAME, values, whereClause, whereArgs);
