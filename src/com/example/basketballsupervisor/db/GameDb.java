@@ -121,7 +121,6 @@ public class GameDb extends BaseDb {
 		beginTransaction();
 		try {
 			if (gameList != null && gameList.size() > 0) {
-				clearAllData();
 				for (Game game : gameList) {
 					if (!exist(game.gId)) {
 						insert(game);
