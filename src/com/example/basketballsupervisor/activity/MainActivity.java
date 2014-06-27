@@ -14,15 +14,11 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -32,6 +28,7 @@ import android.widget.Toast;
 import com.android.framework.core.widget.ConfirmDialog;
 import com.example.basketballsupervisor.IApplication;
 import com.example.basketballsupervisor.R;
+import com.example.basketballsupervisor.adapter.CourtAdapter;
 import com.example.basketballsupervisor.config.Config;
 import com.example.basketballsupervisor.config.Config.CallBack;
 import com.example.basketballsupervisor.db.ActionDb;
@@ -241,14 +238,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void loadData() {
+		loadActionData();
+		
 		GameDb gameDb = new GameDb(this);
 		if (gameDb.isHasData()) {
 			loadLocalData();
 		} else {
 			requestGameData();
 		}
-		
-		loadActionData();
 	}
 
 	private void loadLocalData() {
@@ -416,8 +413,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 //			mGroupAScore = mSpUtil.getSp().getInt("group_a_score", 0);
 //			mGroupBScore = mSpUtil.getSp().getInt("group_b_score", 0);
 //		}
-		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
-		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
+//		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
+//		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
 		
 		if (pausing) {
 			mIvPauseLeft.setImageResource(R.drawable.btn_continue);
@@ -435,6 +432,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		int groupBScore = 0;
 		mGroupAScore = mGroupBScore = 0;
 		
+		for (int i = 0; i < mCourtPositions.size(); i++) {
+			mCourtPositions.set(i, null);
+		}
+		
 		RecordDb db = new RecordDb(this);
 		List<Record> recordList = db.getAll(mGame);
 		for (Record record : recordList) {
@@ -446,10 +447,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			}
 			
 			// 记录得分
-			if (mGroupA.groupId == record.groupId) {
-				groupAScore += mActionMap.get(record.actionId).score;
-			} else if (mGroupB.groupId == record.groupId) {
-				groupBScore += mActionMap.get(record.actionId).score;
+			Integer actionId = Integer.valueOf((int)record.actionId);
+			if (mActionMap.containsKey(actionId)) {
+				if (mGroupA.groupId == record.groupId) {
+					groupAScore += mActionMap.get(actionId).score;
+				} else if (mGroupB.groupId == record.groupId) {
+					groupBScore += mActionMap.get(actionId).score;
+				}
+			} else {
+				Log.e(TAG, "actionId " + actionId + " is not exist in action map");
 			}
 		}
 		// 更新坐标
@@ -457,7 +463,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 		// 更新记录得分
 		updateGroupAScore(groupAScore);
-		updateGroupAScore(groupBScore);
+		updateGroupBScore(groupBScore);
 		
 		return recordList;
 	}
@@ -1899,70 +1905,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (mRoles.contains(3)) {// 记录创新数据
 			// 无需处理
 		}
-	}
-
-	private class CourtAdapter extends BaseAdapter {
-
-		private LayoutInflater mInflater;
-		private List<Integer> positions;
-		
-		private int columnWidth;
-		private int columnHeight;
-
-		public CourtAdapter(Context context, List<Integer> positions) {
-			mInflater = LayoutInflater.from(context);
-			this.positions = positions;
-		}
-
-		public void setColumn(int columnWidth, int columnHeight) {
-			this.columnWidth = columnWidth;
-			this.columnHeight = columnHeight;
-			notifyDataSetChanged();
-		}
-
-		@Override
-		public int getCount() {
-			return positions.size();
-		}
-
-		@Override
-		public Object getItem(int position) {
-			return positions.get(position);
-		}
-
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			if (convertView == null) {
-				convertView = mInflater.inflate(R.layout.item_event_coordinate, parent, false);
-			}
-			
-			if (columnHeight > 0) {
-				AbsListView.LayoutParams params = new AbsListView.LayoutParams(columnWidth, columnHeight);
-				convertView.setLayoutParams(params);
-			}
-			
-			ImageView image = (ImageView) convertView.findViewById(R.id.iv_coordinate);
-
-			Integer type = (Integer) getItem(position);
-			if (type == null) {
-//				image.setImageResource(R.drawable.basketball_square);
-				image.setImageResource(0);
-			} else {
-				if (type == 0) {
-					image.setImageResource(R.drawable.position_03);
-				} else {
-					image.setImageResource(R.drawable.position_07);
-				}
-			}
-			
-			return convertView;
-		}
-		
 	}
 	
 	@Override
