@@ -15,4 +15,5 @@ public class Game implements Serializable {
 	public String location;// [String][not null][比赛地址]
 	public int section;// [int][not null][比赛小节数]
 	public int section_time;// [int][not null][每小节分钟数]
+	public int status = 0;// 比赛状态，0:为开始，1:已结束
 }

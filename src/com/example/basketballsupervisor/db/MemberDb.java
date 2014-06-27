@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
+import com.example.basketballsupervisor.db.GroupDb.Table;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 import com.example.basketballsupervisor.model.Member;
@@ -110,7 +111,9 @@ public class MemberDb extends BaseDb {
 		try {
 			if (memberList != null && memberList.size() > 0) {
 				for (Member member : memberList) {
-					insert(member, group, game);
+					if (!exist(game.gId, group.groupId, member.memberId)) {
+						insert(member, group, game);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -118,6 +121,27 @@ public class MemberDb extends BaseDb {
 		} finally {
 			endTransaction();
 		}
+	}
+
+	private boolean exist(long gameId, long groupId, long memberId) {
+		boolean exist = false;
+		Cursor cursor = null;
+		try {
+			checkDb();
+
+			String selection = String.format(" %s = ? and %s = ? and %s = ? ", Table.GAME_ID, Table.GROUP_ID, Table.MEMBER_ID);
+			String[] selectionArgs = new String[] { String.valueOf(gameId), String.valueOf(groupId), String.valueOf(memberId) };
+
+			cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table._ID + " asc limit 1");
+			exist = (cursor != null && cursor.getCount() > 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return exist;
 	}
 
 	public void insert(Member member, Group group, Game game) {

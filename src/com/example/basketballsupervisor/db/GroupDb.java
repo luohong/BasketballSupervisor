@@ -8,6 +8,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.provider.BaseColumns;
 
+import com.example.basketballsupervisor.db.GameDb.Table;
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
 
@@ -101,7 +102,9 @@ public class GroupDb extends BaseDb {
 		try {
 			if (groupList != null && groupList.size() > 0) {
 				for (Group group : groupList) {
-					insert(group, game);
+					if (!exist(game.gId, group.groupId)) {
+						insert(group, game);
+					}
 				}
 			}
 		} catch (Exception e) {
@@ -109,6 +112,27 @@ public class GroupDb extends BaseDb {
 		} finally {
 			endTransaction();
 		}
+	}
+
+	private boolean exist(long gameId, long groupId) {
+		boolean exist = false;
+		Cursor cursor = null;
+		try {
+			checkDb();
+
+			String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.GROUP_ID);
+			String[] selectionArgs = new String[] { String.valueOf(gameId), String.valueOf(groupId) };
+
+			cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table._ID + " asc limit 1");
+			exist = (cursor != null && cursor.getCount() > 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return exist;
 	}
 
 	public void insert(Group group, Game game) {

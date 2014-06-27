@@ -706,6 +706,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			return ;
 		}
 		
+		if (mGame.status == 1) {
+			showToastShort("比赛已经结束了");
+			return ;
+		}
+		
 		// 选择首发球员
 		if (mRoles.contains(1) || mRoles.contains(2)) {// 记录A队或B队数据无需选择首发球员
 			selectStartPlayers();
@@ -1433,11 +1438,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private void requestNewGameData() {
 		// 请求新的比赛数据
-//		if (running || pausing) {
-//			showToastShort("比赛正在进行，不允许获取新的比赛数据");
-//		} else {
+		if (running || pausing) {
+			showToastShort("比赛正在进行，不允许获取新的比赛数据");
+		} else {
 			requestGameData();
-//		}
+		}
 	}
 
 	private void logout() {
@@ -1591,6 +1596,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mSpUtil.setGameStatePausing(pausing);
 			mSpUtil.setLastGameTime(0);
 		}
+		
+		mGame.status = 1;// 更新比赛状态，比赛已结束
+		mGameDb.update(mGame);
 	}
 
 	@Override

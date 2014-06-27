@@ -94,6 +94,7 @@ public class SpUtil {
 		setGroupAPlayingMemberList(null);
 		setGroupBPlayingMemberList(null);
 		setLastGameTime(0);
+		setQuarterTimeList(null);
 	}
 
 	public long getSelectedGameId() {
@@ -174,12 +175,14 @@ public class SpUtil {
 
 	public void setQuarterTimeList(List<Integer> mQuarterTimeList) {
 		StringBuffer times = new StringBuffer();		
-		for (Integer time : mQuarterTimeList) {
-			times.append(time).append(",");
-		}
-		
-		if (times.length() > 0) {
-			times.deleteCharAt(times.length() - 1);
+		if (mQuarterTimeList != null && mQuarterTimeList.size() > 0) {
+			for (Integer time : mQuarterTimeList) {
+				times.append(time).append(",");
+			}
+			
+			if (times.length() > 0) {
+				times.deleteCharAt(times.length() - 1);
+			}
 		}
 		getEdit().putString("quarterTimeList", times.toString()).commit();
 	}

@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.provider.BaseColumns;
 
 import com.example.basketballsupervisor.config.Config;
+import com.example.basketballsupervisor.db.RecordDb.Table;
 import com.example.basketballsupervisor.model.Game;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,10 +35,11 @@ public class GameDb extends BaseDb {
 		public static final String LOCATION = "location"; 
 		public static final String SECTION = "section"; 
 		public static final String SECTION_TIME = "section_time"; 
+		public static final String STATUS = "status";
 
 		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
 
-		public static final String[] PROJECTION = { _ID, GAME_ID, PLATFORM_ID, NAME, REMARK, /**GROUP_LIST,**/ ROLE, TIME, LOCATION, SECTION, SECTION_TIME };
+		public static final String[] PROJECTION = { _ID, GAME_ID, PLATFORM_ID, NAME, REMARK, /**GROUP_LIST,**/ ROLE, TIME, LOCATION, SECTION, SECTION_TIME, STATUS };
 	}
 	
 	public GameDb(Context context) {
@@ -63,6 +65,7 @@ public class GameDb extends BaseDb {
 		sb.append(Table.TIME).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.SECTION).append(COLUMN_TYPE.INTEGER).append(COMMA);
 		sb.append(Table.SECTION_TIME).append(COLUMN_TYPE.INTEGER).append(COMMA);
+		sb.append(Table.STATUS).append(COLUMN_TYPE.INTEGER).append(COMMA);
 		sb.append(Table.LOCATION).append(COLUMN_TYPE.TEXT);
 		sb.append(BRACKET_RIGHT);
 
@@ -88,6 +91,7 @@ public class GameDb extends BaseDb {
 		game.location = cursor.getString(cursor.getColumnIndexOrThrow(Table.LOCATION));
 		game.section = cursor.getInt(cursor.getColumnIndexOrThrow(Table.SECTION));
 		game.section_time = cursor.getInt(cursor.getColumnIndexOrThrow(Table.SECTION_TIME));
+		game.status = cursor.getInt(cursor.getColumnIndexOrThrow(Table.STATUS));
 		
 		return game;
 	}
@@ -124,7 +128,6 @@ public class GameDb extends BaseDb {
 					}
 				}
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -168,8 +171,23 @@ public class GameDb extends BaseDb {
 			values.put(Table.LOCATION, game.location);
 			values.put(Table.SECTION, game.section);
 			values.put(Table.SECTION_TIME, game.section_time);
+			values.put(Table.STATUS, game.status);
 			
 			db.insert(Table.TABLE_NAME, null, values);
+		}
+	}
+	
+	public void update(Game game) {
+		if (game != null) {
+			checkDb();
+			
+			ContentValues values = new ContentValues();
+			values.put(Table.STATUS, game.status);
+			
+			String whereClause = String.format(" %s = ? ", Table._ID);
+			String[] whereArgs = new String[] { String.valueOf(game.gId) };
+			
+			db.update(Table.TABLE_NAME, values, whereClause, whereArgs);
 		}
 	}
 
