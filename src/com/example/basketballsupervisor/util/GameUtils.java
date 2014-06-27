@@ -21,12 +21,12 @@ public class GameUtils {
 		}
 		gameTime.append(second);
 		
-		gameTime.append(" | ");
-		int milisecends = (count % 1000) / 100;
-		if (milisecends < 10) {
-			gameTime.append("0");
-		}
-		gameTime.append(milisecends);
+//		gameTime.append(" | ");
+//		int milisecends = (count % 1000) / 100;
+//		if (milisecends < 10) {
+//			gameTime.append("0");
+//		}
+//		gameTime.append(milisecends);
 		
 		return gameTime.toString();
 	}

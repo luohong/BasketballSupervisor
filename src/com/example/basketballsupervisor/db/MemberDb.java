@@ -80,16 +80,16 @@ public class MemberDb extends BaseDb {
 		return member;
 	}
 
-	public List<Member> getGroupMembers(long groupId) {
+	public List<Member> getGroupMembers(long gameId, long groupId) {
 		List<Member> memberList = new ArrayList<Member>();
 		
-        String selection = String.format(" %s = ? ", Table.GROUP_ID);
-        String[] selectionArgs = new String[] { String.valueOf(groupId) };
+        String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.GROUP_ID);
+        String[] selectionArgs = new String[] { String.valueOf(gameId) , String.valueOf(groupId) };
         
         Cursor cursor = null;
         try {
         	checkDb();
-            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, null );
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table.MEMBER_ID + " asc" );
             while (cursor != null && cursor.moveToNext()) {
             	Member member = (Member)parseCursor(cursor);
             	memberList.add(member);

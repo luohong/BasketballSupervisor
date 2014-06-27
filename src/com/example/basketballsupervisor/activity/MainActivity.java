@@ -125,6 +125,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private SpUtil mSpUtil;
 	private int mRunningTime = 0;
 	private long mSelectedGameId = -1;
+	
+	private RecordDb mRecordDb;
+	private GameDb mGameDb;
+	private GroupDb mGroupDb;
+	private MemberDb mMemberDb;
+	private ActionDb mActionDb;
+	private PlayingTimeDb mPlayingTimeDb;
+	private GameTimeDb mGameTimeDb;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -156,6 +164,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
         
         PowerManager mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag"); 
+        
+        // 初始化数据
+		mRecordDb = new RecordDb(this);
+		mGameDb = new GameDb(this);
+		mGroupDb = new GroupDb(this);
+		mMemberDb = new MemberDb(this);
+		mActionDb = new ActionDb(this);
+		mPlayingTimeDb = new PlayingTimeDb(this);
+		mGameTimeDb = new GameTimeDb(this);
 	}
 
 	@Override
@@ -224,6 +241,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGameTime.setOnClickListener(this);
 		
 		mTvGameTime.setOnLongClickListener(this);
+		mIvUndo.setOnClickListener(this);
 		
 		mTvGroupAScore.setOnLongClickListener(this);
 		mTvGroupBScore.setOnLongClickListener(this);
@@ -251,8 +269,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private void loadData() {
 		loadActionData();
 		
-		GameDb gameDb = new GameDb(this);
-		if (gameDb.isHasData()) {
+		if (mGameDb.isHasData()) {
 			loadLocalData();
 		} else {
 			requestGameData();
@@ -260,8 +277,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void loadLocalData() {
-		GameDb gameDb = new GameDb(this);
-		List<Game> gameList = gameDb.getAll();
+		List<Game> gameList = mGameDb.getAll();
 		if (gameList != null && gameList.size() > 0) {
 			Game selectedGame = null;
 			mSelectedGameId = mSpUtil.getSelectedGameId();
@@ -296,23 +312,20 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mSelectedGameId = mGame.gId;
 			mSpUtil.setSelectedGameId(mSelectedGameId, hasSelectedGame);
 			
-			GroupDb groupDb = new GroupDb(this);
-			List<Group> groupList = groupDb.getGameGroups(mGame.gId);
+			List<Group> groupList = mGroupDb.getGameGroups(mGame.gId);
 			
 			mGame.groupList = groupList;
 			
 			if (groupList != null && groupList.size() >= 2) {
-				MemberDb memberDb = new MemberDb(this);
-				
 				mGroupA = groupList.get(0);
 				if (mGroupA != null) {
-					mGroupAMemberList = memberDb.getGroupMembers(mGroupA.groupId);						
+					mGroupAMemberList = mMemberDb.getGroupMembers(mGame.gId, mGroupA.groupId);						
 					mGroupA.memberList = mGroupAMemberList;
 				}
 				
 				mGroupB = groupList.get(1);
 				if (mGroupB != null) {
-					mGroupBMemberList = memberDb.getGroupMembers(mGroupB.groupId);		
+					mGroupBMemberList = mMemberDb.getGroupMembers(mGame.gId, mGroupB.groupId);		
 					mGroupB.memberList = mGroupBMemberList;
 				}
 			} else {
@@ -341,6 +354,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 							showToastShort("球队数据获取成功");
 
 							saveGameData(gameList);
+							
+							gameList = mGameDb.getAll();
 							showGameListDialog(gameList);
 						} else {
 							showToastShort("没有最新的比赛数据");
@@ -419,8 +434,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 		int groupAScore = 0;
 		int groupBScore = 0;
-		RecordDb db = new RecordDb(this);
-		List<Record> recordList = db.getAll(mGame);
+		List<Record> recordList = mRecordDb.getAll(mGame);
 		for (Record record : recordList) {
 			// 记录坐标
 			if (!TextUtils.isEmpty(record.coordinate)) {
@@ -465,26 +479,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void saveGameData(List<Game> gameList) {
-		GameDb gameDb = new GameDb(this);
-		gameDb.saveAll(gameList);
+		mGameDb.saveAll(gameList);
 
-		GroupDb groupDb = new GroupDb(this);
-		groupDb.clearAllData();
-		
-		MemberDb memberDb = new MemberDb(this);
-		memberDb.clearAllData();
-		
 		for (Game game : gameList) {
 			if (game != null) {
 				List<Group> groupList = game.groupList;
 				if (groupList != null && groupList.size() > 0) {
-					groupDb.saveAll(groupList, game);
+					mGroupDb.saveAll(groupList, game);
 					for (Group group : groupList) {
 						if (group != null) {
 							List<Member> memberList = group.memberList;
 							
 							if (memberList != null && memberList.size() > 0) {
-								memberDb.saveAll(memberList, group, game);
+								mMemberDb.saveAll(memberList, group, game);
 							}
 						}
 					}
@@ -495,12 +502,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private void loadActionData() {
 		// 加载动作数据
-		ActionDb db = new ActionDb(this);
-		if (!db.isHasData()) {
-			db.insertSampleData();
+		if (!mActionDb.isHasData()) {
+			mActionDb.insertSampleData();
 		}
 		
-		mActionList = db.getAll();
+		mActionList = mActionDb.getAll();
 		for (Action action : mActionList) {
 			mActionMap.put(action.id, action);
 		}
@@ -555,7 +561,45 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void undoGameRecord() {
+		Record record = mRecordDb.getLastestRecord(mGame.gId);
+		if (record != null) {
+			int res = mRecordDb.delete(record.id);
+			if (res > 0) {
+				showToastShort(getUndoSuccessToast(record));
+				initCourtRecord();
+			} else {
+				showToastShort("撤销失败");
+			}
+		} else {
+			showToastShort("撤销失败，暂无比赛记录");
+		}
+	}
+	
+	private String getUndoSuccessToast(Record record) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("已成功撤销 ");
+		if (record.groupId == mGroupA.groupId) {
+			builder.append(mGroupA.groupName).append(" ");
+			for (Member member : mGroupAMemberList) {
+				if (member.memberId == record.memberId) {
+					builder.append(member.name).append("(").append(member.number).append(") ");
+					break;
+				}
+			}
+		} else if (record.groupId == mGroupB.groupId) {
+			builder.append(mGroupB.groupName).append(" ");
+			for (Member member : mGroupBMemberList) {
+				if (member.memberId == record.memberId) {
+					builder.append(member.name).append("(").append(member.number).append(") ");
+					break;
+				}
+			}
+		}
+		Integer actionId = Integer.valueOf((int)record.actionId);
+		builder.append(mActionMap.get(actionId).name);
+		builder.append("记录");
 		
+		return builder.toString();
 	}
 
 	private void showFoulDialog(final int clickPos) {
@@ -613,8 +657,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 成员记录次数map
 		Map<Long, Integer> mMemberActionMap = new HashMap<Long, Integer>();
 		
-		RecordDb db = new RecordDb(this);
-		List<Record> recordList = db.getAll(mGame, 28);
+		List<Record> recordList = mRecordDb.getAll(mGame, 28);
 		for (Record record : recordList) {
 			Integer memberActionCount = mMemberActionMap.get(record.memberId);
 			if (memberActionCount == null) {
@@ -686,14 +729,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			
 			resetCourtPositions();
 		
-			RecordDb db = new RecordDb(this);
-			db.clearGameDataById(mGame.gId);
-			
-			PlayingTimeDb playingTimeDb = new PlayingTimeDb(this);
-			playingTimeDb.clearGameDataById(mGame.gId);
-			
-			GameTimeDb gameTimeDb = new GameTimeDb(this);
-			gameTimeDb.clearGameDataById(mGame.gId);
+			mRecordDb.clearGameDataById(mGame.gId);
+			mPlayingTimeDb.clearGameDataById(mGame.gId);
+			mGameTimeDb.clearGameDataById(mGame.gId);
 		}
 	}
 	
@@ -936,19 +974,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		mGameTime = System.currentTimeMillis();
 		
-		// 记录比赛开始时间
-		GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
-		
-		// 记录首发球员上场时间
-		PlayingTimeDb playingTimeDb = new PlayingTimeDb(getActivity());
-		
+		// 记录比赛开始时间和记录首发球员上场时间
 		if (mRoles.contains(1)) {// 记录A队数据
-			gameTimeDb.startOrContinueGame(mGame, mGroupA, mGameTime);
-			playingTimeDb.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+			mGameTimeDb.startOrContinueGame(mGame, mGroupA, mGameTime);
+			mPlayingTimeDb.startOrContinueGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
 		} 
 		if (mRoles.contains(2)) {// 记录B队数据
-			gameTimeDb.startOrContinueGame(mGame, mGroupB, mGameTime);
-			playingTimeDb.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+			mGameTimeDb.startOrContinueGame(mGame, mGroupB, mGameTime);
+			mPlayingTimeDb.startOrContinueGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
 		}
 		if (mRoles.contains(3)) {// 记录创新数据
 			// 无需处理
@@ -995,8 +1028,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 							recordList.add(record);
 						}
 						
-						RecordDb db = new RecordDb(getActivity());
-						db.saveAll(recordList);
+						mRecordDb.saveAll(recordList);
 					}
 				}
 				
@@ -1232,8 +1264,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private void addMemberDataStatContent(Map<Long, Map<Integer, Integer>> mMemberActionMap, List<DataStat> list, List<Member> memberList, Group group) {
 		
-		PlayingTimeDb db = new PlayingTimeDb(this);
-		List<PlayingTime> playingTimeList = db.getGroupMemberPlayingTime(mGame, group);
+		List<PlayingTime> playingTimeList = mPlayingTimeDb.getGroupMemberPlayingTime(mGame, group);
 		Map<Long, Long> playingTimeMap = new HashMap<Long, Long>();
 		for (PlayingTime playingTime : playingTimeList) {
 			String endTime = playingTime.endTime;
@@ -1431,23 +1462,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mCountDown.stop();
 		}
 		
-		GameDb gameDb = new GameDb(this);
-		gameDb.clearAllData();
-		
-		GroupDb groupDb = new GroupDb(this);
-		groupDb.clearAllData();
-		
-		MemberDb memberDb = new MemberDb(this);
-		memberDb.clearAllData();
-		
-		RecordDb recordDb = new RecordDb(this);
-		recordDb.clearAllData();
-		
-		PlayingTimeDb playingTimeDb = new PlayingTimeDb(this);
-		playingTimeDb.clearAllData();
-		
-		GameTimeDb gameTimeDb = new GameTimeDb(this);
-		gameTimeDb.clearAllData();
+		// 清空数据库表记录
+		mGameDb.clearAllData();
+		mGroupDb.clearAllData();
+		mMemberDb.clearAllData();
+		mRecordDb.clearAllData();
+		mPlayingTimeDb.clearAllData();
+		mGameTimeDb.clearAllData();
 		
 		IApplication.hasStart = false;
 //		finish();
@@ -1619,14 +1640,18 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	public void setCurrentRecordCoordinate(Action action, String coordinate) {
-		String[] split = coordinate.split(",");
-		
-		if (split.length > 1) {
-			int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+		if (!TextUtils.isEmpty(coordinate)) {
+			String[] split = coordinate.split(",");
 			
-			mCourtPositions.set(position, action.type);
-			mCourtAdapter.notifyDataSetChanged();
+			if (split.length > 1) {
+				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+				
+				mCourtPositions.set(position, action.type);
+				mCourtAdapter.notifyDataSetChanged();
+				
+			}
 		}
+		mIvUndo.setVisibility(View.VISIBLE);
 	}
 
 	@Override

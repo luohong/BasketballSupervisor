@@ -256,4 +256,44 @@ public class RecordDb extends BaseDb {
 		}
 	}
 
+	public Record getLastestRecord(long gameId) {
+		Record record = null;
+		Cursor cursor = null;
+		try {
+			checkDb();
+
+			String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.RECORD_ID);
+			String[] selectionArgs = new String[] { String.valueOf(gameId), String.valueOf(-1) };
+
+			cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table._ID + " desc limit 1");
+			if (cursor != null && cursor.moveToFirst()) {
+				record = (Record) parseCursor(cursor);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return record;
+	}
+
+	public int delete(long id) {
+		int res = 0;
+		try {
+			checkDb();
+			
+			String whereClause = String.format(" %s = ? ", Table._ID);
+			String[] whereArgs = new String[] { String.valueOf(id) };
+			
+			res = db.delete(Table.TABLE_NAME, whereClause, whereArgs);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeDbAndCursor();
+		}
+		return res;
+	}
+
 }

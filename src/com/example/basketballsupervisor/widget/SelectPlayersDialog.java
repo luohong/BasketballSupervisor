@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.android.framework.core.widget.BaseDialog;
 import com.android.framework.core.widget.ConfirmDialog;
 import com.example.basketballsupervisor.R;
+import com.example.basketballsupervisor.activity.MainActivity;
 import com.example.basketballsupervisor.db.RecordDb;
 import com.example.basketballsupervisor.model.Action;
 import com.example.basketballsupervisor.model.Game;
@@ -66,9 +67,11 @@ public class SelectPlayersDialog extends BaseDialog {
 	private Group mGroupA;
 	private Group mGroupB;
 	private Map<Long, Integer> mMemberActionMap;
+	private MainActivity mMainActivity;
 
 	public SelectPlayersDialog(Context context, int mode) {
 		super(context);
+		mMainActivity = (MainActivity) context;
 		mMode = mode;
 	}
 
@@ -195,6 +198,8 @@ public class SelectPlayersDialog extends BaseDialog {
 		if (mRoles.contains(3)) {// 记录创新数据
 			// 不处理
 		}
+		
+		mMainActivity.setCurrentRecordCoordinate(action, mCoordinate);
 		
 		Toast.makeText(context, "记录成功", Toast.LENGTH_SHORT).show();
 	}

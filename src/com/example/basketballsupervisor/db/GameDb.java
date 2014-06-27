@@ -97,7 +97,7 @@ public class GameDb extends BaseDb {
         Cursor cursor = null;
         try {
         	checkDb();
-            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, null, null, null, null, null);
+            cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, null, null, null, null, Table.GAME_ID + " desc");
             while (cursor != null && cursor.moveToNext()) {
             	Game game = (Game)parseCursor(cursor);
             	gameList.add(game);
@@ -119,7 +119,9 @@ public class GameDb extends BaseDb {
 			if (gameList != null && gameList.size() > 0) {
 				clearAllData();
 				for (Game game : gameList) {
-					insert(game);
+					if (!exist(game.gId)) {
+						insert(game);
+					}
 				}
 			}
 			
@@ -128,6 +130,27 @@ public class GameDb extends BaseDb {
 		} finally {
 			endTransaction();
 		}
+	}
+
+	private boolean exist(long id) {
+		boolean exist = false;
+		Cursor cursor = null;
+		try {
+			checkDb();
+
+			String selection = String.format(" %s = ? ", Table.GAME_ID);
+			String[] selectionArgs = new String[] { String.valueOf(id) };
+
+			cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table._ID + " asc limit 1");
+			exist = (cursor != null && cursor.getCount() > 0);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return exist;
 	}
 
 	public void insert(Game game) {
