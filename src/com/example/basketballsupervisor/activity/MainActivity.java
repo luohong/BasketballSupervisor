@@ -1587,7 +1587,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		running = false;
 		pausing = false;
 		
-		if (mCountDown == null) {
+		if (mCountDown != null) {
 			mCountDown.reset();
 		}
 
@@ -1780,6 +1780,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		int timeout = getTimeout();
 		mCountDown = new CountDown(mRunningTime, timeout, 1000);
+		mCountDown.setOnCountDownListener(this);
 		mCountDown.start();// 计时开始
 	}
 	
