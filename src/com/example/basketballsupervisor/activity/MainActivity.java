@@ -1924,19 +1924,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		mGameTime = System.currentTimeMillis();
 		
-		// 记录比赛开始时间
-		GameTimeDb gameTimeDb = new GameTimeDb(getActivity());
-		
-		// 记录首发球员上场时间
-		PlayingTimeDb plaingTimeDb = new PlayingTimeDb(getActivity());
-		
+		// 记录比赛开始时间和记录首发球员上场时间
 		if (mRoles.contains(1)) {// 记录A队数据
-			gameTimeDb.pauseOrEndGame(mGame, mGroupA, mGameTime);
-			plaingTimeDb.pauseOrEndGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
+			mGameTimeDb.pauseOrEndGame(mGame, mGroupA, mGameTime);
+			mPlayingTimeDb.pauseOrEndGame(mGame, mGroupA, mGroupAPlayingMemberList, mGameTime);
 		} 
 		if (mRoles.contains(2)) {// 记录B队数据
-			gameTimeDb.pauseOrEndGame(mGame, mGroupB, mGameTime);
-			plaingTimeDb.pauseOrEndGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
+			mGameTimeDb.pauseOrEndGame(mGame, mGroupB, mGameTime);
+			mPlayingTimeDb.pauseOrEndGame(mGame, mGroupB, mGroupBPlayingMemberList, mGameTime);
 		}
 		if (mRoles.contains(3)) {// 记录创新数据
 			// 无需处理
