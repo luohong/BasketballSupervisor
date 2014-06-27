@@ -186,7 +186,7 @@ public class RecordDb extends BaseDb {
 		try {
 			if (recordList != null && recordList.size() > 0) {
 				for (Record record : recordList) {
-					if (!exist(record.id)) {
+					if (record.recordId > -1 && !exist(record.recordId)) {
 						insert(record);
 					}
 				}
@@ -207,7 +207,7 @@ public class RecordDb extends BaseDb {
 			String selection = String.format(" %s = ? ", Table.RECORD_ID);
 			String[] selectionArgs = new String[] { String.valueOf(id) };
 
-			cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, "order by " + Table._ID + "asc limit 1");
+			cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table._ID + " asc limit 1");
 			exist = (cursor != null && cursor.getCount() > 0);
 		} catch (Exception e) {
 			e.printStackTrace();

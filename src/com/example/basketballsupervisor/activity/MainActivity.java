@@ -96,6 +96,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private TextView mTvGameStart, mTvGameTime, mTvGameFirstHalf, mTvGameSecondHalf;
 	private TextView mTvGroupAName, mTvGroupBName;
 	private TextView mTvGroupAScore, mTvGroupBScore;
+	private ImageView mIvUndo;
 	private ImageView mIvSubstitueLeft, mIvSubstitueRight;
 	private ImageView mIvPauseLeft, mIvPauseRight;
 	private ImageView mIvInfoLeft, mIvInfoRight;
@@ -164,6 +165,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mTvGameFirstHalf = (TextView) findViewById(R.id.tv_game_first_half);
 		mTvGameSecondHalf = (TextView) findViewById(R.id.tv_game_second_half);
 		
+		mIvUndo = (ImageView) findViewById(R.id.iv_undo);
+		
 		mTvGroupAName = (TextView) findViewById(R.id.tv_group_a_name);
 		mTvGroupBName = (TextView) findViewById(R.id.tv_group_b_name);
 		
@@ -206,6 +209,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		updateGroupAScore(0);
 		updateGroupBScore(0);
+		
+		mIvUndo.setVisibility(View.GONE);
 		
 		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
 		mGvCourt.setAdapter(mCourtAdapter);
@@ -286,6 +291,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		boolean hasSelectedGame = mGame != null;
 		if (game != null && (!hasSelectedGame || game.gId != mSelectedGameId)) {
 			mGame = game;
+			isRequiredUpdateGameRecord = true;
 			
 			mSelectedGameId = mGame.gId;
 			mSpUtil.setSelectedGameId(mSelectedGameId, hasSelectedGame);
@@ -404,10 +410,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
 		mIvPauseRight.setImageResource(R.drawable.btn_pause);
 		
-		refreshCourtRecord();
+		initCourtRecord();
 	}
 
-	private List<Record> refreshCourtRecord() {
+	private List<Record> initCourtRecord() {
 		
 		resetCourtPositions();
 
@@ -441,6 +447,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		// 更新记录得分
 		updateGroupAScore(groupAScore);
 		updateGroupBScore(groupBScore);
+		
+		mIvUndo.setVisibility(recordList.size() > 0 ? View.VISIBLE : View.GONE);
 		
 		return recordList;
 	}
@@ -540,7 +548,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		case R.id.ll_upload:
 			uploadGameData();
 			break;
+		case R.id.iv_undo:
+			undoGameRecord();
+			break;
 		}
+	}
+
+	private void undoGameRecord() {
+		
 	}
 
 	private void showFoulDialog(final int clickPos) {
@@ -942,11 +957,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	private void updateGameRecord() {
 		// 更新比赛记录，显示统计信息表
-		boolean allowUpdate = running || pausing;
-		if (!allowUpdate) {
-			showToastShort("比赛尚未开始，不允许显示统计列表");
-			return;
-		}
+//		boolean allowUpdate = running || pausing;
+//		if (!allowUpdate) {
+//			showToastShort("比赛尚未开始，不允许显示统计列表");
+//			return;
+//		}
 		
 		if (isRequiredUpdateGameRecord) {
 			final QueryBBGameRecordRequest request = new QueryBBGameRecordRequest(mGame.gId);
@@ -1003,7 +1018,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void showStatPanel() {
-		List<Record> recordList = refreshCourtRecord();
+		List<Record> recordList = initCourtRecord();
 		List<DataStat> list = initDataStat(recordList);
 		
 		DataStatDialog dialog = new DataStatDialog(this, list);

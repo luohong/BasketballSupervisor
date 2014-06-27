@@ -23,6 +23,7 @@ public class MemberDb extends BaseDb {
 
 		public static final String TABLE_NAME = "tb_member";
 
+		public static final String MEMBER_ID = "m_id";
 		public static final String GAME_ID = "g_id";
 		public static final String GROUP_ID = "t_id"; 
 		
@@ -33,7 +34,7 @@ public class MemberDb extends BaseDb {
 
 		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
 
-		public static final String[] PROJECTION = { _ID, GAME_ID, GROUP_ID, NAME, NUMBER, SITE, IS_LEADER };
+		public static final String[] PROJECTION = { _ID, MEMBER_ID, GAME_ID, GROUP_ID, NAME, NUMBER, SITE, IS_LEADER };
 	}
 	
 	public MemberDb(Context context) {
@@ -49,7 +50,8 @@ public class MemberDb extends BaseDb {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(CREATE_TABLE_PREFIX).append(Table.TABLE_NAME).append(BRACKET_LEFT);
-		sb.append(Table._ID).append(COLUMN_TYPE.LONG).append(PRIMARY_KEY).append(COMMA);
+		sb.append(Table._ID).append(COLUMN_TYPE.INTEGER).append(PRIMARY_KEY).append(COMMA);
+		sb.append(Table.MEMBER_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.GAME_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.GROUP_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.NAME).append(COLUMN_TYPE.TEXT).append(COMMA);
@@ -69,7 +71,7 @@ public class MemberDb extends BaseDb {
 	protected Object parseCursor(Cursor cursor) {
 		Member member = new Member();
 		
-		member.memberId = cursor.getLong(cursor.getColumnIndexOrThrow(Table._ID));
+		member.memberId = cursor.getLong(cursor.getColumnIndexOrThrow(Table.MEMBER_ID));
 		member.name = cursor.getString(cursor.getColumnIndexOrThrow(Table.NAME));
 		member.number = cursor.getString(cursor.getColumnIndexOrThrow(Table.NUMBER));
 		member.site = cursor.getString(cursor.getColumnIndexOrThrow(Table.SITE));
@@ -111,7 +113,6 @@ public class MemberDb extends BaseDb {
 					insert(member, group, game);
 				}
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -124,7 +125,7 @@ public class MemberDb extends BaseDb {
 			checkDb();
 			
 			ContentValues values = new ContentValues();
-			values.put(Table._ID, member.memberId);
+			values.put(Table.MEMBER_ID, member.memberId);
 			values.put(Table.GROUP_ID, group.groupId);
 			values.put(Table.GAME_ID, game.gId);
 			values.put(Table.NAME, member.name);

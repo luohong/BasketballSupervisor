@@ -23,6 +23,7 @@ public class GameDb extends BaseDb {
 
 		public static final String TABLE_NAME = "tb_game";
 
+		public static final String GAME_ID = "g_id"; 
 		public static final String PLATFORM_ID = "p_id"; 
 		
 		public static final String NAME = "name"; 
@@ -36,7 +37,7 @@ public class GameDb extends BaseDb {
 
 		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
 
-		public static final String[] PROJECTION = { _ID, PLATFORM_ID, NAME, REMARK, /**GROUP_LIST,**/ ROLE, TIME, LOCATION, SECTION, SECTION_TIME };
+		public static final String[] PROJECTION = { _ID, GAME_ID, PLATFORM_ID, NAME, REMARK, /**GROUP_LIST,**/ ROLE, TIME, LOCATION, SECTION, SECTION_TIME };
 	}
 	
 	public GameDb(Context context) {
@@ -52,7 +53,8 @@ public class GameDb extends BaseDb {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(CREATE_TABLE_PREFIX).append(Table.TABLE_NAME).append(BRACKET_LEFT);
-		sb.append(Table._ID).append(COLUMN_TYPE.LONG).append(PRIMARY_KEY).append(COMMA);
+		sb.append(Table._ID).append(COLUMN_TYPE.INTEGER).append(PRIMARY_KEY).append(COMMA);
+		sb.append(Table.GAME_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.PLATFORM_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.NAME).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.REMARK).append(COLUMN_TYPE.TEXT).append(COMMA);
@@ -75,7 +77,7 @@ public class GameDb extends BaseDb {
 	protected Object parseCursor(Cursor cursor) {
 		Game game = new Game();
 		
-		game.gId = cursor.getLong(cursor.getColumnIndexOrThrow(Table._ID));
+		game.gId = cursor.getLong(cursor.getColumnIndexOrThrow(Table.GAME_ID));
 		game.pId = cursor.getLong(cursor.getColumnIndexOrThrow(Table.PLATFORM_ID));
 		game.gameName = cursor.getString(cursor.getColumnIndexOrThrow(Table.NAME));
 		game.gameRemark = cursor.getString(cursor.getColumnIndexOrThrow(Table.REMARK));
@@ -133,7 +135,7 @@ public class GameDb extends BaseDb {
 			checkDb();
 			
 			ContentValues values = new ContentValues();
-			values.put(Table._ID, game.gId);
+			values.put(Table.GAME_ID, game.gId);
 			values.put(Table.PLATFORM_ID, game.pId);
 			values.put(Table.NAME, game.gameName);
 			values.put(Table.REMARK, game.gameRemark);

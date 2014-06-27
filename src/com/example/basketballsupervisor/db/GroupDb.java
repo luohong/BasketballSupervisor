@@ -22,6 +22,7 @@ public class GroupDb extends BaseDb {
 
 		public static final String TABLE_NAME = "tb_group";
 
+		public static final String GROUP_ID = "group_id";
 		public static final String GAME_ID = "g_id";
 		
 		public static final String NAME = "name"; 
@@ -29,7 +30,7 @@ public class GroupDb extends BaseDb {
 
 		public static final String DEFAULT_SORT_ORDER = Table._ID + " DESC";
 
-		public static final String[] PROJECTION = { _ID, GAME_ID, NAME, SLOGAN };
+		public static final String[] PROJECTION = { _ID, GROUP_ID, GAME_ID, NAME, SLOGAN };
 	}
 	
 	public GroupDb(Context context) {
@@ -45,7 +46,8 @@ public class GroupDb extends BaseDb {
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append(CREATE_TABLE_PREFIX).append(Table.TABLE_NAME).append(BRACKET_LEFT);
-		sb.append(Table._ID).append(COLUMN_TYPE.LONG).append(PRIMARY_KEY).append(COMMA);
+		sb.append(Table._ID).append(COLUMN_TYPE.INTEGER).append(PRIMARY_KEY).append(COMMA);
+		sb.append(Table.GROUP_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.GAME_ID).append(COLUMN_TYPE.LONG).append(COMMA);
 		sb.append(Table.NAME).append(COLUMN_TYPE.TEXT).append(COMMA);
 		sb.append(Table.SLOGAN).append(COLUMN_TYPE.TEXT);
@@ -62,7 +64,7 @@ public class GroupDb extends BaseDb {
 	protected Object parseCursor(Cursor cursor) {
 		Group group = new Group();
 		
-		group.groupId = cursor.getLong(cursor.getColumnIndexOrThrow(Table._ID));
+		group.groupId = cursor.getLong(cursor.getColumnIndexOrThrow(Table.GROUP_ID));
 		group.Slogan = cursor.getString(cursor.getColumnIndexOrThrow(Table.SLOGAN));
 		group.groupName = cursor.getString(cursor.getColumnIndexOrThrow(Table.NAME));
 		
@@ -102,7 +104,6 @@ public class GroupDb extends BaseDb {
 					insert(group, game);
 				}
 			}
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -115,7 +116,7 @@ public class GroupDb extends BaseDb {
 			checkDb();
 			
 			ContentValues values = new ContentValues();
-			values.put(Table._ID, group.groupId);
+			values.put(Table.GROUP_ID, group.groupId);
 			values.put(Table.GAME_ID, game.gId);
 			values.put(Table.NAME, group.groupName);
 			values.put(Table.SLOGAN, group.Slogan);
