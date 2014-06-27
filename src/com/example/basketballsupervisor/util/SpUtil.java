@@ -79,10 +79,12 @@ public class SpUtil {
 		return user;
 	}
 
-	public void setSelectedGameId(long gId) {
+	public void setSelectedGameId(long gId, boolean hasSelectedGame) {
 		getEdit().putLong("selected_game_id", gId).commit();
 		
-		resetGameState();
+		if (hasSelectedGame) {
+			resetGameState();
+		}
 	}
 	
 	public void resetGameState() {
@@ -152,7 +154,7 @@ public class SpUtil {
 	}
 
 	public void setLastGameTime(int i) {
-		getEdit().putInt("last_game_time", 0).commit();
+		getEdit().putInt("last_game_time", i).commit();
 	}
 
 	public List<Integer> getQuarterTimeList() {
@@ -168,6 +170,18 @@ public class SpUtil {
 		}
 		
 		return mQuarterTimeList;
+	}
+
+	public void setQuarterTimeList(List<Integer> mQuarterTimeList) {
+		StringBuffer times = new StringBuffer();		
+		for (Integer time : mQuarterTimeList) {
+			times.append(time).append(",");
+		}
+		
+		if (times.length() > 0) {
+			times.deleteCharAt(times.length() - 1);
+		}
+		getEdit().putString("quarterTimeList", times.toString()).commit();
 	}
 	
 }

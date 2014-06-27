@@ -283,11 +283,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	public void onGameItemClick(Game game) {
-		if (game != null && (mGame == null || game.gId != mSelectedGameId)) {
+		boolean hasSelectedGame = mGame != null;
+		if (game != null && (!hasSelectedGame || game.gId != mSelectedGameId)) {
 			mGame = game;
 			
 			mSelectedGameId = mGame.gId;
-			mSpUtil.setSelectedGameId(mGame.gId);
+			mSpUtil.setSelectedGameId(mSelectedGameId, hasSelectedGame);
 			
 			GroupDb groupDb = new GroupDb(this);
 			List<Group> groupList = groupDb.getGameGroups(mGame.gId);
@@ -407,14 +408,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private List<Record> refreshCourtRecord() {
+		
+		resetCourtPositions();
+
 		int groupAScore = 0;
 		int groupBScore = 0;
-		mGroupAScore = mGroupBScore = 0;
-		
-		for (int i = 0; i < mCourtPositions.size(); i++) {
-			mCourtPositions.set(i, null);
-		}
-		
 		RecordDb db = new RecordDb(this);
 		List<Record> recordList = db.getAll(mGame);
 		for (Record record : recordList) {
@@ -445,6 +443,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		updateGroupBScore(groupBScore);
 		
 		return recordList;
+	}
+
+	private void resetCourtPositions() {
+		mGroupAScore = mGroupBScore = 0;
+		updateGroupAScore(mGroupAScore);
+		updateGroupBScore(mGroupBScore);
+		
+		for (int i = 0; i < mCourtPositions.size(); i++) {
+			mCourtPositions.set(i, null);
+		}
+		mCourtAdapter.notifyDataSetChanged();
 	}
 
 	private void saveGameData(List<Game> gameList) {
@@ -659,6 +668,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			if (isRequiredRecord) {
 				mSpUtil.setGameStateRunning(running);
 			}
+			
+			resetCourtPositions();
 		
 			RecordDb db = new RecordDb(this);
 			db.clearGameDataById(mGame.gId);
@@ -808,15 +819,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private void onRestoreGameState() {
 		
-		// 恢复比赛现场
-		running = mSpUtil.getGameStateRunning();
-		pausing = mSpUtil.getGameStatePausing();
-		
-		if (pausing) {
-			mIvPauseLeft.setImageResource(R.drawable.btn_continue);
-			mIvPauseRight.setImageResource(R.drawable.btn_continue);
-		}
-		
 		if (mRoles.contains(1)) {
 			String memberIds = mSpUtil.getGroupAPlayingMemberList();
 			Log.d(TAG, "onRestoreGameState()... GroupA memberIds:" + memberIds);
@@ -844,11 +846,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mCountDown.setOnCountDownListener(this);
 		
 		onCountDownIntervalReach(lastGameTime);
-		
+
+		// 恢复比赛现场
+		running = mSpUtil.getGameStateRunning();
+		pausing = mSpUtil.getGameStatePausing();
 		if (running) {
 			doStartGame();
 		} else if (pausing) {
 			doStartGame();
+			
+			mIvPauseLeft.setImageResource(R.drawable.btn_continue);
+			mIvPauseRight.setImageResource(R.drawable.btn_continue);
 			mCountDown.setPauseWork(true);
 		}
 	}
@@ -1720,20 +1728,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 	
 	protected void restartCountDown() {		
-		int timeout = 0;
-
-		StringBuffer times = new StringBuffer();		
-		for (Integer time : mQuarterTimeList) {
-			timeout = timeout + time;
-			times.append(time).append(",");
-		}
-		timeout = timeout * 60 * 1000;// 计算比赛时间
+		mSpUtil.setQuarterTimeList(mQuarterTimeList);
 		
-		if (times.length() > 0) {
-			times.deleteCharAt(times.length() - 1);
-		}
-		SpUtil.getInstance(this).getEdit().putString("quarterTimeList", times.toString()).commit();
-		
+		int timeout = getTimeout();
 		mCountDown = new CountDown(mRunningTime, timeout, 1000);
 		mCountDown.start();// 计时开始
 	}
