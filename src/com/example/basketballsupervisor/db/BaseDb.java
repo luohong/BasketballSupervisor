@@ -1,5 +1,7 @@
 package com.example.basketballsupervisor.db;
 
+import com.example.basketballsupervisor.db.RecordDb.Table;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;

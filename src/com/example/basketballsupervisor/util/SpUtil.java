@@ -1,11 +1,17 @@
 package com.example.basketballsupervisor.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.example.basketballsupervisor.config.Config;
+import com.example.basketballsupervisor.model.Member;
 import com.example.basketballsupervisor.model.User;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.text.TextUtils;
+import android.util.Log;
 
 /**
  * 
@@ -18,6 +24,8 @@ import android.content.SharedPreferences.Editor;
  */
 public class SpUtil {
 	private static final String NAME = "preferences";
+
+	private static final String TAG = SpUtil.class.getSimpleName();
 
 	public static SpUtil instance = null;
 
@@ -54,7 +62,7 @@ public class SpUtil {
 	}
 
 	public void logout(){
-		getSp().edit().clear().commit();
+		getEdit().clear().commit();
 	}
 	
 	public void setUser(User user) {
@@ -69,6 +77,97 @@ public class SpUtil {
 			user = new User();
 		}
 		return user;
+	}
+
+	public void setSelectedGameId(long gId) {
+		getEdit().putLong("selected_game_id", gId).commit();
+		
+		resetGameState();
+	}
+	
+	public void resetGameState() {
+		// 清除之前的比赛状态
+		setGameStateRunning(false);
+		setGameStatePausing(false);
+		setGroupAPlayingMemberList(null);
+		setGroupBPlayingMemberList(null);
+		setLastGameTime(0);
+	}
+
+	public long getSelectedGameId() {
+		return getSp().getLong("selected_game_id", -1);
+	}
+
+	public void setGameStateRunning(boolean running) {
+		getEdit().putBoolean("game_state_running", running).commit();
+	}
+
+	public void setGameStatePausing(boolean pausing) {
+		getEdit().putBoolean("game_state_pausing", pausing).commit();
+	}
+
+	public boolean getGameStateRunning() {
+		return getSp().getBoolean("game_state_running", false);
+	}
+
+	public boolean getGameStatePausing() {
+		return getSp().getBoolean("game_state_pausing", false);
+	}
+
+	public void setGroupAPlayingMemberList(List<Member> mGroupAPlayingMemberList) {
+		String memberIds = getGroupMemberIds(mGroupAPlayingMemberList);
+		Log.d(TAG, "onSavePlayingPlayers()... GroupA memberIds:" + memberIds);
+		getEdit().putString("GroupAPlayingMemberList", memberIds).commit();
+	}
+	
+	public void setGroupBPlayingMemberList(List<Member> mGroupBPlayingMemberList) {
+		String memberIds = getGroupMemberIds(mGroupBPlayingMemberList);
+		Log.d(TAG, "onSavePlayingPlayers()... GroupA memberIds:" + memberIds);
+		getEdit().putString("GroupAPlayingMemberList", memberIds).commit();
+	}
+	
+	private String getGroupMemberIds(List<Member> mGroupPlayingMemberList) {
+		StringBuffer memberIds = new StringBuffer();
+		if (mGroupPlayingMemberList != null && mGroupPlayingMemberList.size() > 0) {
+			for (Member member : mGroupPlayingMemberList) {
+				memberIds.append(member.memberId).append(",");
+			}
+			if (memberIds.length() > 0) {
+				memberIds.deleteCharAt(memberIds.length() - 1);
+			}
+		}
+		return memberIds.toString();
+	}
+
+	public String getGroupAPlayingMemberList() {
+		return getSp().getString("GroupAPlayingMemberList", "");
+	}
+
+	public String getGroupBPlayingMemberList() {
+		return getSp().getString("GroupBPlayingMemberList", "");
+	}
+
+	public int getLastGameTime() {
+		return getSp().getInt("last_game_time", 0);
+	}
+
+	public void setLastGameTime(int i) {
+		getEdit().putInt("last_game_time", 0).commit();
+	}
+
+	public List<Integer> getQuarterTimeList() {
+		List<Integer> mQuarterTimeList = new ArrayList<Integer>();
+		
+		String times = getSp().getString("quarterTimeList", "");
+		if (!TextUtils.isEmpty(times)) {
+			String[] time = times.split(",");
+			for (int i = 0; i < time.length; i++) {
+				int t = Integer.parseInt(time[i]);
+				mQuarterTimeList.add(t);
+			}
+		}
+		
+		return mQuarterTimeList;
 	}
 	
 }

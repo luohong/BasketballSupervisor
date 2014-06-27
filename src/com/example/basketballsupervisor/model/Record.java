@@ -10,6 +10,7 @@ public class Record implements Serializable {
 	}
 	
 	public long id;
+	public long recordId = -1;// 从服务器端返回的记录ID
 	public long gameId;
 	public long groupId;
 	public long memberId;
@@ -24,7 +25,7 @@ public class Record implements Serializable {
 	}
 
 	public Record(GameRecord gameRecord) {
-//		id = gameRecord.id;
+		recordId = gameRecord.id;
 		gameId = gameRecord.game_id;
 		groupId = gameRecord.group_id;
 		memberId = gameRecord.member_id;

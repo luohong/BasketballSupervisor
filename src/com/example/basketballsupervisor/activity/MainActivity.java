@@ -201,6 +201,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mCourtPositions.add(null);
 		}
 		
+		mTvGroupAName.setText("A队");
+		mTvGroupBName.setText("B队");
+		
+		updateGroupAScore(0);
+		updateGroupBScore(0);
+		
 		mCourtAdapter = new CourtAdapter(this, mCourtPositions);
 		mGvCourt.setAdapter(mCourtAdapter);
 		
@@ -253,7 +259,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		List<Game> gameList = gameDb.getAll();
 		if (gameList != null && gameList.size() > 0) {
 			Game selectedGame = null;
-			mSelectedGameId = mSpUtil.getSp().getLong("selected_game_id", -1);
+			mSelectedGameId = mSpUtil.getSelectedGameId();
 			if (mSelectedGameId > -1) {
 				for (Game game : gameList) {
 					if (game.gId == mSelectedGameId) {
@@ -264,9 +270,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			}
 			
 			if (selectedGame != null) {
-				mGame = selectedGame;
-				
-				onGameItemClick(mGame);
+				onGameItemClick(selectedGame);
 			} else {
 				showGameListDialog(gameList);
 			}
@@ -279,9 +283,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	public void onGameItemClick(Game game) {
-		mGame = game;
-		if (mGame != null) {
-			mSpUtil.getEdit().putLong("selected_game_id", mGame.gId).commit();
+		if (game != null && (mGame == null || game.gId != mSelectedGameId)) {
+			mGame = game;
+			
+			mSelectedGameId = mGame.gId;
+			mSpUtil.setSelectedGameId(mGame.gId);
 			
 			GroupDb groupDb = new GroupDb(this);
 			List<Group> groupList = groupDb.getGameGroups(mGame.gId);
@@ -302,11 +308,12 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 					mGroupBMemberList = memberDb.getGroupMembers(mGroupB.groupId);		
 					mGroupB.memberList = mGroupBMemberList;
 				}
+			} else {
+				mGroupA = null;
+				mGroupB = null;
+				mGroupAMemberList = new ArrayList<Member>();
+				mGroupBMemberList = new ArrayList<Member>();
 			}
-			
-			// 恢复比赛现场
-			running = mSpUtil.getSp().getBoolean("game_state_running", false);
-			pausing = mSpUtil.getSp().getBoolean("game_state_pausing", false);
 			
 			onInitGameData();
 			onRestoreGameState();
@@ -326,9 +333,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 						if (gameList != null && gameList.size() > 0) {
 							showToastShort("球队数据获取成功");
 
-							mSpUtil.getEdit().putLong("selected_game_id", -1).commit();
-							mSelectedGameId = -1;
-							
 							saveGameData(gameList);
 							showGameListDialog(gameList);
 						} else {
@@ -357,39 +361,22 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private void onInitGameData() {
-		int drawable = R.drawable.st_07;		
-
-		int lastGameTime = mSpUtil.getSp().getInt("last_game_time", 0);
+		
+		mTvGameStart.setVisibility(View.VISIBLE);
+		if (mCountDown != null) {
+			mCountDown.stop();
+		}
+		
 		// 支持多种角色
 		if (mGame.role != null) {
 			mRoles = mGame.role;
 		}
-		mQuarterCount = mGame.section;
-		mQuarterTime = mGame.section_time;
-		
-		String times = SpUtil.getInstance(this).getSp().getString("quarterTimeList", "");
-		if (!TextUtils.isEmpty(times)) {
-			String[] time = times.split(",");
-			for (int i = 0; i < time.length; i++) {
-				int t = Integer.parseInt(time[i]);
-				mQuarterTimeList.add(t);
-			}
-		} else {
-			for (int i = 0; i < mQuarterCount; i++) {
-				mQuarterTimeList.add(mQuarterTime);
-			}
-		}
-		
-		int timeout = mQuarterCount * mQuarterTime * 60 * 1000;// 四节比赛，每节比赛10分钟
-		mCountDown = new CountDown(lastGameTime, timeout, 1000);
-		mCountDown.setOnCountDownListener(this);
-		
-		onCountDownIntervalReach(lastGameTime);
 		
 		if (mRoles.isEmpty()) {
 			mRoles.add(1);// 默认记录A队数据
 		}
-		
+
+		int drawable = R.drawable.st_07;		
 		if (mRoles.contains(1)) {// 记录A队数据
 			mTvGroupAName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, drawable);
 			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
@@ -403,26 +390,18 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mTvGroupBName.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
 		}
 		
+		// 比赛有4节，每节10分钟
+		mQuarterCount = mGame.section;
+		mQuarterTime = mGame.section_time;
+		
 		String groupAName = (mGroupA != null && !TextUtils.isEmpty(mGroupA.groupName)) ? mGroupA.groupName : "A队";
 		mTvGroupAName.setText(groupAName);
 		
 		String groupBName = (mGroupB != null && !TextUtils.isEmpty(mGroupB.groupName)) ? mGroupB.groupName : "B队";
 		mTvGroupBName.setText(groupBName);
 		
-//		if (running || pausing) {
-//			mGroupAScore = mSpUtil.getSp().getInt("group_a_score", 0);
-//			mGroupBScore = mSpUtil.getSp().getInt("group_b_score", 0);
-//		}
-//		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
-//		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
-		
-		if (pausing) {
-			mIvPauseLeft.setImageResource(R.drawable.btn_continue);
-			mIvPauseRight.setImageResource(R.drawable.btn_continue);
-		} else {
-			mIvPauseLeft.setImageResource(R.drawable.btn_pause);
-			mIvPauseRight.setImageResource(R.drawable.btn_pause);
-		}
+		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
+		mIvPauseRight.setImageResource(R.drawable.btn_pause);
 		
 		refreshCourtRecord();
 	}
@@ -678,17 +657,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (!running && !pausing) {
 			running = true;
 			if (isRequiredRecord) {
-				mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
+				mSpUtil.setGameStateRunning(running);
 			}
 		
 			RecordDb db = new RecordDb(this);
-			db.clearAllData();
+			db.clearGameDataById(mGame.gId);
 			
 			PlayingTimeDb playingTimeDb = new PlayingTimeDb(this);
-			playingTimeDb.clearAllData();
+			playingTimeDb.clearGameDataById(mGame.gId);
 			
 			GameTimeDb gameTimeDb = new GameTimeDb(this);
-			gameTimeDb.clearAllData();
+			gameTimeDb.clearGameDataById(mGame.gId);
 		}
 	}
 	
@@ -816,29 +795,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	protected void onSavePlayingPlayers() {
 		// 记录上场球员，在某种特殊条件下，因发生异常导致应用退出，用于重启应用恢复比赛现场
-		if (mRoles.contains(1) && mGroupAPlayingMemberList != null && mGroupAPlayingMemberList.size() > 0) {// 记录A队数据
-			StringBuffer memberIds = new StringBuffer();
-			for (Member member : mGroupAPlayingMemberList) {
-				memberIds.append(member.memberId).append(",");
-			}
-			if (memberIds.length() > 0) {
-				memberIds.deleteCharAt(memberIds.length() - 1);
-			}
-			String memberIdsStr = memberIds.toString();
-			Log.d(TAG, "onSavePlayingPlayers()... GroupA memberIds:" + memberIdsStr);
-			mSpUtil.getEdit().putString("GroupAPlayingMemberList", memberIdsStr).commit();
+		if (mRoles.contains(1)) {// 记录A队数据
+			mSpUtil.setGroupAPlayingMemberList(mGroupAPlayingMemberList);
 		} 
-		if (mRoles.contains(2) && mGroupBPlayingMemberList != null && mGroupBPlayingMemberList.size() > 0) {// 记录B队数据
-			StringBuffer memberIds = new StringBuffer();
-			for (Member member : mGroupBPlayingMemberList) {
-				memberIds.append(member.memberId).append(",");
-			}
-			if (memberIds.length() > 0) {
-				memberIds.deleteCharAt(memberIds.length() - 1);
-			}
-			String memberIdsStr = memberIds.toString();
-			Log.d(TAG, "onSavePlayingPlayers()... GroupB memberIds:" + memberIdsStr);
-			mSpUtil.getEdit().putString("GroupBPlayingMemberList", memberIdsStr).commit();
+		if (mRoles.contains(2)) {// 记录B队数据
+			mSpUtil.setGroupBPlayingMemberList(mGroupBPlayingMemberList);
 		} 
 		if (mRoles.contains(3)) {// 记录创新数据
 			// 不处理
@@ -847,49 +808,66 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private void onRestoreGameState() {
 		
+		// 恢复比赛现场
+		running = mSpUtil.getGameStateRunning();
+		pausing = mSpUtil.getGameStatePausing();
+		
+		if (pausing) {
+			mIvPauseLeft.setImageResource(R.drawable.btn_continue);
+			mIvPauseRight.setImageResource(R.drawable.btn_continue);
+		}
+		
 		if (mRoles.contains(1)) {
-			String memberIds = mSpUtil.getSp().getString("GroupAPlayingMemberList", "");
+			String memberIds = mSpUtil.getGroupAPlayingMemberList();
 			Log.d(TAG, "onRestoreGameState()... GroupA memberIds:" + memberIds);
 			
-			String[] ids = memberIds.split(",");
-			if (mGroupAPlayingMemberList == null) {
-				mGroupAPlayingMemberList = new ArrayList<Member>();
-			}
-			if (mGroupAMemberList != null && ids.length > 0) {
-				Arrays.sort(ids);
-				for (Member member : mGroupAMemberList) {
-					int index = Arrays.binarySearch(ids, String.valueOf(member.memberId));
-					if (index >= 0) {
-						mGroupAPlayingMemberList.add(member);
-					}
-				}
-			}
+			findPlayingMemberList(memberIds, mGroupAPlayingMemberList, mGroupAMemberList);
 		}
 		
 		if (mRoles.contains(2)) {
-			String memberIds = mSpUtil.getSp().getString("GroupBPlayingMemberList", "");
+			String memberIds = mSpUtil.getGroupBPlayingMemberList();
 			Log.d(TAG, "onRestoreGameState()... GroupB memberIds:" + memberIds);
 			
-			String[] ids = memberIds.split(",");
-			if (mGroupBPlayingMemberList == null) {
-				mGroupBPlayingMemberList = new ArrayList<Member>();
-			}
-			if (mGroupBMemberList != null && ids.length > 0) {
-				Arrays.sort(ids);
-				for (Member member : mGroupBMemberList) {
-					int index = Arrays.binarySearch(ids, String.valueOf(member.memberId));
-					if (index >= 0) {
-						mGroupBPlayingMemberList.add(member);
-					}
-				}
+			findPlayingMemberList(memberIds, mGroupBPlayingMemberList, mGroupBMemberList);
+		}
+		
+		mQuarterTimeList = mSpUtil.getQuarterTimeList();
+		if (mQuarterTimeList.isEmpty()) {
+			for (int i = 0; i < mQuarterCount; i++) {
+				mQuarterTimeList.add(mQuarterTime);
 			}
 		}
+
+		int lastGameTime = mSpUtil.getLastGameTime();
+		int timeout = getTimeout();// 四节比赛，每节比赛10分钟
+		mCountDown = new CountDown(lastGameTime, timeout, 1000);
+		mCountDown.setOnCountDownListener(this);
+		
+		onCountDownIntervalReach(lastGameTime);
 		
 		if (running) {
 			doStartGame();
 		} else if (pausing) {
 			doStartGame();
 			mCountDown.setPauseWork(true);
+		}
+	}
+
+	private void findPlayingMemberList(String memberIds, List<Member> groupPlayingMemberList, List<Member> groupMemberList) {
+		String[] ids = memberIds.split(",");
+		if (groupPlayingMemberList == null) {
+			groupPlayingMemberList = new ArrayList<Member>();
+		} else {
+			groupPlayingMemberList.clear();
+		}
+		if (groupMemberList != null && ids.length > 0) {
+			Arrays.sort(ids);
+			for (Member member : groupMemberList) {
+				int index = Arrays.binarySearch(ids, String.valueOf(member.memberId));
+				if (index >= 0) {
+					groupPlayingMemberList.add(member);
+				}
+			}
 		}
 	}
 
@@ -924,8 +902,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		pausing = false;
 		
 		if (isRequiredRecord) {
-			mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
-			mSpUtil.getEdit().putBoolean("game_state_pausing", pausing).commit();
+			mSpUtil.setGameStateRunning(running);
+			mSpUtil.setGameStatePausing(pausing);
 		}
 		
 		mIvPauseLeft.setImageResource(R.drawable.btn_pause);
@@ -1425,7 +1403,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		isRequiredRecord = false;
 		
 		mSpUtil.logout();
-		mSpUtil.getEdit().clear().commit();
 		
 		if (mCountDown != null) {
 			mCountDown.stop();
@@ -1566,9 +1543,9 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 
 		if (isRequiredRecord ) {
-			mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
-			mSpUtil.getEdit().putBoolean("game_state_pausing", pausing).commit();
-			mSpUtil.getEdit().putInt("last_game_time", 0).commit();
+			mSpUtil.setGameStateRunning(running);
+			mSpUtil.setGameStatePausing(pausing);
+			mSpUtil.setLastGameTime(0);
 		}
 	}
 
@@ -1576,7 +1553,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	public void onCountDownIntervalReach(int last) {
 		mRunningTime  = last;
 		if (isRequiredRecord) {
-			mSpUtil.getEdit().putInt("last_game_time", last).commit();
+			mSpUtil.setLastGameTime(last);
 		}
 		mTvGameTime.setText(GameUtils.formGameTime(last));
 
@@ -1609,9 +1586,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mGroupAScore += score;
 		}
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
-		if (isRequiredRecord) {
-			mSpUtil.getEdit().putInt("group_a_score", mGroupAScore).commit();
-		}
 	}
 
 	public void updateGroupBScore(int score) {
@@ -1619,9 +1593,6 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mGroupBScore += score;
 		}
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
-		if (isRequiredRecord) {
-			mSpUtil.getEdit().putInt("group_b_score", mGroupBScore).commit();
-		}
 	}
 
 	public void setCurrentRecordCoordinate(Action action, String coordinate) {
@@ -1766,6 +1737,15 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mCountDown = new CountDown(mRunningTime, timeout, 1000);
 		mCountDown.start();// 计时开始
 	}
+	
+	private int getTimeout() {	
+		int timeout = 0;
+		for (Integer time : mQuarterTimeList) {
+			timeout = timeout + time;
+		}
+		timeout = timeout * 60 * 1000;// 计算比赛时间
+		return timeout;
+	}
 
 	private boolean isQuarterTime() {
 		boolean isQuartTime = false;
@@ -1875,8 +1855,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		running = false;
 		pausing = true;
 		if (isRequiredRecord) {
-			mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
-			mSpUtil.getEdit().putBoolean("game_state_pausing", pausing).commit();
+			mSpUtil.setGameStateRunning(running);
+			mSpUtil.setGameStatePausing(pausing);
 		}
 		
 		mIvPauseLeft.setImageResource(R.drawable.btn_continue);
@@ -1932,8 +1912,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		mHomeWatcher.stopWatch();
 		
 		if (isRequiredRecord) {
-			mSpUtil.getEdit().putBoolean("game_state_running", running).commit();
-			mSpUtil.getEdit().putBoolean("game_state_pausing", pausing).commit();
+			mSpUtil.setGameStateRunning(running);
+			mSpUtil.setGameStatePausing(pausing);
 		}
 	}
 

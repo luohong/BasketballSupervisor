@@ -3,7 +3,9 @@ package com.example.basketballsupervisor.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.GameTime;
@@ -127,6 +129,19 @@ public class GameTimeDb extends BaseDb {
 			e.printStackTrace();
 		} finally {
 			endTransaction();
+		}
+	}
+
+	public void clearGameDataById(long gId) {
+		try {
+			checkDb();
+			String sql = "delete from " + getTableName() + " where " + Table.GAME_ID + " = " + gId;
+			Log.e("SQL", sql);
+			db.execSQL(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeDbAndCursor();
 		}
 	}
 

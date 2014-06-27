@@ -6,7 +6,9 @@ import java.util.List;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import com.example.basketballsupervisor.model.Game;
 import com.example.basketballsupervisor.model.Group;
@@ -177,6 +179,19 @@ public class PlayingTimeDb extends BaseDb {
             }
         }
         return playingTimeList;
+	}
+
+	public void clearGameDataById(long gId) {
+		try {
+			checkDb();
+			String sql = "delete from " + getTableName() + " where " + Table.GAME_ID + " = " + gId;
+			Log.e("SQL", sql);
+			db.execSQL(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			closeDbAndCursor();
+		}
 	}
 
 }
