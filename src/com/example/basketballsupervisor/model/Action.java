@@ -8,19 +8,18 @@ public class Action implements Serializable, Cloneable {
 	public int nextActionId;
 	public String name;
 	public int score;
-	public int cancelable;
-	public int type;// 1 表示得分, 0表示失分
+	public int type;// 0 表示默认，1 表示得分，2表示失分
 
 	public Action() {
 		
 	}
 	
-	public Action(int id, int nextActionId, String name, int score, int cancelable) {
+	public Action(int id, int nextActionId, String name, int score, int type) {
 		this.id = id;
 		this.nextActionId = nextActionId;
 		this.name = name;
 		this.score = score;
-		this.cancelable = cancelable;
+		this.type = type;
 	}
 	
 	@Override

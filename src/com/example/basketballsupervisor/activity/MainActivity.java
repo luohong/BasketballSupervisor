@@ -436,15 +436,16 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		int groupBScore = 0;
 		List<Record> recordList = mRecordDb.getAll(mGame);
 		for (Record record : recordList) {
+			Integer actionId = Integer.valueOf((int)record.actionId);
+
 			// 记录坐标
 			if (!TextUtils.isEmpty(record.coordinate)) {
 				String[] split = record.coordinate.split(",");
 				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-				mCourtPositions.set(position, 0);
+				mCourtPositions.set(position, mActionMap.get(actionId).type);
 			}
 			
 			// 记录得分
-			Integer actionId = Integer.valueOf((int)record.actionId);
 			if (mActionMap.containsKey(actionId)) {
 				if (mGroupA.groupId == record.groupId) {
 					groupAScore += mActionMap.get(actionId).score;

@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 
 import com.example.basketballsupervisor.R;
+import com.example.basketballsupervisor.util.Constants;
 
 public class CourtAdapter extends BaseAdapter {
 
@@ -64,10 +65,19 @@ public class CourtAdapter extends BaseAdapter {
 			// image.setImageResource(R.drawable.basketball_square);
 			image.setImageResource(0);
 		} else {
-			if (type == 0) {
+			switch (type) {
+			case Constants.CourtShowType.NORMAL:
+				image.setImageResource(0);
+				break;
+			case Constants.CourtShowType.HIT:
 				image.setImageResource(R.drawable.position_03);
-			} else {
+				break;
+			case Constants.CourtShowType.MISS:
 				image.setImageResource(R.drawable.position_07);
+				break;
+			default:
+				image.setImageResource(0);
+				break;
 			}
 		}
 

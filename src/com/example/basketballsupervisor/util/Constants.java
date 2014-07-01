@@ -16,4 +16,23 @@ public class Constants {
 	public static String[] INNOVATE_DATA_STAT_COLUMNS = new String[] { "球队",
 			"球员\\统计项", "一条龙", "超远3分", "绝杀", "最后3秒得分", "晃倒", "2+1", "3+1", "扣篮",
 			"快攻", "2罚不中", "3罚不中", "被晃倒" };
+	
+	public interface CourtShowType {
+		
+		/**
+		 * 常规（仅记录、不显示）
+		 */
+		public static final int NORMAL = 0;
+
+		/**
+		 * 命中（打勾）
+		 */
+		public static final int HIT = 1;
+		
+		/**
+		 * 未命中（打叉）
+		 */
+		public static final int MISS = 2;
+	}
+	
 }
