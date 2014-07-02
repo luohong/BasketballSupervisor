@@ -1,46 +1,76 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="480dp"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center"
-    android:layout_margin="10dp"
-    android:background="@color/bg_dialog"
-    android:gravity="center"
-    android:orientation="vertical" >
+<!-- <com.example.basketballsupervisor.widget.InnerScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" > -->
 
-    <TextView
-        android:id="@+id/tv_group_a_name"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:gravity="center"
-        android:text="比赛数据统计列表"
-        android:textColor="@color/black"
-        android:textSize="@dimen/data_stat_title"
-    	android:background="@color/bg_dialog_title" />
-
-    <HorizontalScrollView
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/ll_data_stat"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:layout_gravity="center"
+        android:layout_margin="10dp"
+        android:background="@color/bg_dialog"
+        android:gravity="center"
         android:orientation="vertical" >
-        
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="horizontal" >
-        
-		    <ListView
-		        android:id="@android:id/list"
-		        android:layout_width="3000dp"
-		        android:layout_height="match_parent"
-		        android:background="#A7A9A8"
-		        android:cacheColorHint="@null"
-		        android:dividerHeight="1.0dip"
-		        android:drawSelectorOnTop="false"
-		        android:fadingEdgeLength="0.0sp"
-		        android:fastScrollEnabled="true" />
-		  </LinearLayout>
-    
-    </HorizontalScrollView>
 
-</LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp" >
+
+            <TextView
+                android:id="@+id/tv_group_a_name"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_centerInParent="true"
+                android:background="@color/bg_dialog_title"
+                android:gravity="center"
+                android:text="比赛数据统计列表"
+                android:textColor="@color/black"
+                android:textSize="@dimen/data_stat_title" />
+
+            <Button
+                android:id="@+id/btn_save"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_margin="5dp"
+                android:background="@drawable/item_data_stat_selector"
+                android:text="保存" />
+        </RelativeLayout>
+
+        <!--
+             <ImageView
+            android:id="@+id/iv_court"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:scaleType="center" />
+        -->
+
+        <HorizontalScrollView
+            android:id="@+id/hsv_data_stat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="vertical" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+                <ListView
+                    android:id="@android:id/list"
+                    android:layout_width="3000dp"
+                    android:layout_height="match_parent"
+                    android:background="#A7A9A8"
+                    android:cacheColorHint="@null"
+                    android:dividerHeight="1.0dip"
+                    android:drawSelectorOnTop="false"
+                    android:fadingEdgeLength="0.0sp"
+                    android:fastScrollEnabled="true" />
+            </LinearLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
+<!-- 
+</com.example.basketballsupervisor.widget.InnerScrollView> -->

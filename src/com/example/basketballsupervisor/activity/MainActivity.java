@@ -19,6 +19,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -105,6 +106,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private ImageView mIvLogout;
 	private LinearLayout mLlUpload;
 	
+	private FrameLayout mFlCourt;
 	private GridView mGvCourt;
 	private CourtAdapter mCourtAdapter;
 	private ArrayList<Integer> mCourtPositions;
@@ -208,6 +210,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		
 		mLlUpload = (LinearLayout) findViewById(R.id.ll_upload);
 		
+		mFlCourt = (FrameLayout) findViewById(R.id.fl_court);
 		mGvCourt = (GridView) findViewById(R.id.gv_court);
 	}
 
@@ -2001,6 +2004,18 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 		
 		onSavePlayingPlayers();// 记录上场球员，在某种特殊条件下，因发生异常导致应用退出，用于重启应用恢复比赛现场
+	}
+
+	public View getCourtView() {
+		return mFlCourt;
+	}
+
+	public Group getGroupA() {
+		return mGroupA;
+	}
+
+	public Group getGroupB() {
+		return mGroupB;
 	}
 
 }

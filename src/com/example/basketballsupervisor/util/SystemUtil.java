@@ -15,11 +15,17 @@
 
 package com.example.basketballsupervisor.util;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
 import java.util.UUID;
+
+import com.android.framework.core.util.SDcardUtil;
 
 import android.app.Activity;
 import android.content.Context;
@@ -35,8 +41,10 @@ import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
+import android.view.View;
 
 public class SystemUtil {
 
@@ -47,26 +55,20 @@ public class SystemUtil {
 	private static int screenDensity = -1;
 
 	public static int dipToPx(Context context, int dip) {
-		DisplayMetrics displayMetrics = context.getResources()
-				.getDisplayMetrics();
+		DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
 		return (int) (dip * displayMetrics.density + 0.5f);
 	}
 
-	public static Drawable scaleDrawable(Context context,
-			int drawableResourceId, int width, int height) {
-		Bitmap sourceBitmap = BitmapFactory.decodeResource(
-				context.getResources(), drawableResourceId);
-		return new BitmapDrawable(Bitmap.createScaledBitmap(sourceBitmap,
-				width, height, true));
+	public static Drawable scaleDrawable(Context context, int drawableResourceId, int width, int height) {
+		Bitmap sourceBitmap = BitmapFactory.decodeResource(context.getResources(), drawableResourceId);
+		return new BitmapDrawable(Bitmap.createScaledBitmap(sourceBitmap, width, height, true));
 	}
 
 	public static int getScreenDensity(Context context) {
 		if (screenDensity == -1) {
-			DisplayMetrics displayMetrics = context.getResources()
-					.getDisplayMetrics();
+			DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
 			try {
-				screenDensity = DisplayMetrics.class.getField("densityDpi")
-						.getInt(displayMetrics);
+				screenDensity = DisplayMetrics.class.getField("densityDpi").getInt(displayMetrics);
 			} catch (Exception e) {
 				screenDensity = SCREEN_DENSITY_MEDIUM;
 			}
@@ -79,11 +81,9 @@ public class SystemUtil {
 	 */
 	public static String getIp() {
 		try {
-			for (Enumeration<NetworkInterface> en = NetworkInterface
-					.getNetworkInterfaces(); en.hasMoreElements();) {
+			for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
 				NetworkInterface intf = en.nextElement();
-				for (Enumeration<InetAddress> enumIpAddr = intf
-						.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+				for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
 					InetAddress inetAddress = enumIpAddr.nextElement();
 					if (!inetAddress.isLoopbackAddress()) {
 						return inetAddress.getHostAddress().toString();
@@ -166,11 +166,9 @@ public class SystemUtil {
 	 * 检测是否有活动网络
 	 */
 	public static boolean contactNet(Context context) {
-		ConnectivityManager connectivityManager = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);// 获取系统的连接服务
+		ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);// 获取系统的连接服务
 		NetworkInfo activeNetInfo = connectivityManager.getActiveNetworkInfo();// 获取网络的连接情况
-		if (activeNetInfo != null && activeNetInfo.isConnected()
-				&& activeNetInfo.isAvailable()) {
+		if (activeNetInfo != null && activeNetInfo.isConnected() && activeNetInfo.isAvailable()) {
 			return true;
 		} else {
 			return false;
@@ -178,8 +176,7 @@ public class SystemUtil {
 	}
 
 	public static boolean isConnectionType(Context context, int type) {
-		ConnectivityManager cm = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo active = cm.getActiveNetworkInfo();
 		return (active != null && active.getType() == type);
 	}
@@ -189,13 +186,11 @@ public class SystemUtil {
 	}
 
 	public static boolean is2GNetWork(Context context) {
-		ConnectivityManager connectivity = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		ConnectivityManager connectivity = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if (connectivity == null) {
 			return false;
 		} else {
-			ConnectivityManager cm = (ConnectivityManager) context
-					.getSystemService(Context.CONNECTIVITY_SERVICE);
+			ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 			NetworkInfo net = cm.getActiveNetworkInfo();
 			if (net.getState() == NetworkInfo.State.CONNECTED) {
 				int type = net.getType();
@@ -241,74 +236,66 @@ public class SystemUtil {
 			return false;
 		}
 	}
-	
+
 	public static int getNetStatus(Context context) {
-//		[网络状况.0:未定义网络状况，1:2G,2:3G,3:WIFI,4:4G]
+		// [网络状况.0:未定义网络状况，1:2G,2:3G,3:WIFI,4:4G]
 		int netStatus = 0;// 默认未定义
-		
-		ConnectivityManager cm =  
-	            (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);  
-	  
-	    NetworkInfo activeInfo = cm.getActiveNetworkInfo();  
-	    if (activeInfo != null && activeInfo.isConnected()) {  
-	    	int type = activeInfo.getType();
-	    	
-	    	switch (type) {
+
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		NetworkInfo activeInfo = cm.getActiveNetworkInfo();
+		if (activeInfo != null && activeInfo.isConnected()) {
+			int type = activeInfo.getType();
+
+			switch (type) {
 			case ConnectivityManager.TYPE_WIFI:
 			case ConnectivityManager.TYPE_ETHERNET:
 				netStatus = 3;
 				break;
 			case ConnectivityManager.TYPE_MOBILE:
-				switch (activeInfo.getSubtype()) 
-		        {
-		            case TelephonyManager.NETWORK_TYPE_GPRS:
-		            case TelephonyManager.NETWORK_TYPE_EDGE:
-		            case TelephonyManager.NETWORK_TYPE_CDMA:
-		            case TelephonyManager.NETWORK_TYPE_1xRTT:
-		            case TelephonyManager.NETWORK_TYPE_IDEN:
-		            	netStatus = 1;
-		            case TelephonyManager.NETWORK_TYPE_UMTS:
-		            case TelephonyManager.NETWORK_TYPE_EVDO_0:
-		            case TelephonyManager.NETWORK_TYPE_EVDO_A:
-		            case TelephonyManager.NETWORK_TYPE_HSDPA:
-		            case TelephonyManager.NETWORK_TYPE_HSUPA:
-		            case TelephonyManager.NETWORK_TYPE_HSPA:
-		            case TelephonyManager.NETWORK_TYPE_EVDO_B:
-		            case TelephonyManager.NETWORK_TYPE_EHRPD:
-		            case TelephonyManager.NETWORK_TYPE_HSPAP:
-		            	netStatus = 2;
-		            case TelephonyManager.NETWORK_TYPE_LTE:
-		            	netStatus = 4;
-		            default:
-		            	netStatus = 2;
-		        }
+				switch (activeInfo.getSubtype()) {
+				case TelephonyManager.NETWORK_TYPE_GPRS:
+				case TelephonyManager.NETWORK_TYPE_EDGE:
+				case TelephonyManager.NETWORK_TYPE_CDMA:
+				case TelephonyManager.NETWORK_TYPE_1xRTT:
+				case TelephonyManager.NETWORK_TYPE_IDEN:
+					netStatus = 1;
+				case TelephonyManager.NETWORK_TYPE_UMTS:
+				case TelephonyManager.NETWORK_TYPE_EVDO_0:
+				case TelephonyManager.NETWORK_TYPE_EVDO_A:
+				case TelephonyManager.NETWORK_TYPE_HSDPA:
+				case TelephonyManager.NETWORK_TYPE_HSUPA:
+				case TelephonyManager.NETWORK_TYPE_HSPA:
+				case TelephonyManager.NETWORK_TYPE_EVDO_B:
+				case TelephonyManager.NETWORK_TYPE_EHRPD:
+				case TelephonyManager.NETWORK_TYPE_HSPAP:
+					netStatus = 2;
+				case TelephonyManager.NETWORK_TYPE_LTE:
+					netStatus = 4;
+				default:
+					netStatus = 2;
+				}
 				break;
 			case ConnectivityManager.TYPE_WIMAX:
-            	netStatus = 4;
+				netStatus = 4;
 				break;
 			default:
 				netStatus = 0;// 默认未定义
 				break;
 			}
-	    } 
-	    return netStatus;
+		}
+		return netStatus;
 	}
 
 	public static String getUUID(Activity activity) {
 		String uuid = "";
 		try {
-			final TelephonyManager tm = (TelephonyManager) activity
-					.getBaseContext().getSystemService(
-							Context.TELEPHONY_SERVICE);
+			final TelephonyManager tm = (TelephonyManager) activity.getBaseContext().getSystemService(Context.TELEPHONY_SERVICE);
 			final String tmDevice, tmSerial, tmPhone, androidId;
 			tmDevice = "" + tm.getDeviceId();
 			tmSerial = "" + tm.getSimSerialNumber();
-			androidId = ""
-					+ android.provider.Settings.Secure.getString(
-							activity.getContentResolver(),
-							android.provider.Settings.Secure.ANDROID_ID);
-			UUID deviceUuid = new UUID(androidId.hashCode(),
-					((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
+			androidId = "" + android.provider.Settings.Secure.getString(activity.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+			UUID deviceUuid = new UUID(androidId.hashCode(), ((long) tmDevice.hashCode() << 32) | tmSerial.hashCode());
 
 			uuid = "android:" + deviceUuid.toString();
 		} catch (Exception e) {
@@ -317,17 +304,15 @@ public class SystemUtil {
 
 		return uuid;
 	}
-	
+
 	public static String getDeviceId(Context context) {
-		TelephonyManager tm = (TelephonyManager) context
-				.getSystemService(Context.TELEPHONY_SERVICE);
+		TelephonyManager tm = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		return tm.getDeviceId();
 	}
-	
+
 	public static String getChannelNo(Context context) {
 		try {
-			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-				 PackageManager.GET_META_DATA);
+			ApplicationInfo ai = context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA);
 			return ai.metaData.get("UMENG_CHANNEL").toString();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -343,6 +328,91 @@ public class SystemUtil {
 			result = (int) number / 1000 + "K+";
 		}
 		return result;
+	}
+
+	public static Bitmap getViewBitmap(View v) {
+		v.clearFocus(); // 清除视图焦点
+		v.setPressed(false);// 将视图设为不可点击
+
+		boolean willNotCache = v.willNotCacheDrawing(); // 返回视图是否可以保存他的画图缓存
+		v.setWillNotCacheDrawing(false);
+
+		// Reset the drawing cache background color to fully transparent
+		// for the duration of this operation //将视图在此操作时置为透明
+		int color = v.getDrawingCacheBackgroundColor(); // 获得绘制缓存位图的背景颜色
+		v.setDrawingCacheBackgroundColor(0); // 设置绘图背景颜色
+		if (color != 0) { // 如果获得的背景不是黑色的则释放以前的绘图缓存
+			v.destroyDrawingCache(); // 释放绘图资源所使用的缓存
+		}
+		v.buildDrawingCache(); // 重新创建绘图缓存，此时的背景色是黑色
+		Bitmap cacheBitmap = v.getDrawingCache(); // 将绘图缓存得到的,注意这里得到的只是一个图像的引用
+		if (cacheBitmap == null) {
+			return null;
+		}
+		Bitmap bitmap = Bitmap.createBitmap(cacheBitmap); // 将位图实例化
+		// Restore the view //恢复视图
+		v.destroyDrawingCache();// 释放位图内存
+		v.setWillNotCacheDrawing(willNotCache);// 返回以前缓存设置
+		v.setDrawingCacheBackgroundColor(color);// 返回以前的缓存颜色设置
+		return bitmap;
+	}
+
+	public static String saveBitmap(Bitmap bm, String filename) {
+		
+		if (bm == null || bm.isRecycled()) {
+			return "保存图片加载失败";
+		}
+
+		if (!SDcardUtil.checkSdCardEnable()) {
+			return "SD卡不存在";
+		}
+		
+		String error = "";
+		
+		String sdDir = Environment.getExternalStorageDirectory().toString();
+		String dirName = sdDir + "/BasketballSupervisor/images/";
+		File dir = new File(dirName);
+
+		boolean dirExist = true;
+		if (!dir.isDirectory()) {
+			dirExist = dir.mkdirs();
+		}
+		if (dirExist) {
+			File file = new File(dir.getAbsolutePath() + "/" + filename + ".png");
+			if (!file.exists()) {
+				try {
+					file.createNewFile();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+
+			FileOutputStream fos = null;
+			try {
+				fos = new FileOutputStream(file);
+				bm.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+				fos.flush();
+				
+				error = "保存成功: " + file.getAbsolutePath();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				error = e.getMessage();
+			} catch (IOException e) {
+				e.printStackTrace();
+				error = e.getMessage();
+			} finally {
+				try {
+					if (fos != null) {
+						fos.close();
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		} else {
+			error = "SD卡保存目录创建失败: " + dir.getAbsolutePath();
+		}
+		return error;
 	}
 
 }

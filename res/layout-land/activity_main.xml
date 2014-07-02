@@ -70,6 +70,7 @@
     </LinearLayout>
 
     <FrameLayout
+        android:id="@+id/fl_court"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/menu_margin"
@@ -88,7 +89,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:layout_weight="1"
             android:gravity="center_vertical"
             android:scaleType="fitXY"
             android:src="@drawable/basketball_line" />

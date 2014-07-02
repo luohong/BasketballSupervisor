@@ -1,8 +1,12 @@
 package com.example.basketballsupervisor.widget;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,14 +16,22 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.framework.core.widget.BaseDialog;
 import com.example.basketballsupervisor.R;
+import com.example.basketballsupervisor.activity.MainActivity;
 import com.example.basketballsupervisor.model.DataStat;
+import com.example.basketballsupervisor.model.Group;
+import com.example.basketballsupervisor.util.ScreenShot;
+import com.example.basketballsupervisor.util.SystemUtil;
 
-public class DataStatDialog extends BaseDialog {
+public class DataStatDialog extends BaseDialog implements android.view.View.OnClickListener {
 
 	public static final int TYPE_TITLE = 0;
 	public static final int TYPE_COLUMN = 1;
@@ -29,9 +41,13 @@ public class DataStatDialog extends BaseDialog {
 	private List<DataStat> list;
 	private int selectedItem = -1;
 	private DataStatAdapter mAdapter;
-
+	private ImageView mIvCourt;
+	private Button mBtnSave;
+	private MainActivity mMainActivity;
+	
 	public DataStatDialog(Context context, List<DataStat> list) {
 		super(context);
+		this.mMainActivity = (MainActivity) context;
 		this.list = list;
 	}
 	
@@ -42,13 +58,24 @@ public class DataStatDialog extends BaseDialog {
 
 	@Override
 	protected void onFindViews() {
+//		mIvCourt = (ImageView) findViewById(R.id.iv_court);
+		mBtnSave = (Button) findViewById(R.id.btn_save);
 		mListView = (ListView) findViewById(android.R.id.list);
-		mAdapter = new DataStatAdapter(getContext());
-		mListView.setAdapter(mAdapter);
+		
+//		scrollView1 = (ScrollView)findViewById(R.id.scroll_1);
+//        innerScrollView = (InnerScrollView)findViewById(R.id.scroll_2);
 	}
 
 	@Override
 	protected void onInitViewData() {
+//		View court = mMainActivity.getCourtView();
+//		Bitmap bm = SystemUtil.getViewBitmap(court);
+//		mIvCourt.setImageBitmap(bm);
+//        innerScrollView.parentScrollView = scrollView1;
+		mBtnSave.setOnClickListener(this);
+		
+		mAdapter = new DataStatAdapter(getContext());
+		mListView.setAdapter(mAdapter);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -164,6 +191,44 @@ public class DataStatDialog extends BaseDialog {
 		public long getItemId(int position) {
 			return position;
 		}
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.btn_save:
+//			View v = findViewById(R.id.hsv_data_stat);
+			View v = findViewById(R.id.ll_data_stat);
+			if (v != null) {
+//				Bitmap bm = SystemUtil.getViewBitmap(v);
+				Bitmap bm = ScreenShot.getListViewBitmap(mListView);
+//				Bitmap bm = ScreenShot.getScrollViewBitmap((ScrollView)v);
+				String error = SystemUtil.saveBitmap(bm, getFilename());
+				Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+			}
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	private String getFilename() {
+		Group groupA = mMainActivity.getGroupA();
+		Group groupB = mMainActivity.getGroupB();
+		
+		StringBuilder builder = new StringBuilder();
+		builder.append(groupA.groupName);
+		builder.append("VS");
+		builder.append(groupB.groupName);
+		builder.append("_");
+		
+		Date date = new Date();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMddHHmmss");
+		String formatDate = sdf.format(date);
+		builder.append(formatDate);
+		
+		return builder.toString();
 	}
 
 }
