@@ -2,6 +2,8 @@ package com.example.basketballsupervisor.model;
 
 import java.io.Serializable;
 
+import com.example.basketballsupervisor.util.Constants;
+
 public class Action implements Serializable, Cloneable {
 	
 	public int id;
@@ -28,11 +30,19 @@ public class Action implements Serializable, Cloneable {
 	}
 
 	public static Action newFoulAction() {
-		return new Action(13,14,"犯规",0,0);
+		return new Action(13,14,"犯规",0,Constants.CourtShowType.NORMAL);
 	}
 
 	public static Action newFouledAction() {
-		return new Action(14,-12,"被犯规",0,0);
+		return new Action(14,-12,"被犯规",0,Constants.CourtShowType.NORMAL);
+	}
+
+	public static Action newAddOnePoint() {
+		return new Action(29,-100,"加一分",1,Constants.CourtShowType.NORMAL);
+	}
+
+	public static Action newMinusOnePoint() {
+		return new Action(30,-100,"减一分",-1,Constants.CourtShowType.NORMAL);
 	}
 	
 }

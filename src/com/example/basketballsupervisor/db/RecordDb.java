@@ -145,11 +145,11 @@ public class RecordDb extends BaseDb {
 	}
 
 	public void saveRecord(Game game, Group group, Member member, Action action, long time, String coordinate) {
-		if (game != null && group != null && time > 0 && member != null && action != null) {
+		if (game != null && group != null && time > 0 && action != null) {
 			Record record = new Record();
 			record.gameId = game.gId;
 			record.groupId = group.groupId;
-			record.memberId = member.memberId;
+			record.memberId = member != null ? member.memberId : 0;
 			record.actionId = action.id;
 			record.showTime = String.valueOf(time);
 			record.createTime = String.valueOf(System.currentTimeMillis());

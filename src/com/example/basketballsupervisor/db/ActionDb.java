@@ -109,8 +109,8 @@ public class ActionDb extends BaseDb {
 		sampleActions.add(new Action(10,-11,"后场篮板",0,Constants.CourtShowType.NORMAL));
 		sampleActions.add(new Action(11,0,"失误",0,Constants.CourtShowType.NORMAL));
 		sampleActions.add(new Action(12,0,"封盖",0,Constants.CourtShowType.NORMAL));
-		sampleActions.add(new Action(13,14,"犯规",0,Constants.CourtShowType.NORMAL));
-		sampleActions.add(new Action(14,-12,"被犯规",0,Constants.CourtShowType.NORMAL));
+		sampleActions.add(Action.newFoulAction());
+		sampleActions.add(Action.newFouledAction());
 		sampleActions.add(new Action(15,-1,"创新",0,Constants.CourtShowType.NORMAL));
 		sampleActions.add(new Action(16,-2,"一条龙",0,Constants.CourtShowType.NORMAL));
 		sampleActions.add(new Action(17,-2,"超远3分",0,Constants.CourtShowType.NORMAL));
@@ -125,6 +125,8 @@ public class ActionDb extends BaseDb {
 		sampleActions.add(new Action(26,-2,"3罚不中",0,Constants.CourtShowType.NORMAL));
 		sampleActions.add(new Action(27,-2,"被晃倒",0,Constants.CourtShowType.NORMAL));
 		sampleActions.add(new Action(28,-10,"技术犯规",0,Constants.CourtShowType.NORMAL));
+		sampleActions.add(Action.newAddOnePoint());
+		sampleActions.add(Action.newMinusOnePoint());
 		
 		saveAll(sampleActions);
 	}

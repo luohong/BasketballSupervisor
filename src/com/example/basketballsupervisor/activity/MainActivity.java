@@ -1,3 +1,4 @@
+
 package com.example.basketballsupervisor.activity;
 
 import java.util.ArrayList;
@@ -1637,21 +1638,39 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 //			mTvGameSecondHalf.setTextColor(getResources().getColor(R.color.white));
 //		}
 	}
-
+	
 	public void updateGroupAScore(int score) {
+		updateGroupAScore(score, false);
+	}
+
+	public void updateGroupAScore(int score, boolean save) {
 		if (mGroupAScore + score >= 0) {
 			mGroupAScore += score;
 		}
 		mTvGroupAScore.setText(String.valueOf(mGroupAScore));
+		saveUpdateExtraPoint(mGroupA, score, save);
+	}
+	
+	public void updateGroupBScore(int score) {
+		updateGroupBScore(score, false);
 	}
 
-	public void updateGroupBScore(int score) {
+	public void updateGroupBScore(int score, boolean save) {
 		if (mGroupBScore + score >= 0) {
 			mGroupBScore += score;
 		}
 		mTvGroupBScore.setText(String.valueOf(mGroupBScore));
+		saveUpdateExtraPoint(mGroupB, score, save);
 	}
-
+	
+	private void saveUpdateExtraPoint(Group group, int score, boolean save) {
+		if (save) {
+			mGameTime = System.currentTimeMillis();
+			Action action = score > 0 ? Action.newAddOnePoint() : Action.newMinusOnePoint();
+			mRecordDb.saveRecord(mGame, group, null, action, mGameTime, null);
+		}
+	}
+	
 	public void setCurrentRecordCoordinate(Action action, String coordinate) {
 		if (!TextUtils.isEmpty(coordinate)) {
 			String[] split = coordinate.split(",");
