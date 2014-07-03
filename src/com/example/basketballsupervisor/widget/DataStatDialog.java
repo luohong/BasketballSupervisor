@@ -33,17 +33,18 @@ import com.example.basketballsupervisor.util.SystemUtil;
 
 public class DataStatDialog extends BaseDialog implements android.view.View.OnClickListener {
 
-	public static final int TYPE_TITLE = 0;
-	public static final int TYPE_COLUMN = 1;
-	public static final int TYPE_CONTENT = 2;
+	public static final int TYPE_COURT_POINT = 0;
+	public static final int TYPE_TITLE = 1;
+	public static final int TYPE_COLUMN = 2;
+	public static final int TYPE_CONTENT = 3;
 
 	private ListView mListView;
 	private List<DataStat> list;
 	private int selectedItem = -1;
 	private DataStatAdapter mAdapter;
-	private ImageView mIvCourt;
 	private Button mBtnSave;
 	private MainActivity mMainActivity;
+	private Bitmap mCourtPointBm;
 	
 	public DataStatDialog(Context context, List<DataStat> list) {
 		super(context);
@@ -58,21 +59,16 @@ public class DataStatDialog extends BaseDialog implements android.view.View.OnCl
 
 	@Override
 	protected void onFindViews() {
-//		mIvCourt = (ImageView) findViewById(R.id.iv_court);
 		mBtnSave = (Button) findViewById(R.id.btn_save);
 		mListView = (ListView) findViewById(android.R.id.list);
-		
-//		scrollView1 = (ScrollView)findViewById(R.id.scroll_1);
-//        innerScrollView = (InnerScrollView)findViewById(R.id.scroll_2);
 	}
 
 	@Override
 	protected void onInitViewData() {
-//		View court = mMainActivity.getCourtView();
-//		Bitmap bm = SystemUtil.getViewBitmap(court);
-//		mIvCourt.setImageBitmap(bm);
-//        innerScrollView.parentScrollView = scrollView1;
 		mBtnSave.setOnClickListener(this);
+		
+		View court = mMainActivity.getCourtView();
+		mCourtPointBm = SystemUtil.getViewBitmap(court);
 		
 		mAdapter = new DataStatAdapter(getContext());
 		mListView.setAdapter(mAdapter);
@@ -122,7 +118,7 @@ public class DataStatDialog extends BaseDialog implements android.view.View.OnCl
 		
 		@Override
 		public int getViewTypeCount() {
-			return 3;
+			return 4;
 		}
 		
 		@Override
@@ -147,6 +143,13 @@ public class DataStatDialog extends BaseDialog implements android.view.View.OnCl
 			
 			int viewType = getItemViewType(position);
 			switch (viewType) {
+			case TYPE_COURT_POINT:
+				if (convertView == null) {
+					convertView = mInflater.inflate(R.layout.item_data_stat_court_point, null);
+				}
+				ImageView mIvCourt = ((ImageView) convertView.findViewById(R.id.iv_court_point));
+				mIvCourt.setImageBitmap(mCourtPointBm);
+				break;
 			case TYPE_TITLE:
 				if (convertView == null) {
 					convertView = mInflater.inflate(R.layout.item_data_stat_title, null);

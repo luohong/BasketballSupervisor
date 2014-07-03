@@ -1117,6 +1117,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		List<Member> groupAMemberList = filterMember(mGroupAMemberList);
 		List<Member> groupBMemberList = filterMember(mGroupBMemberList);
 		
+		// 打点图
+		DataStat courtPointTitle = new DataStat();
+		courtPointTitle.type = DataStatDialog.TYPE_COURT_POINT;
+		courtPointTitle.dataList = new ArrayList<String>();
+		courtPointTitle.dataList.add("");
+		list.add(courtPointTitle);
+		
 		// 球队统计标题
 		DataStat groupDataStatTitle = new DataStat();
 		groupDataStatTitle.type = DataStatDialog.TYPE_TITLE;
