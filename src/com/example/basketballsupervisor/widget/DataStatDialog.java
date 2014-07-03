@@ -50,6 +50,7 @@ public class DataStatDialog extends BaseDialog implements android.view.View.OnCl
 	private MainActivity mMainActivity;
 	private Bitmap mCourtPointBm;
 	private String mCourtPointImagePath;
+	private int mDialogWidth;
 	
 	public DataStatDialog(Context context, List<DataStat> list) {
 		super(context);
@@ -71,6 +72,11 @@ public class DataStatDialog extends BaseDialog implements android.view.View.OnCl
 	@Override
 	protected void onInitViewData() {
 		mBtnSave.setOnClickListener(this);
+		
+		DisplayMetrics  dm = new DisplayMetrics();    
+		getWindow().getWindowManager().getDefaultDisplay().getMetrics(dm);    
+
+	    mDialogWidth = (int) (dm.widthPixels * 0.85);
 		
 		View court = mMainActivity.getCourtView();
 		mCourtPointBm = SystemUtil.getViewBitmap(court);
@@ -153,6 +159,7 @@ public class DataStatDialog extends BaseDialog implements android.view.View.OnCl
 					convertView = mInflater.inflate(R.layout.item_data_stat_court_point, null);
 				}
 				ImageView mIvCourt = ((ImageView) convertView.findViewById(R.id.iv_court_point));
+				mIvCourt.setMaxWidth(mDialogWidth);
 				mIvCourt.setImageBitmap(mCourtPointBm);
 				break;
 			case TYPE_TITLE:

@@ -12,6 +12,8 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnDismissListener;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.PowerManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -73,6 +75,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	
 	private static final int CLICK_POS_LEFT = 0;
 	private static final int CLICK_POS_RIGHT = 1;
+	public static final int SHOW_DATA_STAT = 100;
 	private static final String TAG = MainActivity.class.getSimpleName();
 
 	private List<Integer> mRoles = new ArrayList<Integer>(3);
@@ -125,6 +128,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private Map<Integer, Action> mActionMap;
 	private boolean isRequiredUpdateGameRecord = true;// 默认需要获取最新的比赛记录
 	private boolean isRequiredRecord = true;
+	private boolean isRequiredUpdateCourt = true;
 	private SpUtil mSpUtil;
 	private int mRunningTime = 0;
 	private long mSelectedGameId = -1;
@@ -136,6 +140,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	private ActionDb mActionDb;
 	private PlayingTimeDb mPlayingTimeDb;
 	private GameTimeDb mGameTimeDb;
+	
+	private Handler mHandler;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -167,6 +173,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
         
         PowerManager mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = mPowerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "My Tag"); 
+        
+        mHandler = new MainHandler();
         
         // 初始化数据
 		mRecordDb = new RecordDb(this);
@@ -433,52 +441,59 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 	}
 
 	private List<Record> initCourtRecord() {
-		
-		resetCourtPositions();
 
-		int groupAScore = 0;
-		int groupBScore = 0;
 		List<Record> recordList = mRecordDb.getAll(mGame);
-		for (Record record : recordList) {
-			Integer actionId = Integer.valueOf((int)record.actionId);
-			Action action = mActionMap.get(actionId);
-			
-			// 记录坐标
-			if (!TextUtils.isEmpty(record.coordinate)) {
-				String[] split = record.coordinate.split(",");
-				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-				
-				Integer type = mCourtPositions.get(position);
-				if (type == null) {
-					mCourtPositions.set(position, action.type);
-				} else if (action.type > 0 && action.type != type) {
-					if (action.type == 1) {
-						mCourtPositions.set(position, action.type);
-					}
-				}
-			}
-			
-			// 记录得分
-			if (mActionMap.containsKey(actionId)) {
-				if (mGroupA.groupId == record.groupId) {
-					groupAScore += action.score;
-				} else if (mGroupB.groupId == record.groupId) {
-					groupBScore += action.score;
-				}
-			} else {
-				Log.e(TAG, "actionId " + actionId + " is not exist in action map");
-			}
-		}
-		// 更新坐标
-		mCourtAdapter.notifyDataSetChanged();
+		if (isRequiredUpdateCourt) {
+			resetCourtPositions();
 
-		// 更新记录得分
-		updateGroupAScore(groupAScore);
-		updateGroupBScore(groupBScore);
-		
-		mIvUndo.setVisibility(recordList.size() > 0 ? View.VISIBLE : View.GONE);
+			int groupAScore = 0;
+			int groupBScore = 0;
+			for (Record record : recordList) {
+				Integer actionId = Integer.valueOf((int)record.actionId);
+				Action action = mActionMap.get(actionId);
+				
+				// 记录坐标
+				refreshCourtCoordinate(record.coordinate, action);
+				
+				// 记录得分
+				if (mActionMap.containsKey(actionId)) {
+					if (mGroupA.groupId == record.groupId) {
+						groupAScore += action.score;
+					} else if (mGroupB.groupId == record.groupId) {
+						groupBScore += action.score;
+					}
+				} else {
+					Log.e(TAG, "actionId " + actionId + " is not exist in action map");
+				}
+			}
+			// 更新坐标
+			mCourtAdapter.notifyDataSetChanged();
+			
+			// 更新记录得分
+			updateGroupAScore(groupAScore);
+			updateGroupBScore(groupBScore);
+			
+			isRequiredUpdateCourt = false;
+			mIvUndo.setVisibility(recordList.size() > 0 ? View.VISIBLE : View.GONE);
+		}
 		
 		return recordList;
+	}
+
+	private void refreshCourtCoordinate(String coordinate, Action action) {
+		if (!TextUtils.isEmpty(coordinate)) {
+			String[] split = coordinate.split(",");
+			int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
+			
+			Integer type = mCourtPositions.get(position);
+			if (type == null) {
+				mCourtPositions.set(position, action.type);
+			} else if (action.type > 0 && action.type != type) {
+				if (action.type == 1) {
+					mCourtPositions.set(position, action.type);
+				}
+			}
+		}
 	}
 
 	private void resetCourtPositions() {
@@ -1029,7 +1044,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 							isRequiredUpdateGameRecord = response.is_complete == 0;
 							
 							saveGameRecord(response.game_record_list);
-							showStatPanel();
+							initCourtRecord();// 解决获取更新的比赛记录后弹出框中的截图未更新问题
+							mHandler.sendEmptyMessageDelayed(SHOW_DATA_STAT, 200);
 						} else {
 							onFail(response.error_remark);
 						}
@@ -1040,6 +1056,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 				private void saveGameRecord(List<GameRecord> gameRecordList) {
 					if (gameRecordList != null && gameRecordList.size() > 0) {
+						isRequiredUpdateCourt = true;
+						
 						List<Record> recordList = new ArrayList<Record>();
 						
 						for (GameRecord gameRecord : gameRecordList) {
@@ -1690,22 +1708,17 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			mGameTime = System.currentTimeMillis();
 			Action action = score > 0 ? Action.newAddOnePoint() : Action.newMinusOnePoint();
 			mRecordDb.saveRecord(mGame, group, null, action, mGameTime, null);
+			
+			setCurrentRecordCoordinate(action, "");
 		}
 	}
 	
 	public void setCurrentRecordCoordinate(Action action, String coordinate) {
-		if (!TextUtils.isEmpty(coordinate)) {
-			String[] split = coordinate.split(",");
-			
-			if (split.length > 1) {
-				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-				
-				mCourtPositions.set(position, action.type);
-				mCourtAdapter.notifyDataSetChanged();
-				
-			}
-		}
+		refreshCourtCoordinate(coordinate, action);
+		mCourtAdapter.notifyDataSetChanged();
+		
 		mIvUndo.setVisibility(View.VISIBLE);
+		isRequiredUpdateCourt = true;
 	}
 
 	@Override
@@ -2057,6 +2070,21 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 
 	public Group getGroupB() {
 		return mGroupB;
+	}
+	
+	private class MainHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			switch (msg.what) {
+			case SHOW_DATA_STAT:
+				showStatPanel();
+				break;
+
+			default:
+				break;
+			}
+		}
 	}
 
 }
