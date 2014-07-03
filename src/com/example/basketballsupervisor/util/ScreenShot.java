@@ -158,18 +158,24 @@ public class ScreenShot {
 	 * 截图listview
 	 * **/
 	public static Bitmap getListViewBitmap(ListView listView) {
-		int h = 0;
-		Bitmap bitmap = null;
-		// 获取listView实际高度
-		for (int i = 0; i < listView.getChildCount(); i++) {
-			h += listView.getChildAt(i).getHeight();
-		}
-		Log.d(TAG, "实际高度:" + h);
+		
+		int itemHeight = listView.getChildAt(0).getHeight();
+		int height = listView.getAdapter().getCount() * itemHeight;
+		Log.d(TAG, "item 高度:" + itemHeight);
+		Log.d(TAG, "实际高度:" + height);
 		Log.d(TAG, "list 高度:" + listView.getHeight());
+		
 		// 创建对应大小的bitmap
-		bitmap = Bitmap.createBitmap(listView.getWidth(), h, Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = Bitmap.createBitmap(listView.getWidth(), height, Bitmap.Config.ARGB_8888);
 		final Canvas canvas = new Canvas(bitmap);
-		listView.draw(canvas);
+//		listView.draw(canvas);
+		
+		// 获取listView实际高度
+		for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+			View view =  listView.getAdapter().getView(i, null, null);
+			view.draw(canvas);
+		}
+		
 //		// 测试输出
 //		FileOutputStream out = null;
 //		try {
