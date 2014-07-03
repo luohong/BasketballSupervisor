@@ -441,20 +441,29 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		List<Record> recordList = mRecordDb.getAll(mGame);
 		for (Record record : recordList) {
 			Integer actionId = Integer.valueOf((int)record.actionId);
-
+			Action action = mActionMap.get(actionId);
+			
 			// 记录坐标
 			if (!TextUtils.isEmpty(record.coordinate)) {
 				String[] split = record.coordinate.split(",");
 				int position = Integer.parseInt(split[0]) + Integer.parseInt(split[1]) * 32;
-				mCourtPositions.set(position, mActionMap.get(actionId).type);
+				
+				Integer type = mCourtPositions.get(position);
+				if (type == null) {
+					mCourtPositions.set(position, action.type);
+				} else if (action.type > 0 && action.type != type) {
+					if (action.type == 1) {
+						mCourtPositions.set(position, action.type);
+					}
+				}
 			}
 			
 			// 记录得分
 			if (mActionMap.containsKey(actionId)) {
 				if (mGroupA.groupId == record.groupId) {
-					groupAScore += mActionMap.get(actionId).score;
+					groupAScore += action.score;
 				} else if (mGroupB.groupId == record.groupId) {
-					groupBScore += mActionMap.get(actionId).score;
+					groupBScore += action.score;
 				}
 			} else {
 				Log.e(TAG, "actionId " + actionId + " is not exist in action map");
