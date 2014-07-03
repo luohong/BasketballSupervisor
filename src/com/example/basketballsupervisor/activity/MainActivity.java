@@ -1203,7 +1203,13 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			float penaltyHitRate = ((float) penaltyHitCount / (float) penaltyShootCount) * 100;// 罚球命中率 
 			int penaltyScore = penaltyHitCount * mActionMap.get(5).score;// 罚球总得分
 			
-			int totalScore = dichotomyScore + trisectionScore + penaltyScore;// 总得分
+			int addOnePointCount = actionCountMap.containsKey(29) ? actionCountMap.get(29) : 0;// 加一分次数
+			int addOnePointScore = addOnePointCount * mActionMap.get(29).score;// 加一分总得分
+			
+			int minusOnePointCount = actionCountMap.containsKey(30) ? actionCountMap.get(30) : 0;// 减一分次数
+			int minusOnePointScore = minusOnePointCount * mActionMap.get(29).score;// 减一分总得分
+			
+			int totalScore = dichotomyScore + trisectionScore + penaltyScore + addOnePointScore + minusOnePointScore;// 总得分
 			int totalHitCount = dichotomyHitCount + trisectionHitCount;// 总出手命中次数（不含罚球）
 			int totalShootCount = dichotomyShootCount + trisectionShootCount;// 总出手次数（不含罚球） 
 			float totalHitRate = ((float) totalHitCount / (float) totalShootCount) * 100;// 总命中率（总命中率中不含罚球命中率）  
@@ -1712,10 +1718,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				// 加一分
 				switch (view.getId()) {
 				case R.id.tv_group_a_score:
-					updateGroupAScore(1);
+					updateGroupAScore(1, true);
 					break;
 				case R.id.tv_group_b_score:
-					updateGroupBScore(1);
+					updateGroupBScore(1, true);
 					break;
 				}
 			}
