@@ -489,8 +489,18 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			if (type == null) {
 				mCourtPositions.set(position, action.type);
 			} else if (action.type > 0 && action.type != type) {
-				if (action.type == 1) {
+				switch (type) {
+				case 0:
 					mCourtPositions.set(position, action.type);
+					break;
+				case 1:
+					// 无需更新坐标，优先级已最高
+					break;
+				case 2:
+					if (action.type == 1) {// 仅优先级比type高的才设值
+						mCourtPositions.set(position, action.type);
+					}
+					break;
 				}
 			}
 		}
