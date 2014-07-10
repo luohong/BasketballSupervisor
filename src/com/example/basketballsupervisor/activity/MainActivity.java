@@ -581,8 +581,10 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			showFoulDialog(CLICK_POS_RIGHT);// 犯规
 			break;
 		case R.id.iv_stat_left:
+			updateGameRecord(CLICK_POS_LEFT);
+			break;
 		case R.id.iv_stat_right:
-			updateGameRecord();
+			updateGameRecord(CLICK_POS_RIGHT);
 			break;
 		case R.id.iv_new_game:
 			requestNewGameData();
@@ -604,6 +606,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		if (record != null) {
 			int res = mRecordDb.delete(record.id);
 			if (res > 0) {
+				isRequiredUpdateCourt = true;
 				showToastShort(getUndoSuccessToast(record));
 				initCourtRecord();
 			} else {
@@ -1032,7 +1035,7 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		}
 	}
 
-	private void updateGameRecord() {
+	private void updateGameRecord(final int clickPos) {
 		// 更新比赛记录，显示统计信息表
 //		boolean allowUpdate = running || pausing;
 //		if (!allowUpdate) {
@@ -1055,7 +1058,11 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 							
 							saveGameRecord(response.game_record_list);
 							initCourtRecord();// 解决获取更新的比赛记录后弹出框中的截图未更新问题
-							mHandler.sendEmptyMessageDelayed(SHOW_DATA_STAT, 200);
+							
+							Message msg = new Message();
+							msg.what = SHOW_DATA_STAT;
+							msg.obj = clickPos;
+							mHandler.sendMessageDelayed(msg, 200);
 						} else {
 							onFail(response.error_remark);
 						}
@@ -1092,19 +1099,19 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 				}
 			});
 		} else {
-			showStatPanel();
+			showStatPanel(clickPos);
 		}
 	}
 
-	private void showStatPanel() {
+	private void showStatPanel(final int clickPos) {
 		List<Record> recordList = initCourtRecord();
-		List<DataStat> list = initDataStat(recordList);
+		List<DataStat> list = initDataStat(clickPos, recordList);
 		
 		DataStatDialog dialog = new DataStatDialog(this, list);
 		dialog.show();
 	}
 
-	private List<DataStat> initDataStat(List<Record> recordList) {
+	private List<DataStat> initDataStat(final int clickPos, List<Record> recordList) {
 		// 队记录次数map
 		Map<Long, Map<Integer, Integer>> mGroupActionMap = new HashMap<Long, Map<Integer, Integer>>();
 		// 成员记录次数map
@@ -1176,8 +1183,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		list.add(groupDataStatColumn);
 		
 		// 球队统计列值
-		addGroupDataStatContent(mGroupActionMap, list, mGroupA);// A队球员统计列值
-		addGroupDataStatContent(mGroupActionMap, list, mGroupB);// B队球员统计列值
+		switch (clickPos) {
+		case CLICK_POS_LEFT:
+			addGroupDataStatContent(mGroupActionMap, list, mGroupA);// A队球员统计列值
+			break;
+		case CLICK_POS_RIGHT:
+			addGroupDataStatContent(mGroupActionMap, list, mGroupB);// B队球员统计列值
+			break;
+		}
 		
 		// 球员统计标题
 		DataStat memberDataStatTitle = new DataStat();
@@ -1194,8 +1207,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		list.add(memberDataStatColumn);
 		
 		// 球员统计列值
-		addMemberDataStatContent(mMemberActionMap, list, groupAMemberList, mGroupA);// A队球员统计列值
-		addMemberDataStatContent(mMemberActionMap, list, groupBMemberList, mGroupB);// B队球员统计列值
+		switch (clickPos) {
+		case CLICK_POS_LEFT:
+			addMemberDataStatContent(mMemberActionMap, list, groupAMemberList, mGroupA);// A队球员统计列值
+			break;
+		case CLICK_POS_RIGHT:
+			addMemberDataStatContent(mMemberActionMap, list, groupBMemberList, mGroupB);// B队球员统计列值
+			break;
+		}
 		
 		// 创新数据标题
 		DataStat innovateDataStatTitle = new DataStat();
@@ -1212,8 +1231,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		list.add(innovateDataStatColumn);
 		
 		// 创新数据列值
-		addInnovateDataStatContent(mMemberActionMap, list, groupAMemberList, mGroupA);// A队球员创新数据列值
-		addInnovateDataStatContent(mMemberActionMap, list, groupBMemberList, mGroupB);// B队球员创新数据列值
+		switch (clickPos) {
+		case CLICK_POS_LEFT:
+			addInnovateDataStatContent(mMemberActionMap, list, groupAMemberList, mGroupA);// A队球员创新数据列值
+			break;
+		case CLICK_POS_RIGHT:
+			addInnovateDataStatContent(mMemberActionMap, list, groupBMemberList, mGroupB);// B队球员创新数据列值
+			break;
+		}
 		
 		return list;
 	}
@@ -2088,7 +2113,8 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 			super.handleMessage(msg);
 			switch (msg.what) {
 			case SHOW_DATA_STAT:
-				showStatPanel();
+				int clickPos = (Integer)msg.obj;
+				showStatPanel(clickPos);
 				break;
 
 			default:

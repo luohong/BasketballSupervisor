@@ -262,8 +262,8 @@ public class RecordDb extends BaseDb {
 		try {
 			checkDb();
 
-			String selection = String.format(" %s = ? and %s = ? ", Table.GAME_ID, Table.RECORD_ID);
-			String[] selectionArgs = new String[] { String.valueOf(gameId), String.valueOf(-1) };
+			String selection = String.format(" %s = ? and %s = ? and %s = ? ", Table.GAME_ID, Table.RECORD_ID, Table.FROM_TYPE);
+			String[] selectionArgs = new String[] { String.valueOf(gameId), String.valueOf(-1), String.valueOf(Record.FromType.LOCAL) };
 
 			cursor = db.query(Table.TABLE_NAME, Table.PROJECTION, selection, selectionArgs, null, null, Table._ID + " desc limit 1");
 			if (cursor != null && cursor.moveToFirst()) {
