@@ -36,6 +36,13 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Matrix;
+import android.graphics.Paint;
+import android.graphics.Paint.Align;
+import android.graphics.Paint.FontMetrics;
+import android.graphics.Paint.Style;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
@@ -45,6 +52,7 @@ import android.os.Environment;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.View.MeasureSpec;
 
 public class SystemUtil {
 
@@ -357,8 +365,41 @@ public class SystemUtil {
 		return bitmap;
 	}
 
+	public static Bitmap getBitmapFromView(View view) {
+		Bitmap bitmap = null;
+		try {
+			int width = view.getWidth();
+			int height = view.getHeight();
+			if (width != 0 && height != 0) {
+				bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_4444);
+				Canvas canvas = new Canvas(bitmap);
+				view.layout(0, 0, width, height);
+				view.draw(canvas);
+			}
+		} catch (Exception e) {
+			bitmap = null;
+			e.getStackTrace();
+		}
+		return bitmap;
+	}
+
+	public static Bitmap convertViewToBitmap(View view) {
+		view.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+		view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+		view.buildDrawingCache();
+		Bitmap bitmap = view.getDrawingCache();
+		return bitmap;
+	}
+
+	public static Bitmap shrink(Bitmap bitmap) {
+		Matrix matrix = new Matrix();
+		matrix.postScale(0.3f, 0.3f); // 长和宽放大缩小的比例
+		Bitmap resizeBmp = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+		return resizeBmp;
+	}
+
 	public static String saveBitmap(Bitmap bm, String filename) {
-		
+
 		if (bm == null || bm.isRecycled()) {
 			return "保存图片加载失败";
 		}
@@ -366,15 +407,15 @@ public class SystemUtil {
 		if (!SDcardUtil.checkSdCardEnable()) {
 			return "SD卡不存在";
 		}
-		
+
 		String error = "";
-		
+
 		String sdDir = Environment.getExternalStorageDirectory().toString();
 		String dirName = sdDir + "/BasketballSupervisor/images/";
 		File dir = new File(dirName);
 
-		boolean dirExist = true;
-		if (!dir.isDirectory()) {
+		boolean dirExist = dir.exists();
+		if (!dirExist) {
 			dirExist = dir.mkdirs();
 		}
 		if (dirExist) {
@@ -392,7 +433,7 @@ public class SystemUtil {
 				fos = new FileOutputStream(file);
 				bm.compress(Bitmap.CompressFormat.JPEG, 100, fos);
 				fos.flush();
-				
+
 				error = "保存成功: " + file.getAbsolutePath();
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
@@ -413,6 +454,79 @@ public class SystemUtil {
 			error = "SD卡保存目录创建失败: " + dir.getAbsolutePath();
 		}
 		return error;
+	}
+
+	public static Bitmap graphicsGeneration() {
+
+		int col = 20;
+		int row = 11;
+		int gridHeight = 50;
+		int gridWidth = 50;
+
+		int STARTX = 0;
+		int STARTY = 0;
+		
+		Bitmap bitmap = Bitmap.createBitmap(col * gridWidth, row * gridHeight, Bitmap.Config.ARGB_4444);
+		final Canvas canvas = new Canvas(bitmap);
+
+		// 填充表格颜色
+		Paint paintColor = new Paint();
+		paintColor.setStyle(Style.FILL);
+		paintColor.setColor(Color.rgb(235, 241, 221));
+		canvas.drawRect(STARTX, STARTY, STARTX + gridWidth * col, STARTY + gridHeight * row, paintColor);
+		paintColor.setColor(Color.rgb(219, 238, 243));
+		for (int i = 0; i < row; i++) {
+			if ((i + 1) % 2 == 1) {
+				canvas.drawRect(STARTX, i * gridHeight + STARTY, STARTX + col * gridWidth, STARTY + (i + 1) * gridHeight, paintColor);
+			}
+		}
+
+		// 画表格最外层边框
+		Paint paintRect = new Paint();
+		paintRect.setColor(Color.rgb(79, 129, 189));
+		paintRect.setStrokeWidth(2);
+		paintRect.setStyle(Style.STROKE);
+		canvas.drawRect(STARTX, STARTY, STARTX + gridWidth * col, STARTY + gridHeight * row, paintRect);
+		// 画表格的行和列,先画行后画列
+		paintRect.setStrokeWidth(1);
+		for (int i = 0; i < row - 1; i++) {
+			canvas.drawLine(STARTX, STARTY + (i + 1) * gridHeight, STARTX + col * gridWidth, STARTY + (i + 1) * gridHeight, paintRect);
+		}
+		for (int j = 0; j < col - 1; j++) {
+			canvas.drawLine(STARTX + (j + 1) * gridWidth, STARTY, STARTX + (j + 1) * gridWidth, STARTY + row * gridHeight, paintRect);
+		}
+
+		// 在单元格填充数字—如果行数大于60并且列数大于30，就不显示数字；大于10，就改变字大小
+		if (row <= 50 && col <= 30) {
+			Paint paint = new Paint();
+			paint.setColor(Color.rgb(79, 129, 189));
+			paint.setStyle(Style.STROKE);
+			paint.setTextAlign(Align.CENTER);
+			if (row > 40 || col > 25) {
+				paint.setTextSize(7);
+			} else if (row > 30 || col > 20) {
+				paint.setTextSize(8);
+			} else if (row > 20 || col > 15) {
+				paint.setTextSize(9);
+			} else if (row > 10 || col > 10) {
+				paint.setTextSize(10);
+			}
+
+			FontMetrics fontMetrics = paint.getFontMetrics();
+			float fontHeight = fontMetrics.bottom - fontMetrics.top;
+			int text = 0;
+			for (int i = 0; i < row; i++) {
+				for (int j = 0; j < col; j++) {
+					float mLeft = j * gridWidth + STARTX;
+					float mTop = i * gridHeight + STARTY;
+					float mRight = mLeft + gridWidth;
+					text++;
+					float textBaseY = (int) (gridHeight + fontHeight) >> 1;
+					canvas.drawText(text + "", (int) (mLeft + mRight) >> 1, textBaseY + mTop, paint);
+				}
+			}
+		}
+		return bitmap;
 	}
 
 }
