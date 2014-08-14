@@ -35,7 +35,7 @@
                 android:layout_alignParentRight="true"
                 android:layout_margin="5dp"
                 android:background="@drawable/item_data_stat_selector"
-                android:text="保存" />
+                android:text="分享" />
         </RelativeLayout>
 
         <!--

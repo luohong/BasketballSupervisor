@@ -2107,6 +2107,14 @@ public class MainActivity extends BaseActivity implements OnClickListener, OnCou
 		return mGroupB;
 	}
 	
+	public int getGroupAScore() {
+		return mGroupAScore;
+	}
+
+	public int getGroupBScore() {
+		return mGroupBScore;
+	}
+
 	private class MainHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
